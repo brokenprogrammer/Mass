@@ -24,6 +24,7 @@
 
 package me.oskarmendel.mass;
 
+import me.oskarmendel.mass.core.Game;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -38,6 +39,7 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
+ * Starting point of the application.
  *
  * @author Oskar Mendel
  * @version 0.00.00
@@ -49,7 +51,9 @@ public class Mass {
     private long window;
 
     public static void main(String[] args) {
-        new Mass().run();
+        //new Mass().run();
+        Game game = new Game();
+        game.start();
     }
 
     /**
