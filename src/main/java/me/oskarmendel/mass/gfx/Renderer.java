@@ -26,6 +26,7 @@ package me.oskarmendel.mass.gfx;
 
 import me.oskarmendel.mass.gfx.shader.Shader;
 import me.oskarmendel.mass.gfx.shader.ShaderProgram;
+import org.joml.Matrix4f;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -40,41 +41,58 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
  */
 public class Renderer {
 
+    /**
+     * Field of View in Radians
+     */
+    private static final float FOV = (float) Math.toRadians(60.0f);
+
+    /**
+     * Distance to near plane.
+     */
+    private static final float Z_NEAR = 0.01f;
+
+    /**
+     * Distance to far plane.
+     */
+    private static final float Z_FAR = 1000.f;
+
     private ShaderProgram shaderProgram;
+
+    //TODO REMOVE THEESE 3 VARIABELES
+    private Matrix4f projectionMatrix;
+    private int proUni;
+    private float aspectRatio;
 
     /**
      * Initializes the renderer.
      */
     public void init() {
+        //TODO SHOULD THE INIT METHOD REALLY CREATE A SHADER PROGRAM?
         Shader vertexShader = Shader.loadShader(GL_VERTEX_SHADER, "src/main/resources/shaders/default.vert");
         Shader fragmentShader = Shader.loadShader(GL_FRAGMENT_SHADER, "src/main/resources/shaders/default.frag");
         shaderProgram = new ShaderProgram();
-        shaderProgram.attatchShader(vertexShader);
-        shaderProgram.attatchShader(fragmentShader);
+        shaderProgram.attachShader(vertexShader);
+        shaderProgram.attachShader(fragmentShader);
         shaderProgram.link();
 
+        //TODO REMOVE theese 3 lines
+        aspectRatio = (float) 800f / 600f;
+        projectionMatrix = new Matrix4f().perspective(FOV, aspectRatio,
+                Z_NEAR, Z_FAR);
+        proUni = shaderProgram.getUniformLocation("projectionMatrix");
 
         // Enable OpenGL blending.
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    // TEMP REMOVE THIS OR ELSE...
+    //TODO IMPORIVE ARCHITECTURE HERE.
     public void render(Mesh mesh) {
         clear();
 
         shaderProgram.use();
-
-        // Draw the mesh
-        glBindVertexArray(mesh.getVaoId());
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
-
-        // Restore state
-        glDisableVertexAttribArray(0);
-        glBindVertexArray(0);
-
+        shaderProgram.setUniform(proUni, projectionMatrix);
+        mesh.render();
         shaderProgram.stopUse();
     }
 
@@ -85,7 +103,10 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
+    /**
+     * Destroy all resources used by the renderer.
+     */
     public void dispose() {
-
+        // TODO: IMPLEMENT THIS
     }
 }

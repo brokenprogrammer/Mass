@@ -24,6 +24,11 @@
 
 package me.oskarmendel.mass.gfx.shader;
 
+import org.joml.Matrix4f;
+import org.lwjgl.system.MemoryStack;
+
+import java.nio.FloatBuffer;
+
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.opengl.GL20.*;
 
@@ -51,9 +56,8 @@ public class ShaderProgram {
     /**
      * Attatch a shader to this shader program.
      *
-     * @param shader - Shader to attach.
      */
-    public void attatchShader(Shader shader) {
+    public void attachShader(Shader shader) {
         glAttachShader(id, shader.getId());
     }
 
@@ -64,6 +68,31 @@ public class ShaderProgram {
         glLinkProgram(id);
 
         checkStatus();
+    }
+
+    /**
+     * Gets the location of a uniform variable with specified name.
+     *
+     * @param name - Name of the uniform variable.
+     *
+     * @return Location of the uniform.
+     */
+    public int getUniformLocation(CharSequence name) {
+        return glGetUniformLocation(id, name);
+    }
+
+    /**
+     * Sets the uniform variable at the specified location.
+     *
+     * @param location - Uniform location.
+     * @param value - Value to set at the specified location.
+     */
+    public void setUniform(int location, Matrix4f value) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            FloatBuffer floatBuffer = stack.mallocFloat(4*4);
+            value.get(floatBuffer);
+            glUniformMatrix4fv(location, false, floatBuffer);
+        }
     }
 
     /**

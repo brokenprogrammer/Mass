@@ -108,11 +108,12 @@ public class Game {
         // Initialize renderer.
         renderer.init();
 
+        //TODO: THIS MESH IS TEMP AND SHOULD BE REMOVED..
         float[] positions = new float[]{
-                -0.5f,  0.5f, 0.0f,
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                0.5f,  0.5f, 0.0f,
+                -0.5f,  0.5f, -1.05f,
+                -0.5f, -0.5f, -1.05f,
+                 0.5f, -0.5f, -1.05f,
+                 0.5f,  0.5f, -1.05f,
         };
         float[] colors = new float[]{
                 0.5f, 0.0f, 0.0f,
