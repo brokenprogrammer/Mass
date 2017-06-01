@@ -22,46 +22,26 @@
  * SOFTWARE.
  */
 
-package me.oskarmendel.mass.gfx;
+package me.oskarmendel.mass.entity.masster;
 
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
+import me.oskarmendel.mass.entity.Entity;
+import me.oskarmendel.mass.gfx.Mesh;
 
 /**
- * Class to perform transformations like position
- * translation, rotation and scaling.
+ * This class represents the MassterBall used by the Masster.
  *
  * @author Oskar Mendel
  * @version 0.00.00
- * @name Transformation.java
+ * @name MassterBall.java
  */
-public class Transformation {
+public class MassterBall extends Entity {
 
-    private final Matrix4f projectionMatrix;
-
-    private final Matrix4f worldMatrix;
-
-    public Transformation() {
-        this.projectionMatrix = new Matrix4f();
-        this.worldMatrix = new Matrix4f();
-    }
-
-    public final Matrix4f getProjectionMatrix(float fov, float width, float height, float zNear, float zFar) {
-        float aspectRatio = width / height;
-
-        projectionMatrix.identity();
-        projectionMatrix.perspective(fov, aspectRatio, zNear, zFar);
-
-        return projectionMatrix;
-    }
-
-    public Matrix4f getWorldMatrix(Vector3f offset, Vector3f rotation, float scale) {
-        worldMatrix.identity().translate(offset).
-                rotateX((float)Math.toRadians(rotation.x)).
-                rotateY((float)Math.toRadians(rotation.y)).
-                rotateZ((float)Math.toRadians(rotation.z)).
-                scale(scale);
-
-        return worldMatrix;
+    /**
+     *
+     *
+     * @param mesh - Mesh instance this MassterBall should use.
+     */
+    public MassterBall(Mesh mesh) {
+        super(mesh);
     }
 }

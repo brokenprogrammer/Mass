@@ -24,6 +24,8 @@
 
 package me.oskarmendel.mass.core;
 
+import me.oskarmendel.mass.entity.Entity;
+import me.oskarmendel.mass.entity.masster.MassterBall;
 import me.oskarmendel.mass.gfx.Mesh;
 import me.oskarmendel.mass.gfx.Renderer;
 import me.oskarmendel.mass.gfx.Screen;
@@ -78,7 +80,7 @@ public class Game {
         renderer = new Renderer();
     }
 
-    Mesh mesh;
+    private Entity[] entities;
 
     /**
      * This method should be called to initialize and start the game.
@@ -124,7 +126,11 @@ public class Game {
         int[] indices = new int[]{
                 0, 1, 3, 3, 1, 2,
         };
-        mesh = new Mesh(positions, colors, indices);
+        Mesh mesh = new Mesh(positions, colors, indices);
+
+        MassterBall massterBall = new MassterBall(mesh);
+        massterBall.setPosition(0, 0, -2);
+        entities = new Entity[]{massterBall};
 
         // Initialization done, set running to true.
         running = true;
@@ -186,6 +192,6 @@ public class Game {
      * Renders the game.
      */
     public void render() {
-        renderer.render(mesh);
+        renderer.render(this.entities);
     }
 }

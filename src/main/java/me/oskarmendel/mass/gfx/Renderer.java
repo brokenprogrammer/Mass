@@ -24,13 +24,13 @@
 
 package me.oskarmendel.mass.gfx;
 
+import me.oskarmendel.mass.entity.Entity;
 import me.oskarmendel.mass.gfx.shader.Shader;
 import me.oskarmendel.mass.gfx.shader.ShaderProgram;
 import org.joml.Matrix4f;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 /**
  * Performs the rendering process.
@@ -40,6 +40,8 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
  * @name Renderer.java
  */
 public class Renderer {
+
+    Transformation transformation;
 
     /**
      * Field of View in Radians
@@ -58,10 +60,12 @@ public class Renderer {
 
     private ShaderProgram shaderProgram;
 
-    //TODO REMOVE THEESE 3 VARIABELES
-    private Matrix4f projectionMatrix;
-    private int proUni;
-    private float aspectRatio;
+    /**
+     *
+     */
+    public Renderer() {
+        transformation = new Transformation();
+    }
 
     /**
      * Initializes the renderer.
@@ -75,24 +79,27 @@ public class Renderer {
         shaderProgram.attachShader(fragmentShader);
         shaderProgram.link();
 
-        //TODO REMOVE theese 3 lines
-        aspectRatio = (float) 800f / 600f;
-        projectionMatrix = new Matrix4f().perspective(FOV, aspectRatio,
-                Z_NEAR, Z_FAR);
-        proUni = shaderProgram.getUniformLocation("projectionMatrix");
-
         // Enable OpenGL blending.
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    //TODO IMPORIVE ARCHITECTURE HERE.
-    public void render(Mesh mesh) {
+    public void render(Entity[] entities ) {
         clear();
 
         shaderProgram.use();
-        shaderProgram.setUniform(proUni, projectionMatrix);
-        mesh.render();
+        Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, 800, 600, Z_NEAR, Z_FAR);
+        shaderProgram.setUniform(shaderProgram.getUniformLocation("projectionMatrix"), projectionMatrix);
+
+        for (Entity entity : entities) {
+            // Set the world matrix for this entity
+            Matrix4f worldMatrix =
+                    transformation.getWorldMatrix(entity.getPosition(), entity.getRotation(), entity.getScale());
+            shaderProgram.setUniform(shaderProgram.getUniformLocation("worldMatrix"), worldMatrix);
+
+            entity.getMesh().render();
+        }
+
         shaderProgram.stopUse();
     }
 
