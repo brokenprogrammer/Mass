@@ -25,6 +25,8 @@
 package me.oskarmendel.mass.gfx;
 
 /**
+ * Class to perform transformations like position
+ * translation, rotation and scaling.
  *
  * @author Oskar Mendel
  * @version 0.00.00
