@@ -74,6 +74,13 @@ public class ShaderProgram {
     }
 
     /**
+     * Stops using this shader program.
+     */
+    public void stopUse() {
+        glUseProgram(0);
+    }
+
+    /**
      * Checks if a shader program was successfully linked.
      */
     public void checkStatus() {

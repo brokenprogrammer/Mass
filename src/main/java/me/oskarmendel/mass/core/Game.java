@@ -24,6 +24,7 @@
 
 package me.oskarmendel.mass.core;
 
+import me.oskarmendel.mass.gfx.Mesh;
 import me.oskarmendel.mass.gfx.Renderer;
 import me.oskarmendel.mass.gfx.Screen;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -77,6 +78,8 @@ public class Game {
         renderer = new Renderer();
     }
 
+    Mesh mesh;
+
     /**
      * This method should be called to initialize and start the game.
      */
@@ -104,6 +107,23 @@ public class Game {
 
         // Initialize renderer.
         renderer.init();
+
+        float[] positions = new float[]{
+                -0.5f,  0.5f, 0.0f,
+                -0.5f, -0.5f, 0.0f,
+                0.5f, -0.5f, 0.0f,
+                0.5f,  0.5f, 0.0f,
+        };
+        float[] colors = new float[]{
+                0.5f, 0.0f, 0.0f,
+                0.0f, 0.5f, 0.0f,
+                0.0f, 0.0f, 0.5f,
+                0.0f, 0.5f, 0.5f,
+        };
+        int[] indices = new int[]{
+                0, 1, 3, 3, 1, 2,
+        };
+        mesh = new Mesh(positions, colors, indices);
 
         // Initialization done, set running to true.
         running = true;
@@ -165,6 +185,6 @@ public class Game {
      * Renders the game.
      */
     public void render() {
-
+        renderer.render(mesh);
     }
 }

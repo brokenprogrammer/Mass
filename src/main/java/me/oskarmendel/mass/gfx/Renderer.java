@@ -24,6 +24,13 @@
 
 package me.oskarmendel.mass.gfx;
 
+import me.oskarmendel.mass.gfx.shader.Shader;
+import me.oskarmendel.mass.gfx.shader.ShaderProgram;
+
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+
 /**
  * Performs the rendering process.
  *
@@ -33,8 +40,49 @@ package me.oskarmendel.mass.gfx;
  */
 public class Renderer {
 
-    public void init() {
+    private ShaderProgram shaderProgram;
 
+    /**
+     * Initializes the renderer.
+     */
+    public void init() {
+        Shader vertexShader = Shader.loadShader(GL_VERTEX_SHADER, "src/main/resources/shaders/default.vert");
+        Shader fragmentShader = Shader.loadShader(GL_FRAGMENT_SHADER, "src/main/resources/shaders/default.frag");
+        shaderProgram = new ShaderProgram();
+        shaderProgram.attatchShader(vertexShader);
+        shaderProgram.attatchShader(fragmentShader);
+        shaderProgram.link();
+
+
+        // Enable OpenGL blending.
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    // TEMP REMOVE THIS OR ELSE...
+    public void render(Mesh mesh) {
+        clear();
+
+        shaderProgram.use();
+
+        // Draw the mesh
+        glBindVertexArray(mesh.getVaoId());
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+        glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
+
+        // Restore state
+        glDisableVertexAttribArray(0);
+        glBindVertexArray(0);
+
+        shaderProgram.stopUse();
+    }
+
+    /**
+     * Clears the screen.
+     */
+    public void clear() {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     public void dispose() {
