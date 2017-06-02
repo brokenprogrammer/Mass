@@ -24,6 +24,8 @@
 
 package me.oskarmendel.mass.gfx;
 
+import com.sun.deploy.config.VerboseDefaultConfig;
+import me.oskarmendel.mass.entity.Entity;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -39,11 +41,20 @@ public class Transformation {
 
     private final Matrix4f projectionMatrix;
 
-    private final Matrix4f worldMatrix;
+    private final Matrix4f modelViewMatrix;
 
+    /**
+     *
+     */
     public Transformation() {
         this.projectionMatrix = new Matrix4f();
-        this.worldMatrix = new Matrix4f();
+        this.modelViewMatrix = new Matrix4f();
+    }
+
+    public static Matrix4f updateGenericViewMatrix(Vector3f position, Vector3f rotation, Matrix4f matrix) {
+        return matrix.rotationX((float)Math.toRadians(rotation.x))
+                .rotateY((float)Math.toRadians(rotation.y))
+                .translate(-position.x, -position.y, -position.z);
     }
 
     public final Matrix4f getProjectionMatrix(float fov, float width, float height, float zNear, float zFar) {
@@ -55,13 +66,16 @@ public class Transformation {
         return projectionMatrix;
     }
 
-    public Matrix4f getWorldMatrix(Vector3f offset, Vector3f rotation, float scale) {
-        worldMatrix.identity().translate(offset).
-                rotateX((float)Math.toRadians(rotation.x)).
-                rotateY((float)Math.toRadians(rotation.y)).
-                rotateZ((float)Math.toRadians(rotation.z)).
-                scale(scale);
+    public Matrix4f getModelViewMatrix(Entity entity, Matrix4f viewMatrix) {
+        Vector3f rotation = entity.getRotation();
 
-        return worldMatrix;
+        modelViewMatrix.identity().translate(entity.getPosition()).
+                rotateX((float)Math.toRadians(-rotation.x)).
+                rotateY((float)Math.toRadians(-rotation.y)).
+                rotateZ((float)Math.toRadians(-rotation.z)).
+                scale(entity.getScale());
+
+        Matrix4f viewCurr = new Matrix4f(viewMatrix);
+        return viewCurr.mul(modelViewMatrix);
     }
 }

@@ -29,11 +29,13 @@ import me.oskarmendel.mass.entity.masster.MassterBall;
 import me.oskarmendel.mass.gfx.Mesh;
 import me.oskarmendel.mass.gfx.Renderer;
 import me.oskarmendel.mass.gfx.Screen;
+import me.oskarmendel.mass.gfx.Texture;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
-import static org.lwjgl.glfw.GLFW.glfwInit;
-import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
-import static org.lwjgl.glfw.GLFW.glfwTerminate;
+import java.util.Random;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * The Game class initializes the game and starts the game loop.
@@ -52,6 +54,8 @@ public class Game {
 
     public static final boolean VSYNC = true;
 
+    public static final float CAMERA_POS_STEP = 0.05f;
+
     /**
      * The error callback for GLFW.
      * Strong reference due to the garbage collector.
@@ -61,23 +65,35 @@ public class Game {
     /**
      * Shows if the game is running.
      */
-    protected boolean running;
+    private boolean running;
 
     /**
      * GLFW window or screen used by the game.
      */
-    protected Screen screen;
+    private Screen screen;
 
     /**
      * Renderer to handle rendering.
      */
-    protected Renderer renderer;
+    private final Renderer renderer;
+
+    /**
+     * Camera of the game to handle the view of the game.
+     */
+    private final Camera camera;
+
+    /**
+     * Handles camera updates.
+     */
+    private final Vector3f cameraInc;
 
     /**
      * Default constructor for the game.
      */
     public Game() {
         renderer = new Renderer();
+        camera = new Camera();
+        cameraInc = new Vector3f(0, 0,0);
     }
 
     private Entity[] entities;
@@ -192,20 +208,44 @@ public class Game {
      * Handles input.
      */
     private void input() {
+        cameraInc.set(0, 0,0);
 
+        if (screen.isKeyPressed(GLFW_KEY_W)) {
+            cameraInc.z = -1;
+        } else if (screen.isKeyPressed(GLFW_KEY_S)) {
+            cameraInc.z = 1;
+        }
+
+        if (screen.isKeyPressed(GLFW_KEY_A)) {
+            cameraInc.x = -1;
+        } else if (screen.isKeyPressed(GLFW_KEY_D)) {
+            cameraInc.x = 1;
+        }
+
+        if (screen.isKeyPressed(GLFW_KEY_Z)) {
+            cameraInc.y = -1;
+        } else if (screen.isKeyPressed(GLFW_KEY_X)) {
+            cameraInc.y = 1;
+        }
     }
 
     /**
      * Updates the game and logic.
      */
     public void update() {
+        // Update camera position.
+        camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
+
+        // Update the camera view matrix.
+        camera.updateViewMatrix();
+
         for (Entity entity : entities) {
             // Update rotation angle
-            float rotation = entity.getRotation().x + 0.5f;
+            float rotation = entity.getRotation().x + 1;
             if ( rotation > 360 ) {
                 rotation = 0;
             }
-            entity.setRotation(rotation, 0.0f, 0.0f);
+            entity.setRotation(rotation, rotation, 0.0f);
         }
     }
 
@@ -213,6 +253,6 @@ public class Game {
      * Renders the game.
      */
     public void render() {
-        renderer.render(this.entities);
+        renderer.render(this.camera, this.entities);
     }
 }

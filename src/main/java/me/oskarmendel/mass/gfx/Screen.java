@@ -113,6 +113,18 @@ public class Screen {
     }
 
     /**
+     * Checks if specified key was pressed, returns true if the
+     * key was pressed.
+     *
+     * @param keyCode - Keycode of the key to check.
+     *
+     * @return - True if the specified key was pressed, false otherwise.
+     */
+    public boolean isKeyPressed(int keyCode) {
+        return glfwGetKey(id, keyCode) == GLFW_PRESS;
+    }
+
+    /**
      * Update the screen.
      */
     public void update() {

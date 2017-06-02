@@ -24,6 +24,7 @@
 
 package me.oskarmendel.mass.gfx;
 
+import me.oskarmendel.mass.core.Camera;
 import me.oskarmendel.mass.entity.Entity;
 import me.oskarmendel.mass.gfx.shader.Shader;
 import me.oskarmendel.mass.gfx.shader.ShaderProgram;
@@ -80,19 +81,22 @@ public class Renderer {
         shaderProgram.link();
     }
 
-    public void render(Entity[] entities ) {
+    public void render(Camera camera, Entity[] entities ) {
         clear();
 
         shaderProgram.use();
         Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, 800, 600, Z_NEAR, Z_FAR);
         shaderProgram.setUniform(shaderProgram.getUniformLocation("projectionMatrix"), projectionMatrix);
+
+        Matrix4f viewMatrix = camera.getViewMatrix();
+
         shaderProgram.setUniform(shaderProgram.getUniformLocation("texture_sampler"), 0);
 
         for (Entity entity : entities) {
             // Set the world matrix for this entity
-            Matrix4f worldMatrix =
-                    transformation.getWorldMatrix(entity.getPosition(), entity.getRotation(), entity.getScale());
-            shaderProgram.setUniform(shaderProgram.getUniformLocation("worldMatrix"), worldMatrix);
+            Matrix4f modelViewMatrix =
+                    transformation.getModelViewMatrix(entity, viewMatrix);
+            shaderProgram.setUniform(shaderProgram.getUniformLocation("worldMatrix"), modelViewMatrix);
 
             entity.getMesh().render();
         }
