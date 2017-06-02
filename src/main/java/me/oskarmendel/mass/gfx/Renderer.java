@@ -78,10 +78,6 @@ public class Renderer {
         shaderProgram.attachShader(vertexShader);
         shaderProgram.attachShader(fragmentShader);
         shaderProgram.link();
-
-        // Enable OpenGL blending.
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     public void render(Entity[] entities ) {
