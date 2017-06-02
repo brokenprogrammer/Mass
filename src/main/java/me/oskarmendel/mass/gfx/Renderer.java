@@ -86,6 +86,7 @@ public class Renderer {
         shaderProgram.use();
         Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, 800, 600, Z_NEAR, Z_FAR);
         shaderProgram.setUniform(shaderProgram.getUniformLocation("projectionMatrix"), projectionMatrix);
+        shaderProgram.setUniform(shaderProgram.getUniformLocation("texture_sampler"), 0);
 
         for (Entity entity : entities) {
             // Set the world matrix for this entity

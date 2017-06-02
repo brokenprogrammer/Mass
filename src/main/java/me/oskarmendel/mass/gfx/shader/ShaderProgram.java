@@ -82,6 +82,16 @@ public class ShaderProgram {
     }
 
     /**
+     * Set the unform variable at the specified location.
+     *
+     * @param location - Uniform location.
+     * @param value - Value to set at the specified location.
+     */
+    public void setUniform(int location, int value) {
+        glUniform1i(location, value);
+    }
+
+    /**
      * Sets the uniform variable at the specified location.
      *
      * @param location - Uniform location.

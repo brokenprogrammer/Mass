@@ -30,6 +30,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
@@ -100,6 +101,14 @@ public class Texture {
     }
 
     /**
+     * //TODO: Make javadoc
+     * @return
+     */
+    public int getId() {
+        return this.id;
+    }
+
+    /**
      * Getter for the width of this texture.
      *
      * @return - Texture width.
@@ -167,6 +176,9 @@ public class Texture {
         // Upload the texture data.
         texture.uploadData(GL_RGBA, width, height, GL_RGBA, data);
 
+        // Generate Mip Map
+        glGenerateMipmap(GL_TEXTURE_2D);
+
         return texture;
     }
 
@@ -188,7 +200,7 @@ public class Texture {
             IntBuffer comp = stack.mallocInt(1);
 
             // Load image using the STB library
-            stbi_set_flip_vertically_on_load(true);
+            stbi_set_flip_vertically_on_load(false);
             image = stbi_load(path, w, h, comp, 4);
 
             if (image == null) {
