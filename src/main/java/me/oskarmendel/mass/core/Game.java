@@ -33,8 +33,6 @@ import me.oskarmendel.mass.gfx.Texture;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
-import java.util.Random;
-
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
@@ -62,34 +60,23 @@ public class Game {
      */
     private GLFWErrorCallback errorCallback;
 
-    /**
-     * Shows if the game is running.
-     */
+    // Variable for knowing if the game is running.
     private boolean running;
 
-    /**
-     * GLFW window or screen used by the game.
-     */
+    // GLFW window or screen used by the game.
+
     private Screen screen;
 
-    /**
-     * Renderer to handle rendering.
-     */
+    // Renderer to handle rendering.
     private final Renderer renderer;
 
-    /**
-     * Camera of the game to handle the view of the game.
-     */
+    // Camera of the game to handle the view of the game.
     private final Camera camera;
 
-    /**
-     * Handles camera updates.
-     */
+    //Handles camera updates.
     private final Vector3f cameraInc;
 
-    /**
-     * Default constructor for the game.
-     */
+    // Default constructor for the game.
     public Game() {
         renderer = new Renderer();
         camera = new Camera();
@@ -156,7 +143,10 @@ public class Game {
                 7, 6, 4, 7, 4, 5,
 
         };
-        Mesh mesh = new Mesh(positions, colors, indices);
+
+        // TODO: set texture properties for mesh.
+        Texture texture = new Texture();
+        Mesh mesh = new Mesh(positions, colors, indices, texture);
 
         MassterBall massterBall = new MassterBall(mesh);
         massterBall.setPosition(0, 0, -2);

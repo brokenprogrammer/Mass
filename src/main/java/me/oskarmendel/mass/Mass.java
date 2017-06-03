@@ -57,7 +57,7 @@ public class Mass {
     }
 
     /**
-     *
+     * Method which runs the game.
      */
     public void run() {
         init();
@@ -73,9 +73,9 @@ public class Mass {
     }
 
     /**
-     *
+     * Initiates components.
      */
-    public void init() {
+    private void init() {
         // Setup and error callback.
         // Will print error messages in System.err.
         GLFWErrorCallback.createPrint(System.err).set();
