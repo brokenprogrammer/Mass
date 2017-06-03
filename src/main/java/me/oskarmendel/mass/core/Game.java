@@ -127,40 +127,73 @@ public class Game {
         renderer.init();
 
         //TODO: THIS MESH IS TEMP AND SHOULD BE REMOVED..
-        float[] positions = new float[]{
-                -0.5f,  0.5f,  0.5f,
-                -0.5f, -0.5f,  0.5f,
-                0.5f, -0.5f,  0.5f,
-                0.5f,  0.5f,  0.5f,
-                -0.5f,  0.5f, -0.5f,
-                0.5f,  0.5f, -0.5f,
+        float[] positions = new float[] {
+                -0.5f, 0.5f, 0.5f,
+                -0.5f, -0.5f, 0.5f,
+                0.5f, -0.5f, 0.5f,
+                0.5f, 0.5f, 0.5f,
+                -0.5f, 0.5f, -0.5f,
+                0.5f, 0.5f, -0.5f,
                 -0.5f, -0.5f, -0.5f,
                 0.5f, -0.5f, -0.5f,
+                -0.5f, 0.5f, -0.5f,
+                0.5f, 0.5f, -0.5f,
+                -0.5f, 0.5f, 0.5f,
+                0.5f, 0.5f, 0.5f,
+                0.5f, 0.5f, 0.5f,
+                0.5f, -0.5f, 0.5f,
+                -0.5f, 0.5f, 0.5f,
+                -0.5f, -0.5f, 0.5f,
+                -0.5f, -0.5f, -0.5f,
+                0.5f, -0.5f, -0.5f,
+                -0.5f, -0.5f, 0.5f,
+                0.5f, -0.5f, 0.5f,
         };
-        float[] colors = new float[]{
-                0.5f, 0.0f, 0.0f,
-                0.0f, 0.5f, 0.0f,
-                0.0f, 0.0f, 0.5f,
-                0.0f, 0.5f, 0.5f,
-                0.5f, 0.0f, 0.0f,
-                0.0f, 0.5f, 0.0f,
-                0.0f, 0.0f, 0.5f,
-                0.0f, 0.5f, 0.5f,
+        float[] textCoords = new float[]{
+                0.0f, 0.0f,
+                0.0f, 0.5f,
+                0.5f, 0.5f,
+                0.5f, 0.0f,
+                0.0f, 0.0f,
+                0.5f, 0.0f,
+                0.0f, 0.5f,
+                0.5f, 0.5f,
+                0.0f, 0.5f,
+                0.5f, 0.5f,
+                0.0f, 1.0f,
+                0.5f, 1.0f,
+                0.0f, 0.0f,
+                0.0f, 0.5f,
+                0.5f, 0.0f,
+                0.5f, 0.5f,
+                0.5f, 0.0f,
+                1.0f, 0.0f,
+                0.5f, 0.5f,
+                1.0f, 0.5f,
         };
         int[] indices = new int[]{
                 0, 1, 3, 3, 1, 2,
-                4, 0, 3, 5, 4, 3,
-                3, 2, 7, 5, 3, 7,
-                6, 1, 0, 6, 0, 4,
-                2, 1, 6, 2, 6, 7,
-                7, 6, 4, 7, 4, 5,
-
+                8, 10, 11, 9, 8, 11,
+                12, 13, 7, 5, 12, 7,
+                14, 15, 6, 4, 14, 6,
+                16, 18, 19, 17, 16, 19,
+                4, 6, 7, 5, 4, 7,
         };
-        Mesh mesh = new Mesh(positions, colors, indices);
+        Texture t = Texture.loadTexture("src/main/resources/textures/grassblock.png");
+        Mesh mesh = new Mesh(positions, textCoords, indices, t);
 
         MassterBall massterBall = new MassterBall(mesh);
-        massterBall.setPosition(0, 0, -2);
-        entities = new Entity[]{massterBall};
+        massterBall.setPosition(0, -1, -2);
+
+        MassterBall massterBall2 = new MassterBall(mesh);
+        massterBall2.setPosition(-2, 1, -2);
+
+        MassterBall massterBall3 = new MassterBall(mesh);
+        massterBall3.setPosition(3, 2, -2);
+
+        MassterBall massterBall4 = new MassterBall(mesh);
+        massterBall4.setPosition(2, 1, -4);
+        entities = new Entity[]{massterBall, massterBall2, massterBall3, massterBall4};
 
         // Initialization done, set running to true.
         running = true;

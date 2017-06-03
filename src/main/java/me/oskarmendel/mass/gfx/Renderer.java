@@ -98,6 +98,12 @@ public class Renderer {
                     transformation.getModelViewMatrix(entity, viewMatrix);
             shaderProgram.setUniform(shaderProgram.getUniformLocation("worldMatrix"), modelViewMatrix);
 
+            // Render the mesh for this entity
+            shaderProgram.setUniform(shaderProgram.getUniformLocation("color"),
+                    entity.getMesh().getColor());
+            shaderProgram.setUniform(shaderProgram.getUniformLocation("useColor"),
+                    entity.getMesh().isTextured() ? 0 : 1);
+
             entity.getMesh().render();
         }
 

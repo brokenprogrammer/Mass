@@ -25,6 +25,7 @@
 package me.oskarmendel.mass.gfx.shader;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.FloatBuffer;
@@ -89,6 +90,20 @@ public class ShaderProgram {
      */
     public void setUniform(int location, int value) {
         glUniform1i(location, value);
+    }
+
+    /**
+     * Sets the uniform variable at the specified location.
+     *
+     * @param location - Uniform location.
+     * @param value - Value to set at the specified location.
+     */
+    public void setUniform(int location, Vector3f value) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            FloatBuffer floatBuffer = stack.mallocFloat(3);
+            value.get(floatBuffer);
+            glUniform3fv(location, floatBuffer);
+        }
     }
 
     /**

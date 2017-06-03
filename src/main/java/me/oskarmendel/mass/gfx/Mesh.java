@@ -24,6 +24,7 @@
 
 package me.oskarmendel.mass.gfx;
 
+import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
@@ -48,6 +49,8 @@ import static org.lwjgl.opengl.GL30.*;
  */
 public class Mesh {
 
+    private static final Vector3f DEFAULT_COLOR = new Vector3f(1.0f, 1.0f, 1.0f);
+
     /**
      * The vertex array object for this mesh.
      */
@@ -66,6 +69,11 @@ public class Mesh {
     /**
      *
      */
+    private final int normalsVboId;
+
+    /**
+     *
+     */
     private final int indexVboId;
 
     /**
@@ -73,16 +81,26 @@ public class Mesh {
      */
     private final int vertexCount;
 
-    private final Texture texture;
+    /**
+     *
+     */
+    private Texture texture;
 
-    //public Mesh(float[] positions, float[] colors, int[] indices) {
-    public Mesh(float[] positions, float[] textCoords, int[] indices, Texture texture) {
+    /**
+     *
+     */
+    private Vector3f color;
+
+    //public Mesh(float[] positions, float[] colors, int[] indices) { // Create shape with colors
+    //public Mesh(float[] positions, float[] textCoords, int[] indices, Texture texture) { // Create shape with texture
+    public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices) {
         // Store array of floats in the buffer to interface correctly with C Library.
         FloatBuffer positionBuffer = null;
         FloatBuffer textCoordsBuffer = null;
+        FloatBuffer normalsBuffer = null;
         IntBuffer indicesBuffer = null;
         try {
-            this.texture = texture;
+            color = DEFAULT_COLOR;
             vertexCount = indices.length;
 
             // Create the VAO and bind it.
@@ -105,6 +123,15 @@ public class Mesh {
             glBindBuffer(GL_ARRAY_BUFFER, textureVboId);
             glBufferData(GL_ARRAY_BUFFER, textCoordsBuffer, GL_STATIC_DRAW);
             glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+
+            // Vertex normals VBO
+            normalsVboId = glGenBuffers();
+            normalsBuffer = MemoryUtil.memAllocFloat(normals.length);
+            normalsBuffer.put(normals).flip();
+            glBindBuffer(GL_ARRAY_BUFFER, normalsVboId);
+            glBufferData(GL_ARRAY_BUFFER, normalsBuffer, GL_STATIC_DRAW);
+            glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
+
 
             // Index VBO
             indexVboId = glGenBuffers();
@@ -136,23 +163,28 @@ public class Mesh {
      * state when finished.
      */
     public void render() {
-        // Activate first texture bank.
-        glActiveTexture(GL_TEXTURE0);
+        if (this.texture != null) {
+            // Activate first texture bank.
+            glActiveTexture(GL_TEXTURE0);
 
-        // Bind target texture.
-        glBindTexture(GL_TEXTURE_2D, texture.getId());
+            // Bind target texture.
+            glBindTexture(GL_TEXTURE_2D, texture.getId());
+        }
 
         // Draw the mesh.
         glBindVertexArray(getVaoId());
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
 
         glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
 
         // Restore state.
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
         glBindVertexArray(0);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     /**
@@ -174,6 +206,47 @@ public class Mesh {
     }
 
     /**
+     *
+     *
+     * @return
+     */
+    public boolean isTextured() {
+        return this.texture != null;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Texture getTexture() {
+        return this.texture;
+    }
+
+    /**
+     *
+     * @param texture
+     */
+    public void setTexture(Texture texture) {
+        this.texture = texture;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Vector3f getColor() {
+        return this.color;
+    }
+
+    /**
+     *
+     * @param color
+     */
+    public void setColor(Vector3f color) {
+        this.color = color;
+    }
+
+    /**
      * Deletes this mesh and deletes the vertex array object and the
      * vertex buffer object.
      */
@@ -184,7 +257,13 @@ public class Mesh {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDeleteBuffers(positionVboId);
         glDeleteBuffers(textureVboId);
+        glDeleteBuffers(normalsVboId);
         glDeleteBuffers(indexVboId);
+
+        // Delete the texture used by this mesh.
+        if (this.texture != null) {
+            texture.delete();
+        }
 
         // Delete the vertex array object.
         glBindVertexArray(0);
