@@ -30,10 +30,9 @@ import me.oskarmendel.mass.gfx.Mesh;
 import me.oskarmendel.mass.gfx.Renderer;
 import me.oskarmendel.mass.gfx.Screen;
 import me.oskarmendel.mass.gfx.Texture;
+import me.oskarmendel.mass.util.OBJLoader;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
-
-import java.util.Random;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -179,21 +178,20 @@ public class Game {
                 16, 18, 19, 17, 16, 19,
                 4, 6, 7, 5, 4, 7,
         };
-        Texture t = Texture.loadTexture("src/main/resources/textures/grassblock.png");
-        Mesh mesh = new Mesh(positions, textCoords, indices, t);
 
-        MassterBall massterBall = new MassterBall(mesh);
-        massterBall.setPosition(0, -1, -2);
+        //Texture t = Texture.loadTexture("src/main/resources/textures/dankblock.png");
+        try {
+            Mesh mesh = OBJLoader.loadMesh("src/main/resources/models/Male.obj");
 
-        MassterBall massterBall2 = new MassterBall(mesh);
-        massterBall2.setPosition(-2, 1, -2);
+            //mesh.setTexture(t);
 
-        MassterBall massterBall3 = new MassterBall(mesh);
-        massterBall3.setPosition(3, 2, -2);
+            MassterBall massterBall = new MassterBall(mesh);
+            massterBall.setPosition(0, -1, -2);
 
-        MassterBall massterBall4 = new MassterBall(mesh);
-        massterBall4.setPosition(2, 1, -4);
-        entities = new Entity[]{massterBall, massterBall2, massterBall3, massterBall4};
+            entities = new Entity[]{massterBall};
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Initialization done, set running to true.
         running = true;
@@ -274,11 +272,11 @@ public class Game {
 
         for (Entity entity : entities) {
             // Update rotation angle
-            float rotation = entity.getRotation().x + 1;
+            float rotation = entity.getRotation().y + 1;
             if ( rotation > 360 ) {
                 rotation = 0;
             }
-            entity.setRotation(rotation, rotation, 0.0f);
+            entity.setRotation(0.0f, rotation, 0.0f);
         }
     }
 
