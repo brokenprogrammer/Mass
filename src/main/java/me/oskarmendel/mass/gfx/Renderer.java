@@ -100,7 +100,7 @@ public class Renderer {
 
             // Render the mesh for this entity
             shaderProgram.setUniform(shaderProgram.getUniformLocation("color"),
-                    entity.getMesh().getColor());
+                    entity.getMesh().getColor().toVector3f());
             shaderProgram.setUniform(shaderProgram.getUniformLocation("useColor"),
                     entity.getMesh().isTextured() ? 0 : 1);
 

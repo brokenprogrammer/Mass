@@ -49,7 +49,7 @@ import static org.lwjgl.opengl.GL30.*;
  */
 public class Mesh {
 
-    private static final Vector3f DEFAULT_COLOR = new Vector3f(1.0f, 1.0f, 1.0f);
+    private static final Color DEFAULT_COLOR = Color.WHITE;
 
     /**
      * The vertex array object for this mesh.
@@ -89,7 +89,7 @@ public class Mesh {
     /**
      *
      */
-    private Vector3f color;
+    private Color color;
 
     //public Mesh(float[] positions, float[] colors, int[] indices) { // Create shape with colors
     //public Mesh(float[] positions, float[] textCoords, int[] indices, Texture texture) { // Create shape with texture
@@ -234,7 +234,7 @@ public class Mesh {
      *
      * @return
      */
-    public Vector3f getColor() {
+    public Color getColor() {
         return this.color;
     }
 
@@ -242,7 +242,7 @@ public class Mesh {
      *
      * @param color
      */
-    public void setColor(Vector3f color) {
+    public void setColor(Color color) {
         this.color = color;
     }
 
