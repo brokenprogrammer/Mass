@@ -31,5 +31,7 @@ package me.oskarmendel.mass.gfx;
  * @version 0.00.00
  * @name Color.java
  */
+
+// TODO: Create properties for Color Class.
 public class Color {
 }
