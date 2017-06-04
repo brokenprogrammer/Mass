@@ -4,10 +4,7 @@ import me.oskarmendel.mass.gfx.Mesh;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +38,9 @@ public class OBJLoader {
      *
      * @return - Parsed Mesh from the specified OBJ file.
      *
-     * @throws Exception
+     * @throws IOException - When IO operation failed.
      */
-    public static Mesh loadMesh(String path) throws Exception{
+    public static Mesh loadMesh(String path) throws IOException{
         List<String> lines = readAllLines(path);
 
         List<Vector3f> vertices = new ArrayList<>();
@@ -98,12 +95,14 @@ public class OBJLoader {
     }
 
     /**
-     * TODO: Write this javadoc.
-     * @param posList
-     * @param textCoordList
-     * @param normalsList
-     * @param facesList
-     * @param instances
+     * Reorders the given lists translating them into the right format to
+     * produce a new mesh out of the data.
+     *
+     * @param posList - List of read vertices.
+     * @param textCoordList - List of read texture coordinates.
+     * @param normalsList - List of read normals.
+     * @param facesList - List of read faces.
+     * @param instances - 
      *
      * @return
      */
@@ -147,14 +146,15 @@ public class OBJLoader {
     }
 
     /**
-     * TODO: Write this javadoc.
+     * Processes all the Face vertices by transforming them into the
+     * correct data types.
      *
-     * @param indices
-     * @param textCoordList
-     * @param normalsList
-     * @param indicesList
-     * @param textCoordArr
-     * @param normalsArr
+     * @param indices - Indices to process.
+     * @param textCoordList - List of read texture coordinates.
+     * @param normalsList - List of read normals.
+     * @param indicesList - Destination indices list.
+     * @param textCoordArr - Destination texture coordinates array.
+     * @param normalsArr - Destination normals array.
      */
     private static void processFaceVertex(IndexGroup indices, List<Vector2f> textCoordList,
                                           List<Vector3f> normalsList, List<Integer> indicesList,
@@ -178,12 +178,16 @@ public class OBJLoader {
     }
 
     /**
-     * TODO: Wtite this javadoc
-     * @param path
-     * @return
-     * @throws Exception
+     * Reads all lines from the file at the specified path.
+     * Expects the path to point to an .obj file.
+     *
+     * @param path - File path for the .obj file.
+     *
+     * @return - A list containing all the read lines from the file.
+     *
+     * @throws IOException - When IO operation failed.
      */
-    private static List<String> readAllLines(String path) throws  Exception {
+    private static List<String> readAllLines(String path) throws IOException {
         List<String> list = new ArrayList<>();
 
         try(InputStream in = new FileInputStream(path);
@@ -200,7 +204,7 @@ public class OBJLoader {
     }
 
     /**
-     * TODO: Write this javadoc
+     * Inner class representation of a Face triangle.
      */
     protected static class Face {
 
@@ -219,9 +223,12 @@ public class OBJLoader {
         }
 
         /**
-         * TODO: Write this javadoc
-         * @param line
-         * @return
+         * Parses an Index group and matches is with corresponding
+         * position, textures and normal values.
+         *
+         * @param line - Face line to parse.
+         *
+         * @return - The parsed IndexGroup generated from the specified line.
          */
         private IndexGroup parseIndexGroup(String line) {
             IndexGroup indexGroup = new IndexGroup();
@@ -247,8 +254,9 @@ public class OBJLoader {
         }
 
         /**
-         * TODO: Write javadoc
-         * @return
+         * Getter for the Face IndexGroup array.
+         *
+         * @return - The IndexGroup array of this Face.
          */
         public IndexGroup[] getFaceVertexIndices() {
             return indexGroups;
