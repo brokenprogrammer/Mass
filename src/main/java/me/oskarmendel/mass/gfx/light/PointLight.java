@@ -89,6 +89,17 @@ public class PointLight {
     }
 
     /**
+     * Creates a new PointLight using the values from the
+     * specified PointLight.
+     *
+     * @param pointLight - PointLight to use values from.
+     */
+    public PointLight(PointLight pointLight) {
+        this(pointLight.getColor(), new Vector3f(pointLight.getPosition()),
+                pointLight.getIntensity(), pointLight.getAttenuation());
+    }
+
+    /**
      * Getter for the color of this PointLight.
      *
      * @return - The color of this PointLight.
@@ -170,7 +181,7 @@ public class PointLight {
      * The attenuation is calculated using this formula:
      * 1.0 / (constant + linear * distance + exponent * distance^2).
      */
-    private static class Attenuation {
+    public static class Attenuation {
 
         /**
          * Constant value for this Attenuation.

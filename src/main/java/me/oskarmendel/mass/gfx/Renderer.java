@@ -26,9 +26,12 @@ package me.oskarmendel.mass.gfx;
 
 import me.oskarmendel.mass.core.Camera;
 import me.oskarmendel.mass.entity.Entity;
+import me.oskarmendel.mass.gfx.light.PointLight;
 import me.oskarmendel.mass.gfx.shader.Shader;
 import me.oskarmendel.mass.gfx.shader.ShaderProgram;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -81,7 +84,7 @@ public class Renderer {
         shaderProgram.link();
     }
 
-    public void render(Camera camera, Entity[] entities ) {
+    public void render(Camera camera, Entity[] entities, Vector3f ambientLight, PointLight pointLight) {
         clear();
 
         shaderProgram.use();
@@ -90,19 +93,30 @@ public class Renderer {
 
         Matrix4f viewMatrix = camera.getViewMatrix();
 
+        // Update light uniforms
+        shaderProgram.setUniform(shaderProgram.getUniformLocation("ambientLight"), ambientLight);
+        shaderProgram.setUniform(shaderProgram.getUniformLocation("specularPower"), 10f);
+
+        // Update the point light relative to the viewMatrix of the camera.
+        PointLight currPointLight = new PointLight(pointLight);
+        Vector3f lightPos = currPointLight.getPosition();
+        Vector4f aux = new Vector4f(lightPos, 1);
+        aux.mul(viewMatrix);
+        lightPos.x = aux.x;
+        lightPos.y = aux.y;
+        lightPos.z = aux.z;
+        shaderProgram.setUniform("pointLight", currPointLight);
+
         shaderProgram.setUniform(shaderProgram.getUniformLocation("texture_sampler"), 0);
 
         for (Entity entity : entities) {
             // Set the world matrix for this entity
             Matrix4f modelViewMatrix =
                     transformation.getModelViewMatrix(entity, viewMatrix);
-            shaderProgram.setUniform(shaderProgram.getUniformLocation("worldMatrix"), modelViewMatrix);
+            shaderProgram.setUniform(shaderProgram.getUniformLocation("modelViewMatrix"), modelViewMatrix);
 
             // Render the mesh for this entity
-            shaderProgram.setUniform(shaderProgram.getUniformLocation("color"),
-                    entity.getMesh().getColor().toVector3f());
-            shaderProgram.setUniform(shaderProgram.getUniformLocation("useColor"),
-                    entity.getMesh().isTextured() ? 0 : 1);
+            shaderProgram.setUniform("material", entity.getMesh().getMaterial());
 
             entity.getMesh().render();
         }

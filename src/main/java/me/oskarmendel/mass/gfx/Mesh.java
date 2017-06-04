@@ -83,7 +83,7 @@ public class Mesh {
     /**
      *
      */
-    private Texture texture;
+    private Material material;
 
     /**
      *
@@ -162,7 +162,8 @@ public class Mesh {
      * state when finished.
      */
     public void render() {
-        if (this.texture != null) {
+        Texture texture = material.getTexture();
+        if (texture != null) {
             // Activate first texture bank.
             glActiveTexture(GL_TEXTURE0);
 
@@ -206,27 +207,18 @@ public class Mesh {
 
     /**
      *
-     *
      * @return
      */
-    public boolean isTextured() {
-        return this.texture != null;
+    public Material getMaterial() {
+        return this.material;
     }
 
     /**
      *
-     * @return
+     * @param material
      */
-    public Texture getTexture() {
-        return this.texture;
-    }
-
-    /**
-     *
-     * @param texture
-     */
-    public void setTexture(Texture texture) {
-        this.texture = texture;
+    public void setMaterial(Material material) {
+        this.material = material;
     }
 
     /**
@@ -259,8 +251,9 @@ public class Mesh {
         glDeleteBuffers(normalsVboId);
         glDeleteBuffers(indexVboId);
 
+        Texture texture = material.getTexture();
         // Delete the texture used by this mesh.
-        if (this.texture != null) {
+        if (texture != null) {
             texture.delete();
         }
 

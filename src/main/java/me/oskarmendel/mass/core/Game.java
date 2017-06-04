@@ -26,10 +26,8 @@ package me.oskarmendel.mass.core;
 
 import me.oskarmendel.mass.entity.Entity;
 import me.oskarmendel.mass.entity.masster.MassterBall;
-import me.oskarmendel.mass.gfx.Mesh;
-import me.oskarmendel.mass.gfx.Renderer;
-import me.oskarmendel.mass.gfx.Screen;
-import me.oskarmendel.mass.gfx.Texture;
+import me.oskarmendel.mass.gfx.*;
+import me.oskarmendel.mass.gfx.light.PointLight;
 import me.oskarmendel.mass.util.OBJLoader;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -86,6 +84,9 @@ public class Game {
      */
     private final Vector3f cameraInc;
 
+    private Vector3f ambientLight;
+    private PointLight pointLight;
+
     /**
      * Default constructor for the game.
      */
@@ -128,16 +129,24 @@ public class Game {
         Texture t = Texture.loadTexture("src/main/resources/textures/grassblock.png");
         try {
             Mesh mesh = OBJLoader.loadMesh("src/main/resources/models/cube.obj");
-
-            mesh.setTexture(t);
+            Material mat = new Material(t, 1f);
+            mesh.setMaterial(mat);
 
             MassterBall massterBall = new MassterBall(mesh);
-            massterBall.setPosition(0, -1, -2);
+            massterBall.setPosition(0, 0, -2);
 
             entities = new Entity[]{massterBall};
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
+        Color lightColour = new Color(1, 1, 1);
+        Vector3f lightPosition = new Vector3f(0, 0, 1);
+        float lightIntensity = 1.0f;
+        pointLight = new PointLight(lightColour, lightPosition, lightIntensity);
+        PointLight.Attenuation att = new PointLight.Attenuation(0.0f, 0.0f, 1.0f);
+        pointLight.setAttenuation(att);
 
         // Initialization done, set running to true.
         running = true;
@@ -204,6 +213,13 @@ public class Game {
         } else if (screen.isKeyPressed(GLFW_KEY_X)) {
             cameraInc.y = 1;
         }
+
+        float lightPos = pointLight.getPosition().z;
+        if (screen.isKeyPressed(GLFW_KEY_N)) {
+            this.pointLight.getPosition().z = lightPos + 0.1f;
+        } else if (screen.isKeyPressed(GLFW_KEY_M)) {
+            this.pointLight.getPosition().z = lightPos - 0.1f;
+        }
     }
 
     /**
@@ -230,6 +246,6 @@ public class Game {
      * Renders the game.
      */
     public void render() {
-        renderer.render(this.camera, this.entities);
+        renderer.render(this.camera, this.entities, ambientLight, pointLight);
     }
 }
