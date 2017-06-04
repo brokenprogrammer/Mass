@@ -167,7 +167,7 @@ public class OBJLoader {
         if (indices.indexTextCoordinate >= 0) {
             Vector2f textCoord = textCoordList.get(indices.indexTextCoordinate);
             textCoordArr[positionIndex * 2] = textCoord.x;
-            textCoordArr[positionIndex * 2 + 1] = textCoord.y;
+            textCoordArr[positionIndex * 2 + 1] = 1 - textCoord.y;
         }
         if (indices.indexVecNormal >= 0) {
             Vector3f vecNormal = normalsList.get(indices.indexVecNormal);

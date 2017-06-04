@@ -109,7 +109,7 @@ public class Screen {
 
         // Enable OpenGL blending that gives support for transparencies.
         glEnable(GL_BLEND);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 

@@ -24,7 +24,6 @@
 
 package me.oskarmendel.mass.gfx;
 
-import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
