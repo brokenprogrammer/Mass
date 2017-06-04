@@ -85,6 +85,10 @@ public class Screen {
 
         // Create OpenGL context
         glfwMakeContextCurrent(id);
+
+        // Make the window visible
+        glfwShowWindow(id);
+
         GL.createCapabilities();
 
         // Enable v-sync

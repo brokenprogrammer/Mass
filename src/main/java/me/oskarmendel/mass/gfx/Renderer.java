@@ -121,6 +121,7 @@ public class Renderer {
      * Destroy all resources used by the renderer.
      */
     public void dispose() {
-        // TODO: IMPLEMENT THIS
+        // Destroy the shader program.
+        shaderProgram.delete();
     }
 }
