@@ -26,7 +26,7 @@ public class OBJLoader {
      * of the following identifiers:
      *
      * # - Comment line.
-     * v - Geometric vertex with coordinates (x, y, z w).
+     * v - Geometric vertex with coordinates (x, y, z, w).
      * vn - Vertex normal coordinates (x, y, z).
      * vt - Texture coordinates.
      * f - Face definition. Example: f 6/4/1 3/5/3 7/6/5

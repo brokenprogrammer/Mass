@@ -75,11 +75,11 @@ public class Color {
      * values. Alpha value is set to 1.
      *
      * @param red - Red value. Range from 0f - 1f.
-     * @param blue - Blue value. Range from 0f - 1f.
      * @param green - Green value. Range from 0f - 1f.
+     * @param blue - Blue value. Range from 0f - 1f.
      */
-    public Color(float red, float blue, float green) {
-        this(red, blue, green, 1f);
+    public Color(float red, float green, float blue) {
+        this(red, green, blue, 1f);
     }
 
     /**
@@ -87,14 +87,14 @@ public class Color {
      * and alpha values.
      *
      * @param red - Red value. Range from 0f - 1f.
-     * @param blue - Blue value. Range from 0f - 1f.
      * @param green - Green value. Range from 0f - 1f.
+     * @param blue - Blue value. Range from 0f - 1f.
      * @param alpha - Alpha value for transparency. Range from 0f - 1f.
      */
-    public Color(float red, float blue, float green, float alpha) {
+    public Color(float red, float green, float blue, float alpha) {
         this.red = red;
-        this.blue = blue;
         this.green = green;
+        this.blue = blue;
         this.alpha = alpha;
     }
 
@@ -202,7 +202,7 @@ public class Color {
      * @return - This color as a 3D vector object.
      */
     public Vector3f toVector3f() {
-        return new Vector3f(red, blue, green);
+        return new Vector3f(red, green, blue);
     }
 
     /**
@@ -212,6 +212,6 @@ public class Color {
      * @return - This color as a 4D vector object.
      */
     public Vector4f toVector4f() {
-        return new Vector4f(red, blue, green, alpha);
+        return new Vector4f(red, green, blue, alpha);
     }
 }
