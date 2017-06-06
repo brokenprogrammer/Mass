@@ -43,7 +43,7 @@ public abstract class Entity {
     /**
      * The mesh for this Entity.
      */
-    private final Mesh mesh;
+    private Mesh mesh;
 
     /**
      * The position for this Entity.
@@ -60,6 +60,16 @@ public abstract class Entity {
      */
     private final Vector3f rotation;
 
+    protected  Entity() {
+        this.mesh = null;
+
+        position = new Vector3f(0, 0, 0);
+
+        scale = 1;
+
+        rotation = new Vector3f(0, 0, 0);
+    }
+
     /**
      * Protected construtor for the Entity class.
      * This constructor is meant to be called first in every child class.
@@ -68,6 +78,7 @@ public abstract class Entity {
      */
     protected Entity(Mesh mesh) {
         this.mesh = mesh;
+
         position = new Vector3f(0, 0, 0);
 
         scale = 1;
@@ -147,4 +158,14 @@ public abstract class Entity {
     public Mesh getMesh() {
         return this.mesh;
     }
+
+    /**
+     * Setter for the Mesh instance held by this Entity.
+     *
+     * @param mesh - Mesh to set.
+     */
+    public void setMesh(Mesh mesh) {
+        this.mesh = mesh;
+    }
+
 }

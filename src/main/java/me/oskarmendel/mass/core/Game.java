@@ -25,6 +25,7 @@
 package me.oskarmendel.mass.core;
 
 import me.oskarmendel.mass.entity.Entity;
+import me.oskarmendel.mass.entity.geometry.Cube;
 import me.oskarmendel.mass.entity.masster.MassterBall;
 import me.oskarmendel.mass.gfx.*;
 import me.oskarmendel.mass.gfx.light.PointLight;
@@ -126,7 +127,7 @@ public class Game {
         // Initialize renderer.
         renderer.init();
 
-        Texture t = Texture.loadTexture("src/main/resources/textures/grassblock.png");
+        Texture t = Texture.loadTexture("src/main/resources/textures/dankblock.png");
         try {
             Mesh mesh = OBJLoader.loadMesh("src/main/resources/models/cube.obj");
             Material mat = new Material(t, 1f);
@@ -135,7 +136,20 @@ public class Game {
             MassterBall massterBall = new MassterBall(mesh);
             massterBall.setPosition(0, 0, -2);
 
-            entities = new Entity[]{massterBall};
+            Cube c = new Cube(new Vector3f(0, 2, -2), new Vector3f(0, 0 ,0), 1);
+            Cube c2 = new Cube(new Vector3f(0, -2, -2), new Vector3f(0, 0 ,0), 1);
+            Cube c3 = new Cube(new Vector3f(-2, 0, -2), new Vector3f(0, 0 ,0), 1);
+            Cube c4 = new Cube(new Vector3f(2, 0, -2), new Vector3f(0, 0 ,0), 1);
+
+            c.getMesh().getMaterial().setAmbientColor(new Color(0, 1, 0).toVector4f());
+            c.getMesh().getMaterial().setDiffuseColor(new Color(0, 1, 0).toVector4f());
+            c.getMesh().getMaterial().setSpecularColor(new Color(0, 1, 0).toVector4f());
+
+            c2.getMesh().getMaterial().setAmbientColor(new Color(0, 0, 1).toVector4f());
+            c2.getMesh().getMaterial().setDiffuseColor(new Color(0, 0, 1).toVector4f());
+            c2.getMesh().getMaterial().setSpecularColor(new Color(0, 0, 1).toVector4f());
+
+            entities = new Entity[]{massterBall, c, c2, c3, c4};
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -41,9 +41,9 @@ import org.joml.Vector3f;
 public class Cube extends Entity {
 
     /**
-     *
+     * Vertex positions for a cube.
      */
-    private static final float[] positions = {
+    private static final float[] CUBE_POSITIONS = {
             -0.5f,  0.5f,  0.5f,
             -0.5f, -0.5f,  0.5f,
             0.5f, -0.5f,  0.5f,
@@ -56,9 +56,9 @@ public class Cube extends Entity {
     };
 
     /**
-     *
+     * Texture coordinates for a cube.
      */
-    private static final float[] textureCoordinates = {
+    private static final float[] CUBE_TEXTURE_COORDINATES = {
             0.5f, 0.0f, 0.0f,
             0.0f, 0.5f, 0.0f,
             0.0f, 0.0f, 0.5f,
@@ -70,9 +70,9 @@ public class Cube extends Entity {
     };
 
     /**
-     *
+     * Normals for a cube.
      */
-    private static final float[] normals = {
+    private static final float[] CUBE_NORMALS = {
             0.0f, -0.5f, 0.0f,
             0.0f, 0.5f, 0.0f,
             0.5f, 0.0f, 0.0f,
@@ -82,9 +82,9 @@ public class Cube extends Entity {
     };
 
     /**
-     *
+     * Indices for a cube.
      */
-    private static final int[] indices = {
+    private static final int[] CUBE_INDICES = {
             0, 1, 3, 3, 1, 2,
             4, 0, 3, 5, 4, 3,
             3, 2, 7, 5, 3, 7,
@@ -94,15 +94,17 @@ public class Cube extends Entity {
     };
 
     /**
+     * Creates a new cube at the specified position
+     * using the specified rotation and scale.
      *
-     * @param position
-     * @param rotation
-     * @param scale
+     * @param position - Position of the cube.
+     * @param rotation - Rotation of the cube.
+     * @param scale - Scale of the cube.
      */
     public Cube(Vector3f position, Vector3f rotation, float scale) {
         super();
 
-        Mesh mesh = new Mesh(positions, textureCoordinates, normals, indices);
+        Mesh mesh = new Mesh(CUBE_POSITIONS, CUBE_TEXTURE_COORDINATES, CUBE_NORMALS, CUBE_INDICES);
         Material mat = new Material();
 
         mesh.setMaterial(mat);
@@ -114,16 +116,18 @@ public class Cube extends Entity {
     }
 
     /**
+     * Creates a new cube at the specified position
+     * using the specified rotation, scale and color.
      *
-     * @param position
-     * @param rotation
-     * @param scale
-     * @param color
+     * @param position - Position of the cube.
+     * @param rotation - Rotation of the cube.
+     * @param scale - Scale of the cube.
+     * @param color - Color of the cube.
      */
     public Cube(Vector3f position, Vector3f rotation, float scale, Color color) {
         super();
 
-        Mesh mesh = new Mesh(positions, textureCoordinates, normals, indices);
+        Mesh mesh = new Mesh(CUBE_POSITIONS, CUBE_TEXTURE_COORDINATES, CUBE_NORMALS, CUBE_INDICES);
         Material mat = new Material();
 
         mat.setAmbientColor(color.toVector4f());
@@ -139,16 +143,18 @@ public class Cube extends Entity {
     }
 
     /**
-     * 
-     * @param position
-     * @param rotation
-     * @param scale
-     * @param texture
+     * Creates a new cube at the specified position
+     * using the specified rotation, scale and texture.
+     *
+     * @param position - Position of the cube.
+     * @param rotation - Rotation of the cube.
+     * @param scale - Scale of the cube.
+     * @param texture - Texture of the cube.
      */
     public Cube(Vector3f position, Vector3f rotation, float scale, Texture texture) {
         super();
 
-        Mesh mesh = new Mesh(positions, textureCoordinates, normals, indices);
+        Mesh mesh = new Mesh(CUBE_POSITIONS, CUBE_TEXTURE_COORDINATES, CUBE_NORMALS, CUBE_INDICES);
         Material mat = new Material(texture);
 
         mesh.setMaterial(mat);
