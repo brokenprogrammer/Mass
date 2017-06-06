@@ -26,6 +26,7 @@ package me.oskarmendel.mass.gfx;
 
 import me.oskarmendel.mass.core.Camera;
 import me.oskarmendel.mass.entity.Entity;
+import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.light.PointLight;
 import me.oskarmendel.mass.gfx.shader.Shader;
 import me.oskarmendel.mass.gfx.shader.ShaderProgram;
@@ -84,7 +85,8 @@ public class Renderer {
         shaderProgram.link();
     }
 
-    public void render(Camera camera, Entity[] entities, Vector3f ambientLight, PointLight pointLight) {
+    public void render(Camera camera, Entity[] entities, Vector3f ambientLight,
+                       PointLight pointLight, DirectionalLight directionalLight) {
         clear();
 
         shaderProgram.use();
@@ -106,6 +108,13 @@ public class Renderer {
         lightPos.y = aux.y;
         lightPos.z = aux.z;
         shaderProgram.setUniform("pointLight", currPointLight);
+
+        // Update the directional light relative to the viewMatrix of the camera.
+        DirectionalLight currDirLight = new DirectionalLight(directionalLight);
+        Vector4f dir = new Vector4f(currDirLight.getDirection(), 0);
+        dir.mul(viewMatrix);
+        currDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
+        shaderProgram.setUniform("directionalLight", currDirLight);
 
         shaderProgram.setUniform(shaderProgram.getUniformLocation("texture_sampler"), 0);
 

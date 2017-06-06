@@ -28,6 +28,7 @@ import me.oskarmendel.mass.entity.Entity;
 import me.oskarmendel.mass.entity.geometry.Cube;
 import me.oskarmendel.mass.entity.masster.MassterBall;
 import me.oskarmendel.mass.gfx.*;
+import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.light.PointLight;
 import me.oskarmendel.mass.util.OBJLoader;
 import org.joml.Vector3f;
@@ -87,6 +88,8 @@ public class Game {
 
     private Vector3f ambientLight;
     private PointLight pointLight;
+    private DirectionalLight directionalLight;
+    private float lightAngle;
 
     /**
      * Default constructor for the game.
@@ -95,6 +98,7 @@ public class Game {
         renderer = new Renderer();
         camera = new Camera();
         cameraInc = new Vector3f(0, 0,0);
+        lightAngle = -90;
     }
 
     private Entity[] entities;
@@ -127,7 +131,7 @@ public class Game {
         // Initialize renderer.
         renderer.init();
 
-        Texture t = Texture.loadTexture("src/main/resources/textures/dankblock.png");
+        Texture t = Texture.loadTexture("src/main/resources/textures/grassblock.png");
         try {
             Mesh mesh = OBJLoader.loadMesh("src/main/resources/models/cube.obj");
             Material mat = new Material(t, 1f);
@@ -154,6 +158,7 @@ public class Game {
             e.printStackTrace();
         }
 
+        // Position light example.
         ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
         Color lightColour = new Color(1, 1, 1);
         Vector3f lightPosition = new Vector3f(0, 0, 1);
@@ -161,6 +166,11 @@ public class Game {
         pointLight = new PointLight(lightColour, lightPosition, lightIntensity);
         PointLight.Attenuation att = new PointLight.Attenuation(0.0f, 0.0f, 1.0f);
         pointLight.setAttenuation(att);
+
+        // Directional light example.
+        lightPosition = new Vector3f(-1, 0,0 );
+        lightColour = new Color(1, 1, 1);
+        directionalLight = new DirectionalLight(lightColour, lightPosition, lightIntensity);
 
         // Initialization done, set running to true.
         running = true;
@@ -247,19 +257,38 @@ public class Game {
         camera.updateViewMatrix();
 
         for (Entity entity : entities) {
-            // Update rotation angle
-            float rotation = entity.getRotation().y + 1;
-            if ( rotation > 360 ) {
-                rotation = 0;
-            }
-            entity.setRotation(0.0f, rotation, 0.0f);
+            // Do something for every loaded entity.
+            entity.getRotation().y += 1.0f;
         }
+
+        // Update directional light direction.
+        lightAngle += 1.1f;
+        if (lightAngle > 90) {
+            directionalLight.setIntensity(0);
+            if (lightAngle >= 360) {
+                lightAngle = -90;
+            }
+        } else if (lightAngle <= -80 || lightAngle >= 80) {
+            float factor = 1 - (Math.abs(lightAngle) -80) / 10.0f;
+            directionalLight.setIntensity(factor);
+            directionalLight.getColor().setGreen(Math.max(factor, 0.9f));
+            directionalLight.getColor().setBlue(Math.max(factor, 0.5f));
+        } else {
+            directionalLight.setIntensity(1);
+            directionalLight.getColor().setRed(1);
+            directionalLight.getColor().setGreen(1);
+            directionalLight.getColor().setBlue(1);
+        }
+
+        double angRad = Math.toRadians(lightAngle);
+        directionalLight.getDirection().x = (float) Math.sin(angRad);
+        directionalLight.getDirection().y = (float) Math.cos(angRad);
     }
 
     /**
      * Renders the game.
      */
     public void render() {
-        renderer.render(this.camera, this.entities, ambientLight, pointLight);
+        renderer.render(this.camera, this.entities, ambientLight, pointLight, directionalLight);
     }
 }

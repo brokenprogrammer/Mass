@@ -25,6 +25,7 @@
 package me.oskarmendel.mass.gfx.shader;
 
 import me.oskarmendel.mass.gfx.Material;
+import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.light.PointLight;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -160,6 +161,18 @@ public class ShaderProgram {
         setUniform(getUniformLocation(location + ".att.constant"), pointLight.getAttenuation().getConstant());
         setUniform(getUniformLocation(location + ".att.linear"), pointLight.getAttenuation().getLinear());
         setUniform(getUniformLocation(location + ".att.exponent"), pointLight.getAttenuation().getExponent());
+    }
+
+    /**
+     * Sets the DirectionalLight uniform variable with the specified location name.
+     *
+     * @param location - Location name.
+     * @param directionalLight - DirectionalLight object to get values from.
+     */
+    public void setUniform(String location, DirectionalLight directionalLight) {
+        setUniform(getUniformLocation(location + ".color"), directionalLight.getColor().toVector3f());
+        setUniform(getUniformLocation(location + ".direction"), directionalLight.getDirection());
+        setUniform(getUniformLocation(location + ".intensity"), directionalLight.getIntensity());
     }
 
     /**

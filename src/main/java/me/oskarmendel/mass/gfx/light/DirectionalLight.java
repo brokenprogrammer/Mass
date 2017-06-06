@@ -43,9 +43,9 @@ public class DirectionalLight {
     private Color color;
 
     /**
-     * The position of tihs light.
+     * The direction of this light.
      */
-    private Vector3f position;
+    private Vector3f direction;
 
     /**
      * The intensity of this light. Range 0 - 1.
@@ -54,15 +54,15 @@ public class DirectionalLight {
 
     /**
      * Creates a new DirectionalLight with the specified color,
-     * position and intensity.
+     * direction and intensity.
      *
      * @param color - Color of this light.
-     * @param position - Position of this light.
+     * @param direction - Direction of this light.
      * @param intensity - Intensity of this light.
      */
-    public DirectionalLight(Color color, Vector3f position, float intensity) {
+    public DirectionalLight(Color color, Vector3f direction, float intensity) {
         this.color = color;
-        this.position = position;
+        this.direction = direction;
         this.intensity = intensity;
     }
 
@@ -73,7 +73,7 @@ public class DirectionalLight {
      * @param directionalLight - DirectionalLight to use values from.
      */
     public DirectionalLight(DirectionalLight directionalLight) {
-        this(directionalLight.getColor(), new Vector3f(directionalLight.getPosition()),
+        this(directionalLight.getColor(), new Vector3f(directionalLight.getDirection()),
                 directionalLight.getIntensity());
     }
 
@@ -96,21 +96,21 @@ public class DirectionalLight {
     }
 
     /**
-     * Getter for the position of this DirectionalLight.
+     * Getter for the direction of this DirectionalLight.
      *
-     * @return - The position of this DirectionalLight.
+     * @return - The direction of this DirectionalLight.
      */
-    public Vector3f getPosition() {
-        return position;
+    public Vector3f getDirection() {
+        return direction;
     }
 
     /**
-     * Setter for the position of this DirectionalLight.
+     * Setter for the direction of this DirectionalLight.
      *
-     * @param position - Position value to set for this DirectionalLight.
+     * @param direction - Direction value to set for this DirectionalLight.
      */
-    public void setPosition(Vector3f position) {
-        this.position = position;
+    public void setDirection(Vector3f direction) {
+        this.direction = direction;
     }
 
     /**

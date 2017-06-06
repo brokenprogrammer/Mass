@@ -15,6 +15,6 @@ void main() {
     vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mvPos;
     outTexCoord = texCoord;
-    vertexNormal = normalize(modelViewMatrix * vec4(vertexNormal, 0.0)).xyz;
+    vertexNormal = normalize(modelViewMatrix * vec4(normals, 0.0)).xyz;
     vertexPos = mvPos.xyz;
 }
