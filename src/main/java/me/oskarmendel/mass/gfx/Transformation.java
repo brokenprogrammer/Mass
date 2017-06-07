@@ -24,7 +24,6 @@
 
 package me.oskarmendel.mass.gfx;
 
-import com.sun.deploy.config.VerboseDefaultConfig;
 import me.oskarmendel.mass.entity.Entity;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

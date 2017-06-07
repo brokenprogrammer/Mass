@@ -30,6 +30,7 @@ import me.oskarmendel.mass.entity.masster.MassterBall;
 import me.oskarmendel.mass.gfx.*;
 import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.light.PointLight;
+import me.oskarmendel.mass.gfx.light.SpotLight;
 import me.oskarmendel.mass.util.OBJLoader;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -90,6 +91,10 @@ public class Game {
     private PointLight pointLight;
     private DirectionalLight directionalLight;
     private float lightAngle;
+    
+    private SpotLight spotLight;
+    private float spotAngle = 0;
+    private float spotInc = 1;
 
     /**
      * Default constructor for the game.
@@ -166,6 +171,15 @@ public class Game {
         pointLight = new PointLight(lightColour, lightPosition, lightIntensity);
         PointLight.Attenuation att = new PointLight.Attenuation(0.0f, 0.0f, 1.0f);
         pointLight.setAttenuation(att);
+        
+        // Spot light example.
+        lightPosition = new Vector3f(0.0f, 0.0f, 10f);
+        pointLight = new PointLight(lightColour, lightPosition, lightIntensity);
+        att = new PointLight.Attenuation(0.0f, 0.0f, 0.02f);
+        pointLight.setAttenuation(att);
+        Vector3f coneDir = new Vector3f(0, 0, -1);
+        float cutOff = (float) Math.cos(Math.toRadians(140));
+        spotLight = new SpotLight(pointLight, coneDir, cutOff);
 
         // Directional light example.
         lightPosition = new Vector3f(-1, 0,0 );
@@ -238,11 +252,11 @@ public class Game {
             cameraInc.y = 1;
         }
 
-        float lightPos = pointLight.getPosition().z;
+        float lightPos = spotLight.getPointLight().getPosition().z;
         if (screen.isKeyPressed(GLFW_KEY_N)) {
-            this.pointLight.getPosition().z = lightPos + 0.1f;
+            this.spotLight.getPointLight().getPosition().z = lightPos + 0.1f;
         } else if (screen.isKeyPressed(GLFW_KEY_M)) {
-            this.pointLight.getPosition().z = lightPos - 0.1f;
+            this.spotLight.getPointLight().getPosition().z = lightPos - 0.1f;
         }
     }
 
@@ -260,6 +274,18 @@ public class Game {
             // Do something for every loaded entity.
             entity.getRotation().y += 1.0f;
         }
+        
+        // Update spot light direction.
+        spotAngle += spotInc * 0.05f;
+        if (spotAngle > 2) {
+        	spotInc = -1;
+        } else if (spotAngle < -2) {
+        	spotInc = 1;
+        }
+        
+        double spotAngleRad = Math.toRadians(spotAngle);
+        Vector3f coneDir = spotLight.getConeDirection();
+        coneDir.y = (float) Math.sin(spotAngleRad);
 
         // Update directional light direction.
         lightAngle += 1.1f;
@@ -289,6 +315,7 @@ public class Game {
      * Renders the game.
      */
     public void render() {
-        renderer.render(this.camera, this.entities, ambientLight, pointLight, directionalLight);
+        renderer.render(this.camera, this.entities, ambientLight, 
+        		pointLight, spotLight, directionalLight);
     }
 }

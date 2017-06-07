@@ -153,4 +153,13 @@ public class Screen {
     public boolean isClosing() {
         return glfwWindowShouldClose(id);
     }
+    
+    /**
+     * Returns the vsync value for this screen.
+     * 
+     * @return - The vsync value set for this screen.
+     */
+    public boolean getVsync() {
+    	return this.vsync;
+    }
 }

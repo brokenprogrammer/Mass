@@ -27,6 +27,8 @@ package me.oskarmendel.mass.gfx.shader;
 import me.oskarmendel.mass.gfx.Material;
 import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.light.PointLight;
+import me.oskarmendel.mass.gfx.light.SpotLight;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -161,6 +163,18 @@ public class ShaderProgram {
         setUniform(getUniformLocation(location + ".att.constant"), pointLight.getAttenuation().getConstant());
         setUniform(getUniformLocation(location + ".att.linear"), pointLight.getAttenuation().getLinear());
         setUniform(getUniformLocation(location + ".att.exponent"), pointLight.getAttenuation().getExponent());
+    }
+    
+    /**
+     * Sets the SpotLight uniform variable with the specified location name.
+     *
+     * @param location - Location name.
+     * @param spotLight - SpotLight object to get values from.
+     */
+    public void setUniform(String location, SpotLight spotLight) {
+    	setUniform((location + ".pl"), spotLight.getPointLight());
+    	setUniform(getUniformLocation(location + ".coneDirection"), spotLight.getConeDirection());
+        setUniform(getUniformLocation(location + ".cutOff"), spotLight.getCutOff());
     }
 
     /**

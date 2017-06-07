@@ -28,6 +28,7 @@ import me.oskarmendel.mass.core.Camera;
 import me.oskarmendel.mass.entity.Entity;
 import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.light.PointLight;
+import me.oskarmendel.mass.gfx.light.SpotLight;
 import me.oskarmendel.mass.gfx.shader.Shader;
 import me.oskarmendel.mass.gfx.shader.ShaderProgram;
 import org.joml.Matrix4f;
@@ -86,7 +87,7 @@ public class Renderer {
     }
 
     public void render(Camera camera, Entity[] entities, Vector3f ambientLight,
-                       PointLight pointLight, DirectionalLight directionalLight) {
+                       PointLight pointLight, SpotLight spotLight, DirectionalLight directionalLight) {
         clear();
 
         shaderProgram.use();
@@ -108,10 +109,24 @@ public class Renderer {
         lightPos.y = aux.y;
         lightPos.z = aux.z;
         shaderProgram.setUniform("pointLight", currPointLight);
+        
+        // Update the spot light relative to the view matrix.
+        SpotLight currSpotLight = new SpotLight(spotLight);
+        Vector4f dir = new Vector4f(currSpotLight.getConeDirection(), 0);
+        dir.mul(viewMatrix);
+        currSpotLight.setConeDirection(new Vector3f(dir.x, dir.y, dir.z));
+        
+        Vector3f spotLightPos = currSpotLight.getPointLight().getPosition();
+        Vector4f auxSpot = new Vector4f(spotLightPos, 1);
+        auxSpot.mul(viewMatrix);
+        spotLightPos.x = auxSpot.x;
+        spotLightPos.y = auxSpot.y;
+        spotLightPos.z = auxSpot.z;
+        shaderProgram.setUniform("spotLight", currSpotLight);
 
         // Update the directional light relative to the viewMatrix of the camera.
         DirectionalLight currDirLight = new DirectionalLight(directionalLight);
-        Vector4f dir = new Vector4f(currDirLight.getDirection(), 0);
+        dir = new Vector4f(currDirLight.getDirection(), 0);
         dir.mul(viewMatrix);
         currDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
         shaderProgram.setUniform("directionalLight", currDirLight);
