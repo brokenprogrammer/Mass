@@ -155,6 +155,15 @@ public class Screen {
     }
     
     /**
+     * Returns the handle of this screen.
+     * 
+     * @return - The handle for this screen.
+     */
+    public long getScreenHandle() {
+    	return this.id;
+    }
+    
+    /**
      * Returns the vsync value for this screen.
      * 
      * @return - The vsync value set for this screen.
