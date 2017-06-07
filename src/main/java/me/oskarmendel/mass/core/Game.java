@@ -31,7 +31,10 @@ import me.oskarmendel.mass.gfx.*;
 import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.light.PointLight;
 import me.oskarmendel.mass.gfx.light.SpotLight;
+import me.oskarmendel.mass.input.MouseHandler;
 import me.oskarmendel.mass.util.OBJLoader;
+
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
@@ -86,12 +89,14 @@ public class Game {
      * Handles camera updates.
      */
     private final Vector3f cameraInc;
-
+    
+    private final MouseHandler mouseHandler;
+    
+    // Temporary light variables.
     private Vector3f ambientLight;
     private PointLight pointLight;
     private DirectionalLight directionalLight;
     private float lightAngle;
-    
     private SpotLight spotLight;
     private float spotAngle = 0;
     private float spotInc = 1;
@@ -102,6 +107,7 @@ public class Game {
     public Game() {
         renderer = new Renderer();
         camera = new Camera();
+        mouseHandler = new MouseHandler();
         cameraInc = new Vector3f(0, 0,0);
         lightAngle = -90;
     }
@@ -132,6 +138,8 @@ public class Game {
 
         // Create the GLFW screen.
         screen = new Screen(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, VSYNC);
+        
+        mouseHandler.init(screen);
 
         // Initialize renderer.
         renderer.init();
@@ -194,8 +202,18 @@ public class Game {
      * The game loop
      */
     public void gameLoop() {
+    	long lastFrameCheck = 0;
+    	long  lastTime = System.nanoTime();
+    	int frames = 0;
+    	
         while(running) {
-
+        	long now = System.nanoTime();
+        	long updateLength = now - lastTime;
+        	lastTime = now;
+        	frames++;
+        	
+        	lastFrameCheck += updateLength;
+        	
             // Check if the game should close.
             if (screen.isClosing()) {
                 running = false;
@@ -210,6 +228,12 @@ public class Game {
             render();
 
             screen.update();
+            
+            if (lastFrameCheck >= 1000000000) {
+        		System.out.println("FPS: " + frames);
+        		frames = 0;
+        		lastFrameCheck = 0;
+        	}
         }
     }
 
@@ -232,6 +256,9 @@ public class Game {
      * Handles input.
      */
     private void input() {
+    	// Update mouse input.
+    	mouseHandler.input();
+    	
         cameraInc.set(0, 0,0);
 
         if (screen.isKeyPressed(GLFW_KEY_W)) {
@@ -266,7 +293,13 @@ public class Game {
     public void update() {
         // Update camera position.
         camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
-
+        
+        // Update camera based on mouse movements
+        if (mouseHandler.isRightButtonPressed()) {
+        	Vector2f rotVec = mouseHandler.getDispelVec();
+        	camera.moveRotation(rotVec.x * 0.2f, rotVec.y * 0.2f, 0);
+        }
+        
         // Update the camera view matrix.
         camera.updateViewMatrix();
 

@@ -60,6 +60,11 @@ public abstract class Entity {
      */
     private final Vector3f rotation;
 
+    /**
+     * Default constructor for the Entity class.
+     * Sets the mesh to null, position and rotation to vectors of 0s
+     * and scale to 1.
+     */
     protected  Entity() {
         this.mesh = null;
 

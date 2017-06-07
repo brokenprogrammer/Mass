@@ -114,7 +114,7 @@ public class Camera {
 
         if (deltaX != 0) {
             position.x += (float)Math.sin(Math.toRadians(rotation.y - 90)) * -1.0f * deltaX;
-            position.z += (float)Math.sin(Math.toRadians(rotation.y - 90)) *  deltaX;
+            position.z += (float)Math.cos(Math.toRadians(rotation.y - 90)) *  deltaX;
 
         }
 
