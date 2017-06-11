@@ -24,35 +24,12 @@
 
 package me.oskarmendel.mass.entity.geometry;
 
-import org.joml.Vector3f;
-
 /**
- * This class represents a sphere.
- * The sphere type used is icosphere.
+ * This class represents a cylinder.
  *
  * @author Oskar Mendel
  * @version 0.00.00
- * @name Sphere.java
+ * @name Cylinder.java
  */
-public class Sphere {
-	
-	
-	private float[] sphere_positions;
-	private float[] sphere_texture_coordinates;
-	private float[] sphere_normals;
-	private int[] sphere_indices;
-	
-	public Sphere(Vector3f position, Vector3f rotation, float radius) {
-		// How many vertices etc.. Then generate
-		sphere_positions = new float[12];
-	}
-	
-	private void generateIcoSphere() {
-		// The golden ratio.
-		double t = (1.0f + Math.sqrt(5))/2;
-	}
-	
-	private void refine(int iterations) {
-		
-	}
+public class Cylinder {
 }
