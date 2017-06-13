@@ -24,6 +24,8 @@
 
 package me.oskarmendel.mass.entity.geometry;
 
+import java.util.ArrayList;
+
 import org.joml.Vector3f;
 
 import me.oskarmendel.mass.entity.Entity;
@@ -40,15 +42,19 @@ import me.oskarmendel.mass.gfx.Mesh;
  */
 public class Sphere extends Entity{
 	
-	float t = (float) (1.0f + Math.sqrt(5))/2;
+	private static final float t = (float) (1.0f + Math.sqrt(5))/2;
+	
 	private float[] sphere_positions;
-	private float[] sphere_texture_coordinates = {1};
+	private float[] sphere_texture_coordinates = {
+			1
+	};
 	private float[] sphere_normals = {1};
 	private int[] sphere_indices;
 	
-	public Sphere(Vector3f position, Vector3f rotation, float radius) {
+	public Sphere(Vector3f position, Vector3f rotation, float scale, int iterations) {
 		sphere_positions = new float[12*3];
 		generateIcoSphere();
+		subdivide(iterations);
 		
 		Mesh mesh = new Mesh(sphere_positions, sphere_texture_coordinates, sphere_normals, sphere_indices);
 		Material mat = new Material();
@@ -58,13 +64,13 @@ public class Sphere extends Entity{
 		
 		setPosition(position.x, position.y, position.z);
         setRotation(rotation.x, rotation.y, rotation.z);
-        setScale(1);
+        setScale(scale);
 	}
 	
+	/**
+	 * 
+	 */
 	private void generateIcoSphere() {
-		// The golden ratio.
-		float t = (float) (1.0f + Math.sqrt(5))/2;
-		
 		for (int i = 0; i < 12; i+=3) {
 			sphere_positions[i] = 0;
 			sphere_positions[i + 1] = (i&2) == 2?-1:1;
@@ -111,10 +117,33 @@ public class Sphere extends Entity{
 		
 		sphere_indices = indices;
 		
-		//TODO: Texture coords, normals.
+		float[] normals = new float[sphere_positions.length];
+		for(int i = 0; i < normals.length; i+=3) {
+			float x = sphere_positions[i];
+			float y = sphere_positions[i+1];
+			float z = sphere_positions[i+2];
+			float dt = (float) Math.sqrt((x*x)+(y*y)+(z*z));
+			
+			x = x * (1.0f / dt);
+			y = y * (1.0f / dt);
+			z = z * (1.0f / dt);
+			
+			normals[i] = x;
+			normals[i+1] = y;
+			normals[i+2] = z;
+		}
+		
+		sphere_normals = normals;
+		
+		//TODO: Texture coords
+		
 	}
 	
-	private void refine(int iterations) {
+	/**
+	 * 
+	 * @param iterations
+	 */
+	private void subdivide(int iterations) {
 		
 	}
 }
