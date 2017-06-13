@@ -247,7 +247,19 @@ public class Sphere extends Entity {
 	 * Generates the texture coordinates for the sphere.
 	 */
 	private void createTextureCoordinates() {
-		//TODO: Texture coords
+		sphere_texture_coordinates = new float[(sphere_positions.length/3)*2];
+		
+		ArrayList<Vector3f> vertices = new ArrayList<>();
+		for (int i = 0; i < sphere_positions.length; i+=3) {
+			vertices.add(new Vector3f(sphere_positions[i], sphere_positions[i + 1], sphere_positions[i + 2]));
+		}
+		
+		for (int i = 0, k = 0; k < vertices.size(); i+=2, k++) {
+			Vector3f vertex = vertices.get(k);
+			
+			sphere_texture_coordinates[i] = (float)((Math.atan2(vertex.x, vertex.z) + Math.PI) / Math.PI / 2);
+			sphere_texture_coordinates[i + 1] = (float)((Math.acos(vertex.y) + Math.PI) / Math.PI - 1);
+		}
 	}
 	
 	/**
