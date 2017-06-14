@@ -41,37 +41,38 @@ import static org.lwjgl.glfw.GLFW.*;
 public class MouseHandler {
 	
 	/**
-	 * 
+	 * Previous mouse coordinates.
 	 */
 	private Vector2d previousPos;
 	
 	/**
-	 * 
+	 * Current mouse coordinates.
 	 */
 	private Vector2d currentPos;
 	
 	/**
-	 * 
+	 * Dispel vector for the mouse handler.
 	 */
 	private Vector2f dispelVec;
 	
 	/**
-	 * 
+	 * Boolean to check if the mouse is within the screen region.
 	 */
 	private boolean inScreen = false;
 	
 	/**
-	 * 
+	 * Boolean to check if the left mouse button was pressed.
 	 */
 	private boolean leftButtonPressed = false;
 	
 	/**
-	 * 
+	 * Boolean to check if the right mouse button was pressed.
 	 */
 	private boolean rightButtonPressed = false;
 	
 	/**
-	 * 
+	 * Default constructor for the mouse handler initializing all the
+	 * fields.
 	 */
 	public MouseHandler() {
 		previousPos = new Vector2d(-1, -1);
@@ -80,8 +81,10 @@ public class MouseHandler {
 	}
 	
 	/**
+	 * Initializes the mouse handler and binds the mouse callbacks to
+	 * the window handle of the specified screen.
 	 * 
-	 * @param screen
+	 * @param screen - Screen to bind callbacks too.
 	 */
 	public void init(Screen screen) {
 		// Set callback for the cursor position.
@@ -103,7 +106,7 @@ public class MouseHandler {
 	}
 	
 	/**
-	 * 
+	 * Updates the mouse input.
 	 */
 	public void input() {
 		dispelVec.x = 0;
@@ -130,24 +133,27 @@ public class MouseHandler {
 	}
 	
 	/**
+	 * Getter for the dispel vector.
 	 * 
-	 * @return
+	 * @return Dispel vector.
 	 */
 	public Vector2f getDispelVec() {
 		return this.dispelVec;
 	}
 	
 	/**
+	 * Getter for the left mouse button boolean.
 	 * 
-	 * @return
+	 * @return True of the left mouse button was pressed, false otherwise.
 	 */
 	public boolean isLeftButtonPressed() {
 		return this.leftButtonPressed;
 	}
 	
 	/**
+	 * Getter for the right mouse button boolean.
 	 * 
-	 * @return
+	 * @return True of the right mouse button was pressed, false otherwise.
 	 */
 	public boolean isRightButtonPressed() {
 		return this.rightButtonPressed;

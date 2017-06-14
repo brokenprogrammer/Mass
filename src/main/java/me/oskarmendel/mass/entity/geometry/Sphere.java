@@ -57,9 +57,7 @@ public class Sphere extends Entity {
 	/**
 	 * Texture coordinates of the sphere.
 	 */
-	private float[] sphere_texture_coordinates = {
-			1
-	};
+	private float[] sphere_texture_coordinates;
 	
 	/**
 	 * Normals for the sphere.
@@ -137,7 +135,7 @@ public class Sphere extends Entity {
 	
 	/**
 	 * Creates a new sphere at the specified position
-	 * using the specified rotation, scale and color. 
+	 * using the specified rotation, scale and texture. 
 	 * Then subdivides the sphere with the specified amount 
 	 * of iterations.
 	 * 
@@ -245,6 +243,8 @@ public class Sphere extends Entity {
 	
 	/**
 	 * Generates the texture coordinates for the sphere.
+	 * TODO: Switch to using cube mapping:
+	 * https://www.shaneenishry.com/blog/2014/08/01/planet-generation-part-i/
 	 */
 	private void createTextureCoordinates() {
 		sphere_texture_coordinates = new float[(sphere_positions.length/3)*2];

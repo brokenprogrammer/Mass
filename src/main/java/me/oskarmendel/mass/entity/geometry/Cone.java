@@ -30,6 +30,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 import me.oskarmendel.mass.entity.Entity;
+import me.oskarmendel.mass.gfx.Color;
 import me.oskarmendel.mass.gfx.Material;
 import me.oskarmendel.mass.gfx.Mesh;
 import me.oskarmendel.mass.gfx.Texture;
@@ -46,46 +47,46 @@ public class Cone extends Entity {
 	/**
 	 * Vertex positions for the cone.
 	 */
-	private ArrayList<Vector3f> cone_positions;
+	private float[] cone_positions;
 	
+	/**
+	 * Texture coordinates for the cone.
+	 */
 	private float[] cone_texture_coordinates;
 	
+	/**
+	 * Normals for the cone.
+	 */
 	private float[] cone_normals;
 	
 	/**
 	 * Indices for the cone.
 	 */
-	private ArrayList<Vector3i> cone_indices;
+	private int[] cone_indices;
 	
 	
-	private float height;
-	private float radius;
-	private int sides;
+	private float height; // Cone height.
+	private float radius; // Cone radius.
+	private int sides; // Amount of sides for the cone.
 	
+	/**
+	 * Creates a new cone at the specified position
+	 * using the specified rotation and scale.
+	 * 
+	 * @param position - Position of the cone.
+	 * @param rotation - Rotation of the cone.
+	 * @param scale - Scale of the cone.
+	 */
 	public Cone(Vector3f position, Vector3f rotation, float scale) {
-		cone_positions = new ArrayList<Vector3f>();
-		cone_indices = new ArrayList<Vector3i>();
+		super();
+	
 		height = 1;
 		radius = 1;
 		sides = 10;
 		
 		generateCone();
 		
-		float[] pos = new float[cone_positions.size()*3];
-		for (int i = 0, k = 0; k < cone_positions.size(); i+=3, k++) {
-			pos[i] = cone_positions.get(k).x;
-			pos[i + 1] = cone_positions.get(k).y;
-			pos[i + 2] = cone_positions.get(k).z;
-		}
-		
-		int[] ind = new int[cone_indices.size()*3];
-		for (int i = 0, k = 0; k < cone_indices.size(); i+=3, k++) {
-			ind[i] = cone_indices.get(k).x;
-			ind[i + 1] = cone_indices.get(k).y;
-			ind[i + 2] = cone_indices.get(k).z;
-		}
-		
-		Mesh mesh = new Mesh(pos, cone_texture_coordinates, cone_normals, ind);
+		Mesh mesh = new Mesh(cone_positions, cone_texture_coordinates, cone_normals, cone_indices);
 		Material mat = new Material();
 		
 		mesh.setMaterial(mat);
@@ -96,34 +97,58 @@ public class Cone extends Entity {
 		setScale(scale);
 	}
 	
-	public Cone(Vector3f position, Vector3f rotation, float scale, float height) {
+	/**
+	 * Creates a new cone at the specified position
+	 * using the specified rotation, scale and color. 
+	 * 
+	 * @param position - Position of the cone.
+	 * @param rotation - Rotation of the cone.
+	 * @param scale - Scale of the cone.
+	 * @param color - Color of the cone.
+	 */
+	public Cone(Vector3f position, Vector3f rotation, float scale, Color color) {
+		super();
 		
-	}
-	
-	public Cone(Vector3f position, Vector3f rotation, float scale, Texture texture) {
-		cone_positions = new ArrayList<Vector3f>();
-		cone_indices = new ArrayList<Vector3i>();
 		height = 1;
 		radius = 1;
 		sides = 10;
 		
 		generateCone();
 		
-		float[] pos = new float[cone_positions.size()*3];
-		for (int i = 0, k = 0; k < cone_positions.size(); i+=3, k++) {
-			pos[i] = cone_positions.get(k).x;
-			pos[i + 1] = cone_positions.get(k).y;
-			pos[i + 2] = cone_positions.get(k).z;
-		}
+		Mesh mesh = new Mesh(cone_positions, cone_texture_coordinates, cone_normals, cone_indices);
+		Material mat = new Material();
 		
-		int[] ind = new int[cone_indices.size()*3];
-		for (int i = 0, k = 0; k < cone_indices.size(); i+=3, k++) {
-			ind[i] = cone_indices.get(k).x;
-			ind[i + 1] = cone_indices.get(k).y;
-			ind[i + 2] = cone_indices.get(k).z;
-		}
+		mat.setAmbientColor(color.toVector4f());
+        mat.setDiffuseColor(color.toVector4f());
+        mat.setSpecularColor(color.toVector4f());
 		
-		Mesh mesh = new Mesh(pos, cone_texture_coordinates, cone_normals, ind);
+		mesh.setMaterial(mat);
+		setMesh(mesh);
+		
+		setPosition(position.x, position.y, position.z);
+		setRotation(rotation.x, rotation.y, rotation.z);
+		setScale(scale);
+	}
+	
+	/**
+	 * Creates a new cone at the specified position
+	 * using the specified rotation, scale and texture. 
+	 * 
+	 * @param position - Position of the cone.
+	 * @param rotation - Rotation of the cone.
+	 * @param scale - Scale of the cone.
+	 * @param texture - Texture of the cone.
+	 */
+	public Cone(Vector3f position, Vector3f rotation, float scale, Texture texture) {
+		super();
+		
+		height = 1;
+		radius = 1;
+		sides = 10;
+		
+		generateCone();
+		
+		Mesh mesh = new Mesh(cone_positions, cone_texture_coordinates, cone_normals, cone_indices);
 		Material mat = new Material(texture);
 		
 		mesh.setMaterial(mat);
@@ -135,37 +160,55 @@ public class Cone extends Entity {
 	}
 	
 	/**
-	 * 
+	 * Generates the vertices, indices, normals and uv mapping 
+	 * for the cone.
 	 */
 	private void generateCone() {
+		ArrayList<Vector3f> positions = new ArrayList<Vector3f>();
+		ArrayList<Vector3i> indices = new ArrayList<Vector3i>();
+		
 		// Generate bottom
 		Vector3f v0 = new Vector3f(0, 0, 0);
-		cone_positions.add(v0);
+		positions.add(v0);
 		
 		float stepAngle = (float) ((2*Math.PI) / sides);
 		for (int i = 0; i <= sides; i++) {
 			float r = stepAngle * i;
 			float x = (float) Math.cos(r) * radius;
 			float z = (float) Math.sin(r) * radius;
-			cone_positions.add(new Vector3f(x, 0, z));
+			positions.add(new Vector3f(x, 0, z));
 		}
 		
 		for (int i = 0; i < sides+1; i++) {
-			cone_indices.add(new Vector3i(0, i, i+1));
+			indices.add(new Vector3i(0, i, i+1));
 		}
 		
 		// Generate top and sides
 		Vector3f v1 = new Vector3f(0, height, 0);
-		cone_positions.add(v1);
+		positions.add(v1);
 		
-		int topInd = cone_positions.indexOf(v1);
+		int topInd = positions.indexOf(v1);
 		
 		for (int i = 0; i < sides+1; i++) {
-			cone_indices.add(new Vector3i(topInd, i, i+1));
+			indices.add(new Vector3i(topInd, i, i+1));
+		}
+		
+		cone_positions = new float[positions.size()*3];
+		for (int i = 0, k = 0; k < positions.size(); i+=3, k++) {
+			cone_positions[i] = positions.get(k).x;
+			cone_positions[i + 1] = positions.get(k).y;
+			cone_positions[i + 2] = positions.get(k).z;
+		}
+		
+		cone_indices = new int[indices.size()*3];
+		for (int i = 0, k = 0; k < indices.size(); i+=3, k++) {
+			cone_indices[i] = indices.get(k).x;
+			cone_indices[i + 1] = indices.get(k).y;
+			cone_indices[i + 2] = indices.get(k).z;
 		}
 		
 		// Generate normals
-		float[] normals = new float[cone_positions.size()*3];
+		float[] normals = new float[positions.size()*3];
 		
 		// Normals for bottom vertex
 		// TODO: These are not calculated properly, needs refactoring later on.
@@ -174,8 +217,8 @@ public class Cone extends Entity {
 		normals[1] = -1;
 		normals[2] = 0;
 		
-		for (int i = 3, k = 1; k < cone_positions.size(); i+=3, k++) {
-			Vector3f vec = cone_positions.get(k);
+		for (int i = 3, k = 1; k < positions.size(); i+=3, k++) {
+			Vector3f vec = positions.get(k);
 			
 			float x = vec.x;
 			float y = vec.y;
@@ -193,12 +236,12 @@ public class Cone extends Entity {
 		
 		cone_normals = normals;
 		
-		// Generate texture coordinates
+		// Generate texture coordinates through spherical uv mapping
 		// TODO: Switch to cube mapping?
-		cone_texture_coordinates = new float[cone_positions.size()*2];
+		cone_texture_coordinates = new float[positions.size()*2];
 		
-		for (int i = 2, k = 1; k < cone_positions.size(); i+=2, k++) {
-			Vector3f vertex = cone_positions.get(k);
+		for (int i = 2, k = 1; k < positions.size(); i+=2, k++) {
+			Vector3f vertex = positions.get(k);
 			
 			cone_texture_coordinates[i] = (float)((Math.atan2(vertex.x, vertex.z) + Math.PI) / Math.PI / 2);
 			cone_texture_coordinates[i + 1] = (float)((Math.acos(vertex.y) + Math.PI) / Math.PI - 1);
