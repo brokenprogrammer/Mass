@@ -24,8 +24,19 @@
 
 package me.oskarmendel.mass.entity.masster;
 
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.Transform;
+
 import me.oskarmendel.mass.entity.Entity;
 import me.oskarmendel.mass.gfx.Mesh;
+import me.oskarmendel.mass.phys.Collidable;
 
 /**
  * This class represents the MassterBall used by the Masster.
@@ -34,8 +45,14 @@ import me.oskarmendel.mass.gfx.Mesh;
  * @version 0.00.00
  * @name MassterBall.java
  */
-public class MassterBall extends Entity {
+public class MassterBall extends Entity implements Collidable{
 
+	private CollisionShape collisionShape;
+	private RigidBody rigidBody;
+	
+	private DefaultMotionState motionState;
+	private Vector3f fallInertia;
+	
     /**
      *
      *
@@ -43,5 +60,25 @@ public class MassterBall extends Entity {
      */
     public MassterBall(Mesh mesh) {
         super(mesh);
+        
+        initPhysics();
     }
+
+	@Override
+	public void initPhysics() {
+		motionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(0, 50, 0), 1.0f)));
+		
+		int mass = 1;
+		fallInertia = new Vector3f(0,0,0); 
+		
+		collisionShape.calculateLocalInertia(mass,fallInertia);
+		
+		RigidBodyConstructionInfo rigidBodyCI = new RigidBodyConstructionInfo(mass, motionState, collisionShape, fallInertia); 
+		rigidBody = new RigidBody(rigidBodyCI); 
+	}
+
+	@Override
+	public RigidBody getRigidBody() {
+		return this.rigidBody;
+	}
 }

@@ -25,7 +25,9 @@
 package me.oskarmendel.mass.core;
 
 import me.oskarmendel.mass.entity.Entity;
+import me.oskarmendel.mass.entity.geometry.Cone;
 import me.oskarmendel.mass.entity.geometry.Cube;
+import me.oskarmendel.mass.entity.geometry.Cylinder;
 import me.oskarmendel.mass.entity.geometry.Sphere;
 import me.oskarmendel.mass.entity.masster.MassterBall;
 import me.oskarmendel.mass.gfx.*;
@@ -33,11 +35,14 @@ import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.light.PointLight;
 import me.oskarmendel.mass.gfx.light.SpotLight;
 import me.oskarmendel.mass.input.MouseHandler;
+import me.oskarmendel.mass.phys.PhysicsSpace;
 import me.oskarmendel.mass.util.OBJLoader;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
+
+import com.bulletphysics.linearmath.Transform;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -93,6 +98,8 @@ public class Game {
     
     private final MouseHandler mouseHandler;
     
+    private PhysicsSpace physicsSpace;
+    
     // Temporary light variables.
     private Vector3f ambientLight;
     private PointLight pointLight;
@@ -101,7 +108,9 @@ public class Game {
     private SpotLight spotLight;
     private float spotAngle = 0;
     private float spotInc = 1;
-
+    
+    Sphere s;
+    
     /**
      * Default constructor for the game.
      */
@@ -145,16 +154,16 @@ public class Game {
         // Initialize renderer.
         renderer.init();
 
-        Texture t = Texture.loadTexture("src/main/resources/textures/grassblock.png");
+        Texture t = Texture.loadTexture("src/main/resources/textures/hexmap.png");
         try {
             Mesh mesh = OBJLoader.loadMesh("src/main/resources/models/cube.obj");
             Material mat = new Material(t, 1f);
             mesh.setMaterial(mat);
 
             MassterBall massterBall = new MassterBall(mesh);
-            massterBall.setPosition(0, 0, -2);
+            massterBall.setPosition(0, -1, 0);
 
-            Cube c = new Cube(new Vector3f(0, 2, -2), new Vector3f(0, 0 ,0), 0.5f);
+            Cube c = new Cube(new Vector3f(6, 2, -2), new Vector3f(0, 0 ,0), 0.5f);
             Cube c2 = new Cube(new Vector3f(0, -2, -2), new Vector3f(0, 0 ,0), 0.5f);
             Cube c3 = new Cube(new Vector3f(-2, 0, -2), new Vector3f(0, 0 ,0), 0.5f);
             Cube c4 = new Cube(new Vector3f(2, 0, -2), new Vector3f(0, 0 ,0), 0.5f);
@@ -167,9 +176,16 @@ public class Game {
             c2.getMesh().getMaterial().setDiffuseColor(new Color(0, 0, 1).toVector4f());
             c2.getMesh().getMaterial().setSpecularColor(new Color(0, 0, 1).toVector4f());
             
-            Sphere s = new Sphere(new Vector3f(0, 4, -2), new Vector3f(0, 0 ,0), 0.5f, 1);
+            s = new Sphere(new Vector3f(0, 4, -2), new Vector3f(0, 0 ,0), 1f, 1, new Color(1, 0, 0));
+            Sphere s2 = new Sphere(new Vector3f(0, -4, -2), new Vector3f(0, 0 ,0), 1f, 1, t);
 
-            entities = new Entity[]{massterBall, c, c2, c3, c4, s};
+            Cone co = new Cone(new Vector3f(0, 2, -2), new Vector3f(0, 0 ,0), 1f, t);
+            Cone co2 = new Cone(new Vector3f(-2, 3, -2), new Vector3f(0, 0 ,0), 1f, new Color(1, 0, 1));
+            
+            Cylinder cr = new Cylinder(new Vector3f(3, 2, -2), new Vector3f(10, 180, 10), 1f, t);
+            Cylinder cr2 = new Cylinder(new Vector3f(3, 4, -2), new Vector3f(10, 180, 10), 1f, new Color(1, 1, 0));
+            
+            entities = new Entity[]{massterBall, c, c2, c3, c4, s, s2, co, co2, cr, cr2};
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -197,6 +213,8 @@ public class Game {
         lightColour = new Color(1, 1, 1);
         directionalLight = new DirectionalLight(lightColour, lightPosition, lightIntensity);
 
+        physicsSpace = new PhysicsSpace();
+        
         // Initialization done, set running to true.
         running = true;
     }
@@ -308,7 +326,7 @@ public class Game {
 
         for (Entity entity : entities) {
             // Do something for every loaded entity.
-            entity.getRotation().y += 1.0f;
+        	entity.getRotation().y += 1.0f;
         }
         
         // Update spot light direction.
@@ -345,6 +363,10 @@ public class Game {
         double angRad = Math.toRadians(lightAngle);
         directionalLight.getDirection().x = (float) Math.sin(angRad);
         directionalLight.getDirection().y = (float) Math.cos(angRad);
+        
+        physicsSpace.tick();
+        javax.vecmath.Vector3f v = physicsSpace.fallRigidBody.getWorldTransform(new Transform()).origin;
+        s.setPosition(v.x, v.y, v.z);
     }
 
     /**

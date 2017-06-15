@@ -117,6 +117,12 @@
             <artifactId>joml</artifactId>
             <version>${joml.version}</version>
         </dependency>
+        
+        <dependency>
+		    <groupId>cz.advel.jbullet</groupId>
+		    <artifactId>jbullet</artifactId>
+		    <version>20101010-1</version>
+		</dependency>
     </dependencies>
 
     <profiles>
