@@ -29,6 +29,8 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 import com.bulletphysics.collision.broadphase.AxisSweep3;
+import com.bulletphysics.collision.broadphase.BroadphaseInterface;
+import com.bulletphysics.collision.broadphase.DbvtBroadphase;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.shapes.CollisionShape;
@@ -54,26 +56,47 @@ public class PhysicsSpace {
 
 	private static final int MAX_PROXIES = 1024;
 	
-	private ObjectArrayList<CollisionShape> collisionShapes;
-	private CollisionDispatcher dispatcher;
-	private ConstraintSolver solver;
-	private DefaultCollisionConfiguration collisionConfiguration;
 	
 	private AxisSweep3 overlappingPairCache;
 	
 	private Vector3f worldAABBMin = new Vector3f(-1000, -1000, -1000);
 	private Vector3f worldAABBMax = new Vector3f(1000, 1000, 1000);
 	
+	/**
+	 * Container for the JBullet physics world.
+	 */
 	private DiscreteDynamicsWorld dynamicsWorld;
 	
+	/**
+	 * Broadphase finds out which objects that could be colliding
+	 * so that only those objects are checked.
+	 */
+	private BroadphaseInterface broadPhase;
+
+	/**
+	 * Configuration for the collision.
+	 */
+	private DefaultCollisionConfiguration collisionConfiguration;
+
+	/**
+	 * The object that finds out if objects are colliding.
+	 */
+	private CollisionDispatcher dispatcher;
+
+	/**
+	 * Solves constraints.
+	 */
+	private ConstraintSolver solver;
+	
+	// Ground shape to simulate the ground of the physics space.
 	private CollisionShape groundShape;
-	private CollisionShape fallShape;
-	public RigidBody fallRigidBody;
 	
 	/**
-	 * 
+	 * TODO: More comments and add an actual visible shape for the ground shape.
+	 * Oskar Mendel 2017-06-16.
 	 */
 	public PhysicsSpace() {
+		broadPhase = new DbvtBroadphase();
 		collisionConfiguration = new DefaultCollisionConfiguration();
 		dispatcher = new CollisionDispatcher(collisionConfiguration);
 		
@@ -81,32 +104,16 @@ public class PhysicsSpace {
 		
 		solver = new SequentialImpulseConstraintSolver();
 		
-		collisionShapes = new ObjectArrayList<CollisionShape>();
-		
-		dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
+		dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, broadPhase, solver, collisionConfiguration);
 		dynamicsWorld.setGravity(new Vector3f(0, -10, 0));
 		
 		groundShape = new StaticPlaneShape(new Vector3f(0, 1, 0), 1);
-		fallShape = new SphereShape(1);
 		
 		DefaultMotionState groundMotionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(0, -1, 0), 1.0f))); 
 		RigidBodyConstructionInfo groundRigidBodyCI = new RigidBodyConstructionInfo(0, groundMotionState, groundShape, new Vector3f(0,0,0)); 
 		RigidBody groundRigidBody = new RigidBody(groundRigidBodyCI); 
 		
-		collisionShapes.add(groundShape);
 		dynamicsWorld.addRigidBody(groundRigidBody);
-		
-		DefaultMotionState fallMotionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(0, 50, 0), 1.0f)));
-		
-		int mass = 1;
-		
-		Vector3f fallInertia = new Vector3f(0,0,0); 
-		fallShape.calculateLocalInertia(mass,fallInertia); 
-		
-		RigidBodyConstructionInfo fallRigidBodyCI = new RigidBodyConstructionInfo(mass,fallMotionState,fallShape,fallInertia); 
-		fallRigidBody = new RigidBody(fallRigidBodyCI); 
-		
-		dynamicsWorld.addRigidBody(fallRigidBody); 
 	}
 	
 	/**
@@ -114,6 +121,10 @@ public class PhysicsSpace {
 	 */
 	public void initPhysics() {
 		
+	}
+	
+	public void addRigidBody(RigidBody r) {
+		this.dynamicsWorld.addRigidBody(r);
 	}
 	
 	/**

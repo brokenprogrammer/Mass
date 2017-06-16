@@ -35,14 +35,13 @@ import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.light.PointLight;
 import me.oskarmendel.mass.gfx.light.SpotLight;
 import me.oskarmendel.mass.input.MouseHandler;
+import me.oskarmendel.mass.phys.Collidable;
 import me.oskarmendel.mass.phys.PhysicsSpace;
 import me.oskarmendel.mass.util.OBJLoader;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWErrorCallback;
-
-import com.bulletphysics.linearmath.Transform;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -110,6 +109,7 @@ public class Game {
     private float spotInc = 1;
     
     Sphere s;
+    MassterBall massterBall;
     
     /**
      * Default constructor for the game.
@@ -160,7 +160,7 @@ public class Game {
             Material mat = new Material(t, 1f);
             mesh.setMaterial(mat);
 
-            MassterBall massterBall = new MassterBall(mesh);
+            massterBall = new MassterBall(mesh);
             massterBall.setPosition(0, -1, 0);
 
             Cube c = new Cube(new Vector3f(6, 2, -2), new Vector3f(0, 0 ,0), 0.5f);
@@ -214,6 +214,12 @@ public class Game {
         directionalLight = new DirectionalLight(lightColour, lightPosition, lightIntensity);
 
         physicsSpace = new PhysicsSpace();
+        
+        for (Entity ent : entities) {
+        	if (ent instanceof Collidable) {
+        		physicsSpace.addRigidBody(((Collidable) ent).getRigidBody());
+        	}
+        }
         
         // Initialization done, set running to true.
         running = true;
@@ -365,8 +371,8 @@ public class Game {
         directionalLight.getDirection().y = (float) Math.cos(angRad);
         
         physicsSpace.tick();
-        javax.vecmath.Vector3f v = physicsSpace.fallRigidBody.getWorldTransform(new Transform()).origin;
-        s.setPosition(v.x, v.y, v.z);
+        massterBall.update(); // TODO: Make small loop to update logic for all entities. & Replace rotation loop above.
+        					  // Oskar Mendel 2017-06-16.
     }
 
     /**

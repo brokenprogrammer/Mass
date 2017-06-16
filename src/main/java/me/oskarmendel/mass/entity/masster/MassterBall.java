@@ -28,6 +28,7 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
+import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
@@ -68,13 +69,22 @@ public class MassterBall extends Entity implements Collidable{
 	public void initPhysics() {
 		motionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(0, 50, 0), 1.0f)));
 		
+		//TODO Calculate shape based on mesh & Javadoc comments.
+		//Oskar Mendel 2017-06-16.
+		
 		int mass = 1;
 		fallInertia = new Vector3f(0,0,0); 
-		
+		collisionShape = new BoxShape(new Vector3f(1, 1, 1));
 		collisionShape.calculateLocalInertia(mass,fallInertia);
 		
 		RigidBodyConstructionInfo rigidBodyCI = new RigidBodyConstructionInfo(mass, motionState, collisionShape, fallInertia); 
 		rigidBody = new RigidBody(rigidBodyCI); 
+	}
+	
+	@Override
+	public void update() {
+		Vector3f v = this.rigidBody.getWorldTransform(new Transform()).origin;
+		this.setPosition(v.x, v.y, v.z);
 	}
 
 	@Override

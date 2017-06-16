@@ -44,6 +44,11 @@ public interface Collidable {
 	void initPhysics();
 	
 	/**
+	 * Method to update logic for this collidable.
+	 */
+	void update();
+	
+	/**
 	 * Getter for the collidables RigidBody.
 	 * 
 	 * @return RigidBody of the collidable.
