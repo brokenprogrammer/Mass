@@ -42,12 +42,15 @@ import me.oskarmendel.mass.gfx.Texture;
  * @version 0.00.00
  * @name Cone.java
  */
-public class Cone extends Entity {
+public class Cone extends Entity implements Geometry {
 
 	/**
 	 * Vertex positions for the cone.
 	 */
 	private float[] cone_positions;
+	
+	// ArrayList used during the generation of the Cone.
+	ArrayList<Vector3f> positions;
 	
 	/**
 	 * Texture coordinates for the cone.
@@ -84,7 +87,9 @@ public class Cone extends Entity {
 		radius = 1;
 		sides = 10;
 		
-		generateCone();
+		generateVertices();
+		generateNormals();
+		generateTextureCoordinates();
 		
 		Mesh mesh = new Mesh(cone_positions, cone_texture_coordinates, cone_normals, cone_indices);
 		Material mat = new Material();
@@ -113,7 +118,9 @@ public class Cone extends Entity {
 		radius = 1;
 		sides = 10;
 		
-		generateCone();
+		generateVertices();
+		generateNormals();
+		generateTextureCoordinates();
 		
 		Mesh mesh = new Mesh(cone_positions, cone_texture_coordinates, cone_normals, cone_indices);
 		Material mat = new Material();
@@ -146,7 +153,9 @@ public class Cone extends Entity {
 		radius = 1;
 		sides = 10;
 		
-		generateCone();
+		generateVertices();
+		generateNormals();
+		generateTextureCoordinates();
 		
 		Mesh mesh = new Mesh(cone_positions, cone_texture_coordinates, cone_normals, cone_indices);
 		Material mat = new Material(texture);
@@ -160,11 +169,11 @@ public class Cone extends Entity {
 	}
 	
 	/**
-	 * Generates the vertices, indices, normals and uv mapping 
-	 * for the cone.
+	 * Generates the vertices and indices for the Cone.
 	 */
-	private void generateCone() {
-		ArrayList<Vector3f> positions = new ArrayList<Vector3f>();
+	@Override
+	public void generateVertices() {
+		positions = new ArrayList<Vector3f>();
 		ArrayList<Vector3i> indices = new ArrayList<Vector3i>();
 		
 		// Generate bottom
@@ -206,11 +215,15 @@ public class Cone extends Entity {
 			cone_indices[i + 1] = indices.get(k).y;
 			cone_indices[i + 2] = indices.get(k).z;
 		}
-		
-		// Generate normals
+	}
+
+	/**
+	 * Generates the normals for the Cone.
+	 */
+	@Override
+	public void generateNormals() {
 		float[] normals = new float[positions.size()*3];
 		
-		// Normals for bottom vertex
 		// TODO: These are not calculated properly, needs refactoring later on.
 		// Oskar Mendel - 2017-06-14
 		normals[0] = 0;
@@ -235,8 +248,13 @@ public class Cone extends Entity {
 		}
 		
 		cone_normals = normals;
-		
-		// Generate texture coordinates through spherical uv mapping
+	}
+
+	/**
+	 * Generates the uv mapping for the Cone.
+	 */
+	@Override
+	public void generateTextureCoordinates() {
 		// TODO: Switch to cube mapping?
 		cone_texture_coordinates = new float[positions.size()*2];
 		

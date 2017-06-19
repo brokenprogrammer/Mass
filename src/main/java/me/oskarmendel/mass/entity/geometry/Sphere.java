@@ -45,7 +45,7 @@ import me.oskarmendel.mass.gfx.Texture;
  * @version 0.00.00
  * @name Sphere.java
  */
-public class Sphere extends Entity {
+public class Sphere extends Entity implements Geometry {
 	
 	private static final float t = (float) (1.0f + Math.sqrt(5))/2;
 	
@@ -82,10 +82,10 @@ public class Sphere extends Entity {
 	public Sphere(Vector3f position, Vector3f rotation, float scale, int iterations) {
 		super();
 		
-		createIcoSphere();
+		generateVertices();
 		subdivide(iterations);
-		createNormals();
-		createTextureCoordinates();
+		generateNormals();
+		generateTextureCoordinates();
 		
 		Mesh mesh = new Mesh(sphere_positions, sphere_texture_coordinates, sphere_normals, sphere_indices);
 		Material mat = new Material();
@@ -113,10 +113,10 @@ public class Sphere extends Entity {
 	public Sphere(Vector3f position, Vector3f rotation, float scale, int iterations, Color color) {
 		super();
 		
-		createIcoSphere();
+		generateVertices();
 		subdivide(iterations);
-		createNormals();
-		createTextureCoordinates();
+		generateNormals();
+		generateTextureCoordinates();
 		
 		Mesh mesh = new Mesh(sphere_positions, sphere_texture_coordinates, sphere_normals, sphere_indices);
 		Material mat = new Material();
@@ -148,10 +148,10 @@ public class Sphere extends Entity {
 	public Sphere(Vector3f position, Vector3f rotation, float scale, int iterations, Texture texture) {
 		super();
 		
-		createIcoSphere();
+		generateVertices();
 		subdivide(iterations);
-		createNormals();
-		createTextureCoordinates();
+		generateNormals();
+		generateTextureCoordinates();
 		
 		Mesh mesh = new Mesh(sphere_positions, sphere_texture_coordinates, sphere_normals, sphere_indices);
 		Material mat = new Material(texture);
@@ -168,7 +168,8 @@ public class Sphere extends Entity {
 	 * Generates an initial icosphere vertex positions and
 	 * indices.
 	 */
-	private void createIcoSphere() {
+	@Override
+	public void generateVertices() {
 		sphere_positions = new float[12*3];
 		
 		for (int i = 0; i < 12; i+=3) {
@@ -215,13 +216,14 @@ public class Sphere extends Entity {
 				8, 10, 4
 		};
 		
-		sphere_indices = indices;	
+		sphere_indices = indices;
 	}
 	
 	/**
 	 * Generates the normals for the sphere.
 	 */
-	private void createNormals() {
+	@Override
+	public void generateNormals() {
 		float[] normals = new float[sphere_positions.length];
 		for(int i = 0; i < normals.length; i+=3) {
 			float x = sphere_positions[i];
@@ -246,7 +248,8 @@ public class Sphere extends Entity {
 	 * TODO: Switch to using cube mapping:
 	 * https://www.shaneenishry.com/blog/2014/08/01/planet-generation-part-i/
 	 */
-	private void createTextureCoordinates() {
+	@Override
+	public void generateTextureCoordinates() {
 		sphere_texture_coordinates = new float[(sphere_positions.length/3)*2];
 		
 		ArrayList<Vector3f> vertices = new ArrayList<>();

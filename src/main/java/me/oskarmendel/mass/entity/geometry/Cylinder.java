@@ -42,12 +42,15 @@ import me.oskarmendel.mass.gfx.Texture;
  * @version 0.00.00
  * @name Cylinder.java
  */
-public class Cylinder extends Entity {
+public class Cylinder extends Entity implements Geometry {
 	
 	/**
 	 * Vertex positions for the cylinder.
 	 */
 	private float[] cylinder_positions;
+	
+	// ArrayList used during the generation of the Cylinder.
+	ArrayList<Vector3f> positions;
 	
 	/**
 	 * Texture coordinates of the cylinder.
@@ -83,7 +86,9 @@ public class Cylinder extends Entity {
 		radius = 1;
 		sides = 10;
 		
-		generateCylinder();
+		generateVertices();
+		generateNormals();
+		generateTextureCoordinates();
 		
 		Mesh mesh = new Mesh(cylinder_positions, cylinder_texture_coordinates, cylinder_normals, cylinder_indices);
 		Material mat = new Material();
@@ -112,7 +117,9 @@ public class Cylinder extends Entity {
 		radius = 1;
 		sides = 10;
 		
-		generateCylinder();
+		generateVertices();
+		generateNormals();
+		generateTextureCoordinates();
 		
 		Mesh mesh = new Mesh(cylinder_positions, cylinder_texture_coordinates, cylinder_normals, cylinder_indices);
 		Material mat = new Material();
@@ -145,7 +152,9 @@ public class Cylinder extends Entity {
 		radius = 1;
 		sides = 10;
 		
-		generateCylinder();
+		generateVertices();
+		generateNormals();
+		generateTextureCoordinates();
 		
 		Mesh mesh = new Mesh(cylinder_positions, cylinder_texture_coordinates, cylinder_normals, cylinder_indices);
 		Material mat = new Material(texture);
@@ -159,11 +168,11 @@ public class Cylinder extends Entity {
 	}
 	
 	/**
-	 * Generates the vertices, indices, normals and uv mapping 
-	 * for the cylinder.
+	 * Generates the vertices and indices for the Cylinder.
 	 */
-	private void generateCylinder() {
-		ArrayList<Vector3f> positions = new ArrayList<Vector3f>();
+	@Override
+	public void generateVertices() {
+		positions = new ArrayList<Vector3f>();
 		ArrayList<Vector3i> indices = new ArrayList<Vector3i>();
 		
 		Vector3f v0 = new Vector3f(0, 0, 0);
@@ -208,10 +217,15 @@ public class Cylinder extends Entity {
 			cylinder_indices[i + 1] = indices.get(k).y;
 			cylinder_indices[i + 2] = indices.get(k).z;
 		}
-		
-		// Generate normals
+	}
+
+	/**
+	 * Generates the normals for the Cylinder.
+	 */
+	@Override
+	public void generateNormals() {
 		float[] normals = new float[positions.size()*3];
-		// Normals for bottom and top vertex
+		
 		// TODO: These are not calculated properly, needs refactoring later on.
 		// Oskar Mendel - 2017-06-15
 		normals[0] = 0;
@@ -236,9 +250,15 @@ public class Cylinder extends Entity {
 		}
 		
 		cylinder_normals = normals;
-		
-		// Generate texture coordinates through spherical uv mapping
+	}
+
+	/**
+	 * Generates the uv mapping for the Cylinder.
+	 */
+	@Override
+	public void generateTextureCoordinates() {
 		// TODO: Switch to cube mapping?
+		// Oskar Mendel - 2017-06-15
 		cylinder_texture_coordinates = new float[positions.size()*2];
 		
 		for (int i = 2, k = 1; k < positions.size(); i+=2, k++) {
