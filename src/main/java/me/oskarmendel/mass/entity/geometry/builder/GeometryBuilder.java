@@ -22,37 +22,53 @@
  * SOFTWARE.
  */
 
-package me.oskarmendel.mass.entity.geometry;
+package me.oskarmendel.mass.entity.geometry.builder;
+
+import org.joml.Vector3f;
+
+import me.oskarmendel.mass.entity.geometry.Geometry;
 
 /**
- * Interface for all geometric presets containing 
- * methods shared between all the geometric shapes.
+ * Interface for all geometric builders containing 
+ * methods shared between all the builders.
  *
  * @author Oskar Mendel
  * @version 0.00.00
- * @name Geometry.java
+ * @name GeometryBuilder.java
  */
-public interface Geometry {
+public interface GeometryBuilder {
 	
 	/**
-	 * Generates the vertices and its respective indices.
+	 * Sets the position of the Geometric object to build.
+	 * 
+	 * @param position - Position of the geometric object.
+	 * 
+	 * @return This builder object.
 	 */
-	void generateVertices();
-		
-	/**
-	 * Generates the normals for the geometric preset.
-	 */
-	void generateNormals();
+	GeometryBuilder setPosition(Vector3f position);
 	
 	/**
-	 * Generates the texture coordinates for all triangles
-	 * in the geometric preset.
+	 * Sets the rotation of the Geometric object to build.
+	 * 
+	 * @param rotation - Rotation of the geometric object.
+	 * 
+	 * @return This builder object.
 	 */
-	void generateTextureCoordinates();
+	GeometryBuilder setRotation(Vector3f rotation);
 	
 	/**
-	 * Generates the mesh based upon the previously generated 
-	 * vertices, indices, normals and texture coordinates.
+	 * Sets the scale of the Geometric object to build.
+	 * 
+	 * @param scale - Scale of the geometric object.
+	 * 
+	 * @return This builder object.
 	 */
-	void generateMesh();
+	GeometryBuilder setScale(float scale);
+	
+	/**
+	 * Builds the object using all the specified values.
+	 * 
+	 * @return Geometric object built using the values given to the builder.
+	 */
+	Geometry build();
 }

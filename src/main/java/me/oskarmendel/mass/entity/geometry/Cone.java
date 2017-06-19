@@ -73,6 +73,30 @@ public class Cone extends Entity implements Geometry {
 	private int sides; // Amount of sides for the cone.
 	
 	/**
+	 * Color of this cone.
+	 */
+	private Color color;
+	
+	/**
+	 * Texture of this cone.
+	 */
+	private Texture texture;
+	
+	/**
+	 * Default constructor for the Cone. 
+	 */
+	public Cone() {
+		super();
+		
+		this.height = 1;
+		this.radius = 1;
+		this.sides = 10;
+		
+		this.color = null;
+		this.texture = null;
+	}
+	
+	/**
 	 * Creates a new cone at the specified position
 	 * using the specified rotation and scale.
 	 * 
@@ -264,5 +288,105 @@ public class Cone extends Entity implements Geometry {
 			cone_texture_coordinates[i] = (float)((Math.atan2(vertex.x, vertex.z) + Math.PI) / Math.PI / 2);
 			cone_texture_coordinates[i + 1] = (float)((Math.acos(vertex.y) + Math.PI) / Math.PI - 1);
 		}
+	}
+	
+	/**
+	 * Generates the mesh based upon the previously generated 
+	 * vertices, indices, normals and texture coordinates.
+	 */
+	@Override
+	public void generateMesh() {
+		Mesh mesh = new Mesh(cone_positions, cone_texture_coordinates, cone_normals, cone_indices);
+		setMesh(mesh);
+	}
+	
+	/**
+	 * Getter for the height of this cone.
+	 * 
+	 * @return - The height of this cone.
+	 */
+	public float getHeight() {
+		return height;
+	}
+
+	/**
+	 * Setter for the height of this cone.
+	 * 
+	 * @param height - Height value to set. 
+	 */
+	public void setHeight(float height) {
+		this.height = height;
+	}
+
+	/**
+	 * Getter for the radius of this cone.
+	 * 
+	 * @return - The radius of this cone.
+	 */
+	public float getRadius() {
+		return radius;
+	}
+
+	/**
+	 * Setter for the radius of this cone.
+	 * 
+	 * @param radius - Sides value to set. 
+	 */
+	public void setRadius(float radius) {
+		this.radius = radius;
+	}
+
+	/**
+	 * Getter for the sides of this cone.
+	 * 
+	 * @return - The amount sides of this cone.
+	 */
+	public int getSides() {
+		return sides;
+	}
+
+	/**
+	 * Setter for the sides of this cone.
+	 * 
+	 * @param sides - Sides value to set.
+	 */
+	public void setSides(int sides) {
+		this.sides = sides;
+	}
+
+	/**
+	 * Setter color of this cone.
+	 * 
+	 * @param color - Color value to set.
+	 */
+	public void setColor(Color color) {
+		this.color = color;
+	}
+	
+	/**
+	 * Getter of the color of this cone.
+	 * 
+	 * @return - The color of this cone.
+	 */
+	public Color getColor() {
+		return this.color;
+	}
+	
+	/**
+	 * Setter of the texture of this cone.
+	 * 
+	 * @param texture - Texture value to set.
+	 */
+	public void setTexture(Texture texture) {
+		this.texture = texture;
+	}
+	
+	/**
+	 * Getter of the texture of this cone.
+	 * 
+	 * @return - The texture of this cone.
+	 */
+	public Texture getTexture() {
+		return this.texture;
 	}
 }

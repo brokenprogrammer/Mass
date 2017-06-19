@@ -70,6 +70,32 @@ public class Sphere extends Entity implements Geometry {
 	private int[] sphere_indices;
 	
 	/**
+	 * The number of subdivisions this sphere should go through.
+	 */
+	private int subdivisions;
+	
+	/**
+	 * Color of this sphere.
+	 */
+	private Color color;
+	
+	/**
+	 * Texture of this sphere.
+	 */
+	private Texture texture;
+	
+	/**
+	 * Default constructor for the Sphere 
+	 */
+	public Sphere() {
+		super();
+		
+		this.subdivisions = 0;
+		this.color = null;
+		this.texture = null;
+	}
+	
+	/**
 	 * Creates a new sphere at the specified position
 	 * using the specified rotation and scale. Then 
 	 * subdivides the sphere with the specified amount of iterations.
@@ -266,12 +292,22 @@ public class Sphere extends Entity implements Geometry {
 	}
 	
 	/**
+	 * Generates the mesh based upon the previously generated 
+	 * vertices, indices, normals and texture coordinates.
+	 */
+	@Override
+	public void generateMesh() {
+		Mesh mesh = new Mesh(sphere_positions, sphere_texture_coordinates, sphere_normals, sphere_indices);
+		setMesh(mesh);
+	}
+	
+	/**
 	 * Subdivides each of the icospheres triangles into 4 
 	 * smaller triangles.
 	 * 
 	 * @param iterations - Number of subdivisions.
 	 */
-	private void subdivide(int iterations) {
+	public void subdivide(int iterations) {
 		ArrayList<Vector3f> vertices = new ArrayList<>();
 		Map<Long, Integer> middlePointIndexCache = new HashMap<Long, Integer>();
 		
@@ -361,5 +397,59 @@ public class Sphere extends Entity implements Geometry {
 		cache.put(key, i);
  
 		return i;
+	}
+	
+	/**
+	 * Setter of the amount of subdivisions for this sphere.
+	 *  
+	 * @param subdivisions - Subdivisions value to set.
+	 */
+	public void setSubdivisions(int subdivisions) {
+		this.subdivisions = subdivisions;
+	}
+	
+	/**
+	 * Getter of the subdivisions value of this sphere.
+	 * 
+	 * @return - The amount of subdivisions of this sphere.
+	 */
+	public int getSubdivisions() {
+		return this.subdivisions;
+	}
+	
+	/**
+	 * Setter color of this sphere.
+	 * 
+	 * @param color - Color value to set.
+	 */
+	public void setColor(Color color) {
+		this.color = color;
+	}
+	
+	/**
+	 * Getter of the color of this sphere.
+	 * 
+	 * @return - The color of this sphere.
+	 */
+	public Color getColor() {
+		return this.color;
+	}
+	
+	/**
+	 * Setter of the texture of this sphere.
+	 * 
+	 * @param texture - Texture value to set.
+	 */
+	public void setTexture(Texture texture) {
+		this.texture = texture;
+	}
+	
+	/**
+	 * Getter of the texture of this sphere.
+	 * 
+	 * @return - The texture of this sphere.
+	 */
+	public Texture getTexture() {
+		return this.texture;
 	}
 }
