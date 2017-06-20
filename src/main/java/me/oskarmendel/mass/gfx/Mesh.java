@@ -51,6 +51,16 @@ public class Mesh {
     private static final Color DEFAULT_COLOR = Color.WHITE;
 
     /**
+     * Vertice positions of this mesh.
+     */
+    private float[] positions;
+    
+    /**
+     * Indices of this mesh.
+     */
+    private int[] indices;
+    
+    /**
      * The vertex array object for this mesh.
      */
     private final int vaoId;
@@ -93,7 +103,10 @@ public class Mesh {
     //public Mesh(float[] positions, float[] colors, int[] indices) { // Create shape with colors
     //public Mesh(float[] positions, float[] textCoords, int[] indices, Texture texture) { // Create shape with texture
     public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices) {
-        // Store array of floats in the buffer to interface correctly with C Library.
+        this.positions = positions;
+    	this.indices = indices;
+    	
+    	// Store array of floats in the buffer to interface correctly with C Library.
         FloatBuffer positionBuffer = null;
         FloatBuffer textCoordsBuffer = null;
         FloatBuffer normalsBuffer = null;
@@ -261,4 +274,40 @@ public class Mesh {
         glBindVertexArray(0);
         glDeleteVertexArrays(vaoId);
     }
+
+	/**
+	 * Getter for the array of vertex positions for this Mesh.
+	 * 
+	 * @return - The vertex positions of this Mesh.
+	 */
+	public float[] getPositions() {
+		return positions;
+	}
+
+	/**
+	 * Setter for the vertex positions for this Mesh.
+	 * 
+	 * @param positions - The positions array to set.
+	 */
+	public void setPositions(float[] positions) {
+		this.positions = positions;
+	}
+
+	/**
+	 * Getter for the array of indices for this Mesh.
+	 * 
+	 * @return - The indices of this mesh.
+	 */
+	public int[] getIndices() {
+		return indices;
+	}
+
+	/**
+	 * Setter for the indices for this Mesh.
+	 * 
+	 * @param indices - The indices array to set
+	 */
+	public void setIndices(int[] indices) {
+		this.indices = indices;
+	}
 }

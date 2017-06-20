@@ -25,10 +25,7 @@
 package me.oskarmendel.mass.core;
 
 import me.oskarmendel.mass.entity.Entity;
-import me.oskarmendel.mass.entity.geometry.Cone;
-import me.oskarmendel.mass.entity.geometry.Cube;
-import me.oskarmendel.mass.entity.geometry.Cylinder;
-import me.oskarmendel.mass.entity.geometry.Sphere;
+import me.oskarmendel.mass.entity.TestRoom;
 import me.oskarmendel.mass.entity.masster.MassterBall;
 import me.oskarmendel.mass.gfx.*;
 import me.oskarmendel.mass.gfx.light.DirectionalLight;
@@ -108,8 +105,8 @@ public class Game {
     private float spotAngle = 0;
     private float spotInc = 1;
     
-    Sphere s;
     MassterBall massterBall;
+    TestRoom room;
     
     /**
      * Default constructor for the game.
@@ -156,36 +153,53 @@ public class Game {
 
         Texture t = Texture.loadTexture("src/main/resources/textures/hexmap.png");
         try {
-            Mesh mesh = OBJLoader.loadMesh("src/main/resources/models/cube.obj");
-            Material mat = new Material(t, 1f);
-            mesh.setMaterial(mat);
+            Mesh cubeMesh = OBJLoader.loadMesh("src/main/resources/models/cube.obj");
+            Mesh testRoomMesh = OBJLoader.loadMesh("src/main/resources/models/room.obj");
+            Material mat = new Material(t, 1.0f);
+            cubeMesh.setMaterial(mat);
+            testRoomMesh.setMaterial(new Material());
 
-            massterBall = new MassterBall(mesh);
+            massterBall = new MassterBall(cubeMesh);
             massterBall.setPosition(0, -1, 0);
-
-            Cube c = new Cube(new Vector3f(6, 2, -2), new Vector3f(0, 0 ,0), 0.5f);
-            Cube c2 = new Cube(new Vector3f(0, -2, -2), new Vector3f(0, 0 ,0), 0.5f);
-            Cube c3 = new Cube(new Vector3f(-2, 0, -2), new Vector3f(0, 0 ,0), 0.5f);
-            Cube c4 = new Cube(new Vector3f(2, 0, -2), new Vector3f(0, 0 ,0), 0.5f);
-
-            c.getMesh().getMaterial().setAmbientColor(new Color(0, 1, 0).toVector4f());
-            c.getMesh().getMaterial().setDiffuseColor(new Color(0, 1, 0).toVector4f());
-            c.getMesh().getMaterial().setSpecularColor(new Color(0, 1, 0).toVector4f());
-
-            c2.getMesh().getMaterial().setAmbientColor(new Color(0, 0, 1).toVector4f());
-            c2.getMesh().getMaterial().setDiffuseColor(new Color(0, 0, 1).toVector4f());
-            c2.getMesh().getMaterial().setSpecularColor(new Color(0, 0, 1).toVector4f());
             
-            s = new Sphere(new Vector3f(0, 4, -2), new Vector3f(0, 0 ,0), 1f, 1, new Color(1, 0, 0));
-            Sphere s2 = new Sphere(new Vector3f(0, -4, -2), new Vector3f(0, 0 ,0), 1f, 1, t);
+            room = new TestRoom(testRoomMesh);
+            room.setPosition(0, -1, 0);
 
-            Cone co = new Cone(new Vector3f(0, 2, -2), new Vector3f(0, 0 ,0), 1f, t);
-            Cone co2 = new Cone(new Vector3f(-2, 3, -2), new Vector3f(0, 0 ,0), 1f, new Color(1, 0, 1));
+//            Cube c = new Cube(new Vector3f(6, 2, -2), new Vector3f(0, 0 ,0), 0.5f);
+//            Cube c2 = new Cube(new Vector3f(0, -2, -2), new Vector3f(0, 0 ,0), 0.5f);
+//            Cube c3 = new Cube(new Vector3f(-2, 0, -2), new Vector3f(0, 0 ,0), 0.5f);
+//            Cube c4 = new Cube(new Vector3f(2, 0, -2), new Vector3f(0, 0 ,0), 0.5f);
+//
+//            c.getMesh().getMaterial().setAmbientColor(new Color(0, 1, 0).toVector4f());
+//            c.getMesh().getMaterial().setDiffuseColor(new Color(0, 1, 0).toVector4f());
+//            c.getMesh().getMaterial().setSpecularColor(new Color(0, 1, 0).toVector4f());
+//
+//            c2.getMesh().getMaterial().setAmbientColor(new Color(0, 0, 1).toVector4f());
+//            c2.getMesh().getMaterial().setDiffuseColor(new Color(0, 0, 1).toVector4f());
+//            c2.getMesh().getMaterial().setSpecularColor(new Color(0, 0, 1).toVector4f());
+//            
+//            s = new Sphere(new Vector3f(0, 4, -2), new Vector3f(0, 0 ,0), 1f, 1, new Color(1, 0, 0));
+//            Sphere s2;//= new Sphere(new Vector3f(0, -4, -2), new Vector3f(0, 0 ,0), 1f, 1, t);
+//
+//            SphereBuilder sb = new SphereBuilder();
+//            sb.setPosition(new Vector3f(0, -4, -2)).setRotation(new Vector3f(0, 0, 0)).setScale(1).setColor(new Color(0, 1, 0)).setSubdivisions(3);
+//            s2 = sb.build();
+//            
+//            Cone co = new Cone(new Vector3f(0, 2, -2), new Vector3f(0, 0 ,0), 1f, t);
+//            Cone co2;// = new Cone(new Vector3f(-2, 3, -2), new Vector3f(0, 0 ,0), 1f, new Color(1, 0, 1));
+//            
+//            ConeBuilder cob = new ConeBuilder();
+//            cob.setPosition(new Vector3f(-2, 3, -2)).setRotation(new Vector3f(00, 0, 0)).setScale(1).setHeight(3).setColor(new Color(1, 0.8f, 1));
+//            co2 = cob.build();
+//            
+//            Cylinder cr = new Cylinder(new Vector3f(3, 2, -2), new Vector3f(10, 180, 10), 1f, t);
+//            Cylinder cr2; // = new Cylinder(new Vector3f(3, 4, -2), new Vector3f(10, 180, 10), 1f, new Color(1, 1, 0));
+//            
+//            CylinderBuilder cb = new CylinderBuilder();
+//            cb.setPosition(new Vector3f(3, 4, -2)).setRotation(new Vector3f(10, 180, 10)).setScale(1).setHeight(3).setColor(new Color(1, 1, 0));
+//            cr2 = cb.build();
             
-            Cylinder cr = new Cylinder(new Vector3f(3, 2, -2), new Vector3f(10, 180, 10), 1f, t);
-            Cylinder cr2 = new Cylinder(new Vector3f(3, 4, -2), new Vector3f(10, 180, 10), 1f, new Color(1, 1, 0));
-            
-            entities = new Entity[]{massterBall, c, c2, c3, c4, s, s2, co, co2, cr, cr2};
+            entities = new Entity[]{massterBall, room};
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -329,11 +343,6 @@ public class Game {
         
         // Update the camera view matrix.
         camera.updateViewMatrix();
-
-        for (Entity entity : entities) {
-            // Do something for every loaded entity.
-        	entity.getRotation().y += 1.0f;
-        }
         
         // Update spot light direction.
         spotAngle += spotInc * 0.05f;
@@ -371,8 +380,16 @@ public class Game {
         directionalLight.getDirection().y = (float) Math.cos(angRad);
         
         physicsSpace.tick();
-        massterBall.update(); // TODO: Make small loop to update logic for all entities. & Replace rotation loop above.
-        					  // Oskar Mendel 2017-06-16.
+        
+        for (Entity entity : entities) {
+            // Do something for every loaded entity.
+        	//entity.getRotation().y += 1.0f;
+        	
+        	// Update physics of all collidable entities.
+        	if (entity instanceof Collidable) {
+        		((Collidable) entity).updatePhysics();
+        	}
+        }
     }
 
     /**

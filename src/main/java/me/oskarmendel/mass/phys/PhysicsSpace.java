@@ -24,26 +24,16 @@
 
 package me.oskarmendel.mass.phys;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
-import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.DbvtBroadphase;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.SphereShape;
-import com.bulletphysics.collision.shapes.StaticPlaneShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
-import com.bulletphysics.linearmath.DefaultMotionState;
-import com.bulletphysics.linearmath.Transform;
-import com.bulletphysics.util.ObjectArrayList;
 
 /**
  * This class manages the physics of the game world.
@@ -54,13 +44,10 @@ import com.bulletphysics.util.ObjectArrayList;
  */
 public class PhysicsSpace {
 
-	private static final int MAX_PROXIES = 1024;
+	//private static final int MAX_PROXIES = 1024;
 	
-	
-	private AxisSweep3 overlappingPairCache;
-	
-	private Vector3f worldAABBMin = new Vector3f(-1000, -1000, -1000);
-	private Vector3f worldAABBMax = new Vector3f(1000, 1000, 1000);
+	//private Vector3f worldAABBMin = new Vector3f(-1000, -1000, -1000);
+	//private Vector3f worldAABBMax = new Vector3f(1000, 1000, 1000);
 	
 	/**
 	 * Container for the JBullet physics world.
@@ -89,31 +76,31 @@ public class PhysicsSpace {
 	private ConstraintSolver solver;
 	
 	// Ground shape to simulate the ground of the physics space.
-	private CollisionShape groundShape;
+	//private CollisionShape groundShape;
 	
 	/**
-	 * TODO: More comments and add an actual visible shape for the ground shape.
+	 * TODO: Add an actual visible shape for the ground shape.
 	 * Oskar Mendel 2017-06-16.
 	 */
 	public PhysicsSpace() {
+		// TODO: Comments on stuff.
 		broadPhase = new DbvtBroadphase();
 		collisionConfiguration = new DefaultCollisionConfiguration();
 		dispatcher = new CollisionDispatcher(collisionConfiguration);
-		
-		overlappingPairCache = new AxisSweep3(worldAABBMin, worldAABBMax, MAX_PROXIES);
 		
 		solver = new SequentialImpulseConstraintSolver();
 		
 		dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, broadPhase, solver, collisionConfiguration);
 		dynamicsWorld.setGravity(new Vector3f(0, -10, 0));
 		
-		groundShape = new StaticPlaneShape(new Vector3f(0, 1, 0), 1);
 		
-		DefaultMotionState groundMotionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(0, -1, 0), 1.0f))); 
-		RigidBodyConstructionInfo groundRigidBodyCI = new RigidBodyConstructionInfo(0, groundMotionState, groundShape, new Vector3f(0,0,0)); 
-		RigidBody groundRigidBody = new RigidBody(groundRigidBodyCI); 
+//		groundShape = new StaticPlaneShape(new Vector3f(0, 1, 0), 1);
+//		
+//		DefaultMotionState groundMotionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(0, -1, 0), 1.0f))); 
+//		RigidBodyConstructionInfo groundRigidBodyCI = new RigidBodyConstructionInfo(0, groundMotionState, groundShape, new Vector3f(0,0,0)); 
+//		RigidBody groundRigidBody = new RigidBody(groundRigidBodyCI); 
 		
-		dynamicsWorld.addRigidBody(groundRigidBody);
+		//dynamicsWorld.addRigidBody(groundRigidBody);
 	}
 	
 	/**
@@ -123,12 +110,17 @@ public class PhysicsSpace {
 		
 	}
 	
-	public void addRigidBody(RigidBody r) {
-		this.dynamicsWorld.addRigidBody(r);
+	/**
+	 * Adds a RigidBody to the physics world.
+	 * 
+	 * @param rigidBody - RigidBody to add to the physics world.
+	 */
+	public void addRigidBody(RigidBody rigidBody) {
+		this.dynamicsWorld.addRigidBody(rigidBody);
 	}
 	
 	/**
-	 * 
+	 * Steps the physics simulation one tick.
 	 */
 	public void tick() {
 		dynamicsWorld.stepSimulation(1/60.f, 10);

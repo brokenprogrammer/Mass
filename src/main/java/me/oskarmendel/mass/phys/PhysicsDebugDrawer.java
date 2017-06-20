@@ -24,34 +24,53 @@
 
 package me.oskarmendel.mass.phys;
 
-import com.bulletphysics.dynamics.RigidBody;
+import javax.vecmath.Vector3f;
+
+import com.bulletphysics.linearmath.IDebugDraw;
 
 /**
- * Interface for all collidable objects.
- * Classes that implements this interface will be counted as 
- * collidable and that they support collision detection.
+ * 
  *
  * @author Oskar Mendel
  * @version 0.00.00
- * @name Collidable.java
+ * @name PhysicsDebugDrawer.java
  */
-public interface Collidable {
-	
-	/**
-	 * Method to initialize all physics related
-	 * values.
-	 */
-	void initPhysics();
-	
-	/**
-	 * Method to update physics logic for this collidable.
-	 */
-	void updatePhysics();
-	
-	/**
-	 * Getter for the collidables RigidBody.
-	 * 
-	 * @return RigidBody of the collidable.
-	 */
-	RigidBody getRigidBody();
+public class PhysicsDebugDrawer extends IDebugDraw {
+
+	@Override
+	public void draw3dText(Vector3f arg0, String arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void drawContactPoint(Vector3f arg0, Vector3f arg1, float arg2, int arg3, Vector3f arg4) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void drawLine(Vector3f arg0, Vector3f arg1, Vector3f arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getDebugMode() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void reportErrorWarning(String arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setDebugMode(int arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

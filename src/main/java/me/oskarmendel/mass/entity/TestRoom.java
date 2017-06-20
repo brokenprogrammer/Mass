@@ -22,99 +22,92 @@
  * SOFTWARE.
  */
 
-package me.oskarmendel.mass.entity.masster;
+package me.oskarmendel.mass.entity;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
+import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.ConvexHullShape;
+import com.bulletphysics.collision.shapes.IndexedMesh;
+import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
-import com.bulletphysics.util.ObjectArrayList;
 
-import me.oskarmendel.mass.entity.Entity;
 import me.oskarmendel.mass.gfx.Mesh;
 import me.oskarmendel.mass.phys.Collidable;
 
 /**
- * This class represents the MassterBall used by the Masster.
+ * This class represents a testing room.
  *
  * @author Oskar Mendel
  * @version 0.00.00
- * @name MassterBall.java
+ * @name TestRoom.java
  */
-public class MassterBall extends Entity implements Collidable{
+public class TestRoom extends Entity implements Collidable {
 
 	/**
-	 * Shape of the MassterBall entity.
+	 * Shape of the testing room.
 	 */
 	private CollisionShape collisionShape;
 	
 	/**
-	 * RigidBody for the MassterBall entity.
+	 * RigidBody for the testing room.
 	 */
 	private RigidBody rigidBody;
 	
-	/**
-	 * MotionState for the MassterBall entity.
-	 * Bullet physics uses the MotionState to handle frame 
-	 * of simulation.
-	 */
-	private DefaultMotionState motionState;
+	
 	
 	/**
-	 * The fall innertia for the MassterBall entity.
+	 * 
+	 * @param mesh
 	 */
-	private Vector3f fallInertia;
-	
-	/**
-	 * The mass of the massterBall entity in kilo's.
-	 */
-	private int mass = 1;
-	
-    /**
-     * Constructs a new MassterBall using the specified Mesh.
-     *
-     * @param mesh - Mesh instance this MassterBall should use.
-     */
-    public MassterBall(Mesh mesh) {
-        super(mesh);
-        
-        initPhysics();
-    }
-
-    /**
-	 * Method to initialize all physics related
-	 * values.
-	 */
-	@Override
-	public void initPhysics() {
-		motionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(3, 50, 0), 1.0f)));
+	public TestRoom(Mesh mesh) {
+		super(mesh);
 		
-		// Construct collision shape based on the mesh vertices in the Mesh.
-		ObjectArrayList<Vector3f> points = new ObjectArrayList<Vector3f>();
-		float[] positions = getMesh().getPositions();
-		
-		for (int i = 0; i < positions.length; i+= 3) {
-			Vector3f v = new Vector3f(positions[i], positions[i + 1], positions[i + 2]);
-			points.add(v);
-		}
-		
-		fallInertia = new Vector3f(0,0,0); 
-		collisionShape = new ConvexHullShape(points);
-		collisionShape.calculateLocalInertia(mass,fallInertia);
-		
-		// Construct the RigidBody.
-		RigidBodyConstructionInfo rigidBodyCI = new RigidBodyConstructionInfo(mass, motionState, collisionShape, fallInertia); 
-		rigidBody = new RigidBody(rigidBodyCI); 
+		initPhysics();
 	}
 	
 	/**
-	 * Method to update physics logic for this MassterBall.
+	 * 
+	 */
+	@Override
+	public void initPhysics() {
+		DefaultMotionState groundMotionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(0, -1, 0), 1.0f))); 
+
+		
+		// Construct collision shape based on the mesh vertices in the Mesh.
+		float[] positions = getMesh().getPositions();
+		int[] indices = getMesh().getIndices();
+		
+		IndexedMesh indexedMesh = new IndexedMesh();
+		indexedMesh.numTriangles = indices.length / 3;
+		indexedMesh.triangleIndexBase = ByteBuffer.allocateDirect(indices.length*4).order(ByteOrder.nativeOrder());
+        indexedMesh.triangleIndexBase.asIntBuffer().put(indices);
+        indexedMesh.triangleIndexStride = 3 * 4;
+        indexedMesh.numVertices = positions.length / 3;
+        indexedMesh.vertexBase = ByteBuffer.allocateDirect(positions.length*4).order(ByteOrder.nativeOrder());
+        indexedMesh.vertexBase.asFloatBuffer().put(positions);
+        indexedMesh.vertexStride = 3 * 4;
+		
+		TriangleIndexVertexArray vertArray = new TriangleIndexVertexArray();
+		vertArray.addIndexedMesh(indexedMesh);
+		
+		collisionShape = new BvhTriangleMeshShape(vertArray, true);
+		
+		
+		RigidBodyConstructionInfo groundRigidBodyCI = new RigidBodyConstructionInfo(0, groundMotionState, collisionShape, new Vector3f(0,0,0)); 
+		rigidBody = new RigidBody(groundRigidBodyCI);
+	}
+
+	/**
+	 * 
 	 */
 	@Override
 	public void updatePhysics() {
@@ -123,12 +116,11 @@ public class MassterBall extends Entity implements Collidable{
 	}
 
 	/**
-	 * Getter for the MassterBall RigidBody.
 	 * 
-	 * @return RigidBody of the MassterBall.
 	 */
 	@Override
 	public RigidBody getRigidBody() {
 		return this.rigidBody;
 	}
+
 }
