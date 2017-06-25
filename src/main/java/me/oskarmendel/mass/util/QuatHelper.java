@@ -27,7 +27,7 @@ package me.oskarmendel.mass.util;
 import javax.vecmath.Quat4f;
 
 /**
- * 
+ * Helper class for working with Quaternions.  
  *
  * @author Oskar Mendel
  * @version 0.00.00
@@ -35,17 +35,36 @@ import javax.vecmath.Quat4f;
  */
 public class QuatHelper {
 	
+	/**
+	 * Getter for the pitch value of the specified quaternion.
+	 * 
+	 * @param q - Quaternion to retrieve pitch value from.
+	 *  
+	 * @return Pitch value from specified quaternion.
+	 */
 	public static float getPitch(Quat4f q) {
-		return (float) (Math.atan2(2.0 * (q.y * q.z + q.w * q.w), 
-				q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z));
+		return (float) (Math.atan2(2.0 * (q.x * q.y + q.w * q.z), q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z));
 	}
 	
+	/**
+	 * Getter for the yaw value of the specified quaternion.
+	 * 
+	 * @param q - Quaternion to retrieve yaw value from.
+	 * 
+	 * @return Yaw value from specified quaternion.
+	 */
 	public static float getYaw(Quat4f q) {
 		return (float)(Math.asin(-2.0 * (q.x * q.z - q.w * q.y))) ;
 	}
 	
+	/**
+	 * Getter for the roll value of the specified quaternion.
+	 * 
+	 * @param q - Quaternion to retrieve roll value from.
+	 * 
+	 * @return Roll value from specified quaternion.
+	 */
 	public static float getRoll(Quat4f q) {
-		return (float)(Math.atan2(2.0 * (q.x * q.y + q.w * q.z), 
-				q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z)) ;
+		return (float)(Math.atan2(2.0 * (q.y * q.z + q.w * q.x), q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z)) ;
 	}
 }

@@ -52,6 +52,7 @@ public class Player extends MobBase {
 	// Component manager
 		// Updateable component
 		// Drawable component
+	// State parrent class
 	
 	// Health Component
 	// Armor component
@@ -92,26 +93,66 @@ public class Player extends MobBase {
 	 */
 	private int mass = 1;
 	
+	/**
+	 * Constructs a new Player using the specified Mesh.
+	 * 
+	 * @param mesh - - Mesh instance this Plyer should use.
+	 */
 	public Player(Mesh mesh) {
 		super(mesh);
 		
 		initPhysics();
 	}
 	
-	public void move(float x, float y, float z) {
+	/**
+	 * Move the position of the player by the specified deltaX,
+	 * deltaY and deltaZ using the specified camera rotation.
+	 * 
+	 * @param deltaX - Value to move the x position by.
+	 * @param deltaY - Value to move the y position by.
+	 * @param deltaZ - Value to move the z position by.
+	 * @param camY - Camera y rotation to use for movement.
+	 */
+	public void movePosition(float deltaX, float deltaY, float deltaZ, float camY) {
 		Transform controllTransform = new Transform();
 		this.rigidBody.getMotionState().getWorldTransform(controllTransform);
-		Vector3f v = controllTransform.origin;
-		Vector3f force = new Vector3f(x, y, z);
+		Vector3f position = controllTransform.origin;
 		
-		v.sub(force);
+		if (deltaZ != 0) {
+            position.x += (float)Math.sin(Math.toRadians(camY)) * -1.0f * deltaZ;
+            position.z += (float)Math.cos(Math.toRadians(camY)) * deltaZ;
+        }
+
+        if (deltaX != 0) {
+            position.x += (float)Math.sin(Math.toRadians(camY - 90)) * -1.0f * deltaX;
+            position.z += (float)Math.cos(Math.toRadians(camY - 90)) *  deltaX;
+
+        }
+
+        position.y += deltaY;
+        
+        controllTransform.transform(new Vector3f(deltaX, deltaY, deltaZ));
+        
+        this.rigidBody.activate();
+        this.rigidBody.setWorldTransform(controllTransform);
+	}
+	
+	/**
+	 * Moves the rotation of the player by the specified deltaX,
+	 * deltaY and deltaZ.
+	 * 
+	 * @param x - Value to move the x rotation by.
+	 * @param y - Value to move the y rotation by.
+	 * @param z - Value to move the z rotation by.
+	 */
+	public void moveRotation(float x, float y, float z) {
 		this.rigidBody.activate();
-		this.rigidBody.applyCentralForce(v);
+		this.rigidBody.setAngularVelocity(new Vector3f(0, x, 0));
 	}
 
 	@Override
 	public void initPhysics() {
-		motionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(0, 50, 0), 1.0f)));
+		motionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(3, 20, 0), 1.0f)));
 		
 		// Construct collision shape based on the mesh vertices in the Mesh.
 		ObjectArrayList<Vector3f> points = new ObjectArrayList<Vector3f>();
@@ -128,17 +169,21 @@ public class Player extends MobBase {
 		
 		// Construct the RigidBody.
 		RigidBodyConstructionInfo rigidBodyCI = new RigidBodyConstructionInfo(mass, motionState, collisionShape, fallInertia); 
-		rigidBody = new RigidBody(rigidBodyCI); 
+		rigidBody = new RigidBody(rigidBodyCI);
+		//rigidBody.setDamping(0.999f, 1);
 	}
 
 	@Override
 	public void updatePhysics() {
-		Vector3f v = this.rigidBody.getWorldTransform(new Transform()).origin;
+		Transform t = new Transform();
+		this.rigidBody.getWorldTransform(t);
+		Vector3f v = t.origin;
 		Quat4f r = new Quat4f(); 
-		this.rigidBody.getWorldTransform(new Transform()).getRotation(r);
+		r = t.getRotation(r);
 
 		this.setPosition(v.x, v.y, v.z);
-		this.setRotation((float) Math.toDegrees(QuatHelper.getPitch(r)), 
+		this.setRotation(
+				(float) Math.toDegrees(QuatHelper.getPitch(r)), 
 				(float) Math.toDegrees(QuatHelper.getYaw(r)), 
 				(float) Math.toDegrees(QuatHelper.getRoll(r)));
 	}
