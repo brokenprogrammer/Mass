@@ -36,7 +36,7 @@ import org.joml.Vector4f;
  */
 public class Material {
 
-    private static final Color DEFAULT_COLOR = Color.WHITE;
+    public static final Color DEFAULT_COLOR = Color.WHITE;
 
     /**
      * The ambient color of this Material.
@@ -113,6 +113,25 @@ public class Material {
         this.specularColor = DEFAULT_COLOR.toVector4f();
         this.reflectance = reflectance;
         this.texture = texture;
+    }
+    
+    /**
+     * Creates a new Material with the specified reflectance
+     * and ambient, diffuse and specular colors.
+     *
+     * @param ambientColor - Ambient color of this Material.
+     * @param diffuseColor - Diffuse color of this Material.
+     * @param specularColor - Specular color of this Material.
+     * @param reflectance - Reflectance value of this Material.
+     */
+    public Material(Vector4f ambientColor, Vector4f diffuseColor,
+            Vector4f specularColor, float reflectance) {
+    	
+    	this.ambientColor = ambientColor;
+        this.diffuseColor = diffuseColor;
+        this.specularColor = specularColor;
+        this.reflectance = reflectance;
+        this.texture = null;
     }
 
     /**

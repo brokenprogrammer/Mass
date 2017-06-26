@@ -24,6 +24,7 @@
 
 package me.oskarmendel.mass.util;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -63,6 +64,36 @@ public class ArrayHelper {
 			res[i++] = f;
 		}
 		
+		return res;
+	}
+	
+	/**
+	 * Creates a new array filled with the specified length and fills
+	 * each position in the array with the specified defaultValue.
+	 * 
+	 * @param length - Length of the array to create.
+	 * @param defaultValue - Value to fill all the positions in the array with.
+	 * 
+	 * @return Array of target length filled with the specified value on each position.
+	 */
+	public static int[] createEmptyArrayInt(int length, int defaultValue) {
+		int[] res = new int[length];
+		Arrays.fill(res, defaultValue);
+		return res;
+	}
+	
+	/**
+	 * Creates a new array filled with the specified length and fills
+	 * each position in the array with the specified defaultValue.
+	 * 
+	 * @param length - Length of the array to create.
+	 * @param defaultValue - Value to fill all the positions in the array with.
+	 * 
+	 * @return Array of target length filled with the specified value on each position.
+	 */
+	public static float[] createEmptyArrayFloat(int length, float defaultValue) {
+		float[] res = new float[length];
+		Arrays.fill(res, defaultValue);
 		return res;
 	}
 }

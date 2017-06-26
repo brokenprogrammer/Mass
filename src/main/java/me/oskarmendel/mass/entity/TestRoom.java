@@ -65,11 +65,21 @@ public class TestRoom extends Entity implements Collidable {
 	
 	
 	/**
-	 * 
+	 *  TODO: add comments
 	 * @param mesh
 	 */
 	public TestRoom(Mesh mesh) {
 		super(mesh);
+		
+		initPhysics();
+	}
+	
+	/**
+	 * 
+	 * @param meshes
+	 */
+	public TestRoom(Mesh[] meshes) {
+		super(meshes);
 		
 		initPhysics();
 	}
@@ -81,6 +91,7 @@ public class TestRoom extends Entity implements Collidable {
 	public void initPhysics() {
 		DefaultMotionState groundMotionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(0, -1, 0), 1.0f))); 
 
+		//TODO: Un uglify this code.
 		
 		// Construct collision shape based on the mesh vertices in the Mesh.
 		float[] positions = getMesh().getPositions();
@@ -104,6 +115,7 @@ public class TestRoom extends Entity implements Collidable {
 		
 		RigidBodyConstructionInfo groundRigidBodyCI = new RigidBodyConstructionInfo(0, groundMotionState, collisionShape, new Vector3f(0,0,0)); 
 		rigidBody = new RigidBody(groundRigidBodyCI);
+		this.rigidBody.activate();
 	}
 
 	/**

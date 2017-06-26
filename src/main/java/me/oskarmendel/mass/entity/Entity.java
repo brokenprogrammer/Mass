@@ -43,7 +43,7 @@ public abstract class Entity {
     /**
      * The mesh for this Entity.
      */
-    private Mesh mesh;
+    private Mesh[] meshes;
 
     /**
      * The position for this Entity.
@@ -66,8 +66,6 @@ public abstract class Entity {
      * and scale to 1.
      */
     protected  Entity() {
-        this.mesh = null;
-
         position = new Vector3f(0, 0, 0);
 
         scale = 1;
@@ -82,13 +80,21 @@ public abstract class Entity {
      * @param mesh - Mesh instance this Entity should hold.
      */
     protected Entity(Mesh mesh) {
-        this.mesh = mesh;
-
-        position = new Vector3f(0, 0, 0);
-
-        scale = 1;
-
-        rotation = new Vector3f(0, 0, 0);
+        this();
+        
+    	this.meshes = new Mesh[]{mesh};
+    }
+    
+    /**
+     * Protected construtor for the Entity class.
+     * This constructor is meant to be called first in every child class.
+     * 
+     * @param meshes - Array of meshes to use for this Entity.
+     */
+    protected Entity(Mesh[] meshes) {
+    	this();
+    	
+    	this.meshes = meshes;
     }
 
     /**
@@ -161,7 +167,15 @@ public abstract class Entity {
      * @return - Mesh instance for this Entity.
      */
     public Mesh getMesh() {
-        return this.mesh;
+        return this.meshes[0];
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public Mesh[] getMeshes() {
+    	return this.meshes;
     }
 
     /**
@@ -170,7 +184,14 @@ public abstract class Entity {
      * @param mesh - Mesh to set.
      */
     public void setMesh(Mesh mesh) {
-        this.mesh = mesh;
+        this.meshes = new Mesh[]{mesh};
     }
-
+    
+    /**
+     * 
+     * @param meshes
+     */
+    public void setMeshes(Mesh[] meshes) {
+    	this.meshes = meshes;
+    }
 }

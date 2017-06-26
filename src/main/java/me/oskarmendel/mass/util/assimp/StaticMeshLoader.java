@@ -22,22 +22,27 @@
  * SOFTWARE.
  */
 
-package me.oskarmendel.mass.util;
+package me.oskarmendel.mass.util.assimp;
 
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
+import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
 import org.lwjgl.assimp.AIMaterial;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIScene;
+import org.lwjgl.assimp.AIString;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.assimp.Assimp;
 
 import me.oskarmendel.mass.gfx.Material;
 import me.oskarmendel.mass.gfx.Mesh;
+import me.oskarmendel.mass.gfx.Texture;
+import me.oskarmendel.mass.util.ArrayHelper;
 
 /**
  * This class is used together with Assimp to load 
@@ -94,8 +99,52 @@ public class StaticMeshLoader {
         return meshes;
 	}
 	
+	/**
+	 * 
+	 * @param aiMaterial
+	 * @param materials
+	 * @param texturePath
+	 * @throws Exception
+	 */
 	private static void processMaterial(AIMaterial aiMaterial, List<Material> materials, String texturePath) throws Exception{
+		AIColor4D color = AIColor4D.create();
 		
+		AIString path = AIString.calloc();
+		Assimp.aiGetMaterialTexture(aiMaterial, Assimp.aiTextureType_DIFFUSE, 0, path, (IntBuffer) null, null, null, null, null, null);
+		String textureP = path.dataString();
+		Texture texture = null;
+		
+		if (textureP != null && textureP.length() > 0) {
+			TextureCache textCache = TextureCache.getInstance();
+			String textureFile = texturePath + "/" + textureP;
+			textureFile = textureFile.replace("//", "/");
+			texture = textCache.getTexture(textureFile);
+		}
+		
+		Vector4f ambient = Material.DEFAULT_COLOR.toVector4f();
+		int result = Assimp.aiGetMaterialColor(aiMaterial, Assimp.AI_MATKEY_COLOR_AMBIENT, Assimp.aiTextureType_NONE, 0, color);
+		
+		if (result == 0) {
+			ambient = new Vector4f(color.r(), color.g(), color.b(), color.a());
+		}
+		
+		Vector4f diffuse = Material.DEFAULT_COLOR.toVector4f();
+		result = Assimp.aiGetMaterialColor(aiMaterial, Assimp.AI_MATKEY_COLOR_DIFFUSE, Assimp.aiTextureType_NONE, 0, color);
+		
+		if (result == 0) {
+			diffuse = new Vector4f(color.r(), color.g(), color.b(), color.a());
+		}
+		
+		Vector4f specular = Material.DEFAULT_COLOR.toVector4f();
+		result = Assimp.aiGetMaterialColor(aiMaterial, Assimp.AI_MATKEY_COLOR_SPECULAR, Assimp.aiTextureType_NONE, 0, color);
+		
+		if (result == 0) {
+			diffuse = new Vector4f(color.r(), color.g(), color.b(), color.a());
+		}
+		
+		Material material = new Material(ambient, diffuse, specular, 1.0f);
+		material.setTexture(texture);
+		materials.add(material);
 	}
 	
 	/**

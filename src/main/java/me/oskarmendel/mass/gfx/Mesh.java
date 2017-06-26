@@ -26,8 +26,12 @@ package me.oskarmendel.mass.gfx;
 
 import org.lwjgl.system.MemoryUtil;
 
+import me.oskarmendel.mass.util.ArrayHelper;
+
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -49,7 +53,8 @@ import static org.lwjgl.opengl.GL30.*;
 public class Mesh {
 
     private static final Color DEFAULT_COLOR = Color.WHITE;
-
+    private static final int MAX_WEIGHTS = 4;
+    
     /**
      * Vertice positions of this mesh.
      */
@@ -65,29 +70,8 @@ public class Mesh {
      */
     private final int vaoId;
 
-    /**
-     *
-     */
-    private final int positionVboId;
-
-    /**
-     *
-     */
-    private final int textureVboId;
-
-    /**
-     *
-     */
-    private final int normalsVboId;
-
-    /**
-     *
-     */
-    private final int indexVboId;
-
-    /**
-     *
-     */
+    private final List<Integer> vboIdList;
+    
     private final int vertexCount;
 
     /**
@@ -103,6 +87,10 @@ public class Mesh {
     //public Mesh(float[] positions, float[] colors, int[] indices) { // Create shape with colors
     //public Mesh(float[] positions, float[] textCoords, int[] indices, Texture texture) { // Create shape with texture
     public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices) {
+        this(positions, textCoords, normals, indices, ArrayHelper.createEmptyArrayInt(MAX_WEIGHTS * positions.length / 3, 0), ArrayHelper.createEmptyArrayFloat(MAX_WEIGHTS * positions.length / 3, 0));
+    }
+    
+    public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices, int[] jointIndices, float[] weights) {
         this.positions = positions;
     	this.indices = indices;
     	
@@ -110,46 +98,70 @@ public class Mesh {
         FloatBuffer positionBuffer = null;
         FloatBuffer textCoordsBuffer = null;
         FloatBuffer normalsBuffer = null;
+        FloatBuffer weightsBuffer = null;
+        IntBuffer jointIndicesBuffer = null;
         IntBuffer indicesBuffer = null;
         try {
             color = DEFAULT_COLOR;
             vertexCount = indices.length;
+            vboIdList = new ArrayList<>();
 
             // Create the VAO and bind it.
             vaoId = glGenVertexArrays();
             glBindVertexArray(vaoId);
 
             // Position VBO
-            positionVboId = glGenBuffers();
+            int vboId = glGenBuffers();
+            vboIdList.add(vboId);
             positionBuffer = MemoryUtil.memAllocFloat(positions.length);
             positionBuffer.put(positions).flip();
-            glBindBuffer(GL_ARRAY_BUFFER, positionVboId);
+            glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, positionBuffer, GL_STATIC_DRAW);
             // Define structure of data and store it in VAO attribute list.
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 
             // Texture coordinates VBO
-            textureVboId = glGenBuffers();
+            vboId = glGenBuffers();
+            vboIdList.add(vboId);
             textCoordsBuffer = MemoryUtil.memAllocFloat(textCoords.length);
             textCoordsBuffer.put(textCoords).flip();
-            glBindBuffer(GL_ARRAY_BUFFER, textureVboId);
+            glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, textCoordsBuffer, GL_STATIC_DRAW);
             glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
 
             // Vertex normals VBO
-            normalsVboId = glGenBuffers();
+            vboId = glGenBuffers();
+            vboIdList.add(vboId);
             normalsBuffer = MemoryUtil.memAllocFloat(normals.length);
             normalsBuffer.put(normals).flip();
-            glBindBuffer(GL_ARRAY_BUFFER, normalsVboId);
+            glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, normalsBuffer, GL_STATIC_DRAW);
             glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
 
-
+            // Weights VBO
+            vboId = glGenBuffers();
+            vboIdList.add(vboId);
+            weightsBuffer = MemoryUtil.memAllocFloat(weights.length);
+            weightsBuffer.put(weights).flip();
+            glBindBuffer(GL_ARRAY_BUFFER, vboId);
+            glBufferData(GL_ARRAY_BUFFER, weightsBuffer, GL_STATIC_DRAW);
+            glVertexAttribPointer(3, 4, GL_FLOAT, false, 0, 0);
+            
+            // Joint indices VBO
+            vboId = glGenBuffers();
+            vboIdList.add(vboId);
+            jointIndicesBuffer = MemoryUtil.memAllocInt(jointIndices.length);
+            jointIndicesBuffer.put(jointIndices).flip();
+            glBindBuffer(GL_ARRAY_BUFFER, vboId);
+            glBufferData(GL_ARRAY_BUFFER, jointIndicesBuffer, GL_STATIC_DRAW);
+            glVertexAttribPointer(4, 4, GL_FLOAT, false, 0, 0);
+            
             // Index VBO
-            indexVboId = glGenBuffers();
+            vboId = glGenBuffers();
+            vboIdList.add(vboId);
             indicesBuffer = MemoryUtil.memAllocInt(indices.length);
             indicesBuffer.put(indices).flip();
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVboId);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW);
 
             // Unbinds the VBO and VAO.
@@ -162,6 +174,18 @@ public class Mesh {
 
             if (textCoordsBuffer != null) {
                 MemoryUtil.memFree(textCoordsBuffer);
+            }
+            
+            if (normalsBuffer != null) {
+            	MemoryUtil.memFree(normalsBuffer);
+            }
+            
+            if (weightsBuffer != null) {
+            	MemoryUtil.memFree(weightsBuffer);
+            }
+            
+            if (jointIndicesBuffer != null) {
+            	MemoryUtil.memFree(jointIndicesBuffer);
             }
 
             if (indicesBuffer != null) {
@@ -259,10 +283,9 @@ public class Mesh {
 
         // Delete the vertex buffer objects.
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDeleteBuffers(positionVboId);
-        glDeleteBuffers(textureVboId);
-        glDeleteBuffers(normalsVboId);
-        glDeleteBuffers(indexVboId);
+        for (int vboId : vboIdList) {
+        	glDeleteBuffers(vboId);
+        }
 
         Texture texture = material.getTexture();
         // Delete the texture used by this mesh.
