@@ -55,10 +55,14 @@ import me.oskarmendel.mass.util.ArrayHelper;
 public class StaticMeshLoader {
 	
 	/**
+	 * Loads one or more meshes at the specified resource path with 
+	 * the textures at the specified texture path.
 	 * 
-	 * @param resourcePath
-	 * @param texturePath
-	 * @return
+	 * @param resourcePath - Path for the mesh resource to load.
+	 * @param texturePath - Path for the textures to use for the mesh.
+	 * 
+	 * @return Mesh array with the loaded meshes.
+	 * 
 	 * @throws Exception
 	 */
 	public static Mesh[] load(String resourcePath, String texturePath) throws Exception {
@@ -66,11 +70,15 @@ public class StaticMeshLoader {
 	}
 	
 	/**
+	 * Loads one or more meshes at the specified resource path with 
+	 * the textures at the specified texture path with the specified flags.
 	 * 
-	 * @param resourcePath
-	 * @param texturesDir
-	 * @param flags
-	 * @return
+	 * @param resourcePath - Path for the mesh resource to load.
+	 * @param texturesDir - Path for the textures to use for the mesh.
+	 * @param flags - Flags for the Assimp importer to use.
+	 * 
+	 * @return Mesh array with the loaded meshes.
+	 * 
 	 * @throws Exception
 	 */
 	public static Mesh[] load(String resourcePath, String texturesDir, int flags) throws Exception {
@@ -100,10 +108,12 @@ public class StaticMeshLoader {
 	}
 	
 	/**
+	 * Processes a materials for the mesh.
 	 * 
-	 * @param aiMaterial
-	 * @param materials
-	 * @param texturePath
+	 * @param aiMaterial - AIMaterial to process.
+	 * @param materials - List of processed materials.
+	 * @param texturePath - Path for the texture for currnet material.
+	 * 
 	 * @throws Exception
 	 */
 	private static void processMaterial(AIMaterial aiMaterial, List<Material> materials, String texturePath) throws Exception{
@@ -117,7 +127,7 @@ public class StaticMeshLoader {
 		if (textureP != null && textureP.length() > 0) {
 			TextureCache textCache = TextureCache.getInstance();
 			String textureFile = texturePath + "/" + textureP;
-			textureFile = textureFile.replace("//", "/");
+			textureFile = textureFile.replace("//", "/").replace("\\", "/");
 			texture = textCache.getTexture(textureFile);
 		}
 		
@@ -148,10 +158,12 @@ public class StaticMeshLoader {
 	}
 	
 	/**
+	 * Process one mesh.
 	 * 
-	 * @param aiMesh
-	 * @param materials
-	 * @return
+	 * @param aiMesh - AIMesh to process.
+	 * @param materials - List of materials.
+	 * 
+	 * @return A fully processed mesh.
 	 */
 	private static Mesh processMesh(AIMesh aiMesh, List<Material> materials) {
 		List<Float> vertices = new ArrayList<>();
@@ -182,9 +194,10 @@ public class StaticMeshLoader {
 	}
 	
 	/**
+	 * Proceses the vertices of a mesh.
 	 * 
-	 * @param aiMesh
-	 * @param vertices
+	 * @param aiMesh - AIMesh to process vertices for.
+	 * @param vertices - List of vertices to add processed vertices to.
 	 */
 	private static void processVertices(AIMesh aiMesh, List<Float> vertices) {
 		AIVector3D.Buffer aiVertices = aiMesh.mVertices();
@@ -198,9 +211,11 @@ public class StaticMeshLoader {
 	}
 	
 	/**
+	 * Proceses the texture coordinates of a mesh.
 	 * 
-	 * @param aiMesh
-	 * @param textures
+	 * @param aiMesh - AIMesh to process texture coordinates for.
+	 * @param textures - List of texture coordinates to add 
+	 * processed coordinates to.
 	 */
 	private static void processTextureCoordinates(AIMesh aiMesh, List<Float> textures) {
 		AIVector3D.Buffer aiTextures = aiMesh.mTextureCoords(0);
@@ -214,9 +229,10 @@ public class StaticMeshLoader {
 	}
 	
 	/**
+	 * Proceses the normals of a mesh.
 	 * 
-	 * @param aiMesh
-	 * @param normals
+	 * @param aiMesh - AIMesh to process normals for.
+	 * @param normals - List of normals to add processed normals to.
 	 */
 	private static void processNormals(AIMesh aiMesh, List<Float> normals) {
 		AIVector3D.Buffer aiNormals = aiMesh.mNormals();
@@ -230,9 +246,10 @@ public class StaticMeshLoader {
 	}
 	
 	/**
+	 * Proceses the indices of a mesh.
 	 * 
-	 * @param aiMesh
-	 * @param indices
+	 * @param aiMesh - AIMesh to process indices for.
+	 * @param indices - List of indices to add processed indices to.
 	 */
 	private static void processIndices(AIMesh aiMesh, List<Integer> indices) {
 		int numFaces = aiMesh.mNumFaces();

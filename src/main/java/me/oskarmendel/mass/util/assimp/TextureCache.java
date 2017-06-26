@@ -30,6 +30,7 @@ import java.util.Map;
 import me.oskarmendel.mass.gfx.Texture;
 
 /**
+ * Singleton class to cache used textures.
  *
  * @author Oskar Mendel
  * @version 0.00.00
@@ -41,10 +42,19 @@ public class TextureCache {
 	
 	private Map<String, Texture> textureMap;
 	
+	/**
+	 * Private constructor for the TextureCache initializing
+	 * the texture map.
+	 */
 	private TextureCache() {
 		textureMap = new HashMap<>();
 	}
 	
+	/**
+	 * Getter for the singleton instance of this class.
+	 * 
+	 * @return The instance of this class.
+	 */
 	public static TextureCache getInstance() {
 		if (INSTANCE == null) {
 			INSTANCE = new TextureCache();
@@ -53,6 +63,16 @@ public class TextureCache {
 		return INSTANCE;
 	}
 	
+	/**
+	 * Getter for a cached texture within this texture cache.
+	 * 
+	 * @param path - Path of the texture to get.
+	 * 
+	 * @return The cahced texture if it exists, creates a 
+	 * new texture with the specified path otherwise.
+	 * 
+	 * @throws Exception
+	 */
 	public Texture getTexture(String path) throws Exception{
 		Texture texture = textureMap.get(path);
 		
