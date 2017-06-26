@@ -92,25 +92,28 @@ public class TestRoom extends Entity implements Collidable {
 		DefaultMotionState groundMotionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(0, -1, 0), 1.0f))); 
 
 		//TODO: Un uglify this code.
-		
-		// Construct collision shape based on the mesh vertices in the Mesh.
-		float[] positions = getMesh().getPositions();
-		int[] indices = getMesh().getIndices();
-		
-		IndexedMesh indexedMesh = new IndexedMesh();
-		indexedMesh.numTriangles = indices.length / 3;
-		indexedMesh.triangleIndexBase = ByteBuffer.allocateDirect(indices.length*4).order(ByteOrder.nativeOrder());
-        indexedMesh.triangleIndexBase.asIntBuffer().put(indices);
-        indexedMesh.triangleIndexStride = 3 * 4;
-        indexedMesh.numVertices = positions.length / 3;
-        indexedMesh.vertexBase = ByteBuffer.allocateDirect(positions.length*4).order(ByteOrder.nativeOrder());
-        indexedMesh.vertexBase.asFloatBuffer().put(positions);
-        indexedMesh.vertexStride = 3 * 4;
-		
 		TriangleIndexVertexArray vertArray = new TriangleIndexVertexArray();
-		vertArray.addIndexedMesh(indexedMesh);
 		
-		collisionShape = new BvhTriangleMeshShape(vertArray, true);
+		for (Mesh mesh : this.getMeshes()) {
+			// Construct collision shape based on the mesh vertices in the Mesh.
+			float[] positions = mesh.getPositions();
+			int[] indices = mesh.getIndices();
+			
+			IndexedMesh indexedMesh = new IndexedMesh();
+			indexedMesh.numTriangles = indices.length / 3;
+			indexedMesh.triangleIndexBase = ByteBuffer.allocateDirect(indices.length*4).order(ByteOrder.nativeOrder());
+	        indexedMesh.triangleIndexBase.asIntBuffer().put(indices);
+	        indexedMesh.triangleIndexStride = 3 * 4;
+	        indexedMesh.numVertices = positions.length / 3;
+	        indexedMesh.vertexBase = ByteBuffer.allocateDirect(positions.length*4).order(ByteOrder.nativeOrder());
+	        indexedMesh.vertexBase.asFloatBuffer().put(positions);
+	        indexedMesh.vertexStride = 3 * 4;
+			
+			
+			vertArray.addIndexedMesh(indexedMesh);
+		}
+		
+		collisionShape = new BvhTriangleMeshShape(vertArray, false);
 		
 		
 		RigidBodyConstructionInfo groundRigidBodyCI = new RigidBodyConstructionInfo(0, groundMotionState, collisionShape, new Vector3f(0,0,0)); 

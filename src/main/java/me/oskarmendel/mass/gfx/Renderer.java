@@ -135,14 +135,16 @@ public class Renderer {
 
         for (Entity entity : entities) {
             // Set the world matrix for this entity
-            Matrix4f modelViewMatrix =
-                    transformation.getModelViewMatrix(entity, viewMatrix);
-            shaderProgram.setUniform(shaderProgram.getUniformLocation("modelViewMatrix"), modelViewMatrix);
-
-            // Render the mesh for this entity
-            shaderProgram.setUniform("material", entity.getMesh().getMaterial());
-
-            entity.getMesh().render();
+        	for (Mesh mesh : entity.getMeshes()) {
+	            Matrix4f modelViewMatrix =
+	                    transformation.getModelViewMatrix(entity, viewMatrix);
+	            shaderProgram.setUniform(shaderProgram.getUniformLocation("modelViewMatrix"), modelViewMatrix);
+	
+	            // Render the mesh for this entity
+	            shaderProgram.setUniform("material", mesh.getMaterial());
+	
+	            mesh.render();
+        	}
         }
 
         shaderProgram.stopUse();

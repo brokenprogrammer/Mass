@@ -93,7 +93,7 @@ public class MassterBall extends Entity implements Collidable{
 	 */
 	@Override
 	public void initPhysics() {
-		motionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(-2, 55, 0), 1.0f)));
+		motionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(-2, -400, 0), 1.0f)));
 		
 		// Construct collision shape based on the mesh vertices in the Mesh.
 		fallInertia = new Vector3f(0,0,0); 

@@ -152,7 +152,7 @@ public class Player extends MobBase {
 
 	@Override
 	public void initPhysics() {
-		motionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(3, 20, 0), 1.0f)));
+		motionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(5, -400, -4), 1.0f)));
 		
 		// Construct collision shape based on the mesh vertices in the Mesh.
 		ObjectArrayList<Vector3f> points = new ObjectArrayList<Vector3f>();
