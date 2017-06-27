@@ -53,7 +53,10 @@ public class Renderer {
      * Field of View in Radians
      */
     private static final float FOV = (float) Math.toRadians(60.0f);
-
+    
+    private static final int MAX_POINT_LIGHTS = 5;
+    private static final int MAX_SPOT_LIGHTS = 5;
+    
     /**
      * Distance to near plane.
      */
@@ -86,8 +89,17 @@ public class Renderer {
         shaderProgram.link();
     }
 
+    /**
+     * 
+     * @param camera
+     * @param entities
+     * @param ambientLight
+     * @param pointLights
+     * @param spotLights
+     * @param directionalLight
+     */
     public void render(Camera camera, Entity[] entities, Vector3f ambientLight,
-                       PointLight pointLight, SpotLight spotLight, DirectionalLight directionalLight) {
+                       PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight) {
         clear();
 
         shaderProgram.use();
@@ -95,41 +107,9 @@ public class Renderer {
         shaderProgram.setUniform(shaderProgram.getUniformLocation("projectionMatrix"), projectionMatrix);
 
         Matrix4f viewMatrix = camera.getViewMatrix();
-
-        // Update light uniforms
-        shaderProgram.setUniform(shaderProgram.getUniformLocation("ambientLight"), ambientLight);
-        shaderProgram.setUniform(shaderProgram.getUniformLocation("specularPower"), 10f);
-
-        // Update the point light relative to the viewMatrix of the camera.
-        PointLight currPointLight = new PointLight(pointLight);
-        Vector3f lightPos = currPointLight.getPosition();
-        Vector4f aux = new Vector4f(lightPos, 1);
-        aux.mul(viewMatrix);
-        lightPos.x = aux.x;
-        lightPos.y = aux.y;
-        lightPos.z = aux.z;
-        shaderProgram.setUniform("pointLight", currPointLight);
         
-        // Update the spot light relative to the view matrix.
-        SpotLight currSpotLight = new SpotLight(spotLight);
-        Vector4f dir = new Vector4f(currSpotLight.getConeDirection(), 0);
-        dir.mul(viewMatrix);
-        currSpotLight.setConeDirection(new Vector3f(dir.x, dir.y, dir.z));
-        
-        Vector3f spotLightPos = currSpotLight.getPointLight().getPosition();
-        Vector4f auxSpot = new Vector4f(spotLightPos, 1);
-        auxSpot.mul(viewMatrix);
-        spotLightPos.x = auxSpot.x;
-        spotLightPos.y = auxSpot.y;
-        spotLightPos.z = auxSpot.z;
-        shaderProgram.setUniform("spotLight", currSpotLight);
-
-        // Update the directional light relative to the viewMatrix of the camera.
-        DirectionalLight currDirLight = new DirectionalLight(directionalLight);
-        dir = new Vector4f(currDirLight.getDirection(), 0);
-        dir.mul(viewMatrix);
-        currDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
-        shaderProgram.setUniform("directionalLight", currDirLight);
+        // Update light uniforms.
+        renderLights(viewMatrix, ambientLight, pointLights, spotLights, directionalLight);
 
         shaderProgram.setUniform(shaderProgram.getUniformLocation("texture_sampler"), 0);
 
@@ -148,6 +128,64 @@ public class Renderer {
         }
 
         shaderProgram.stopUse();
+    }
+    
+    /**
+     * 
+     * @param viewMatrix
+     * @param ambientLight
+     * @param pointLights
+     * @param spotLights
+     * @param directionalLight
+     */
+    private void renderLights(Matrix4f viewMatrix, Vector3f ambientLight, 
+    		PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight) {
+    	
+    	// TODO: Throw error if too many lights? - Oskar Mendel 2017-06-28
+    	
+    	shaderProgram.setUniform(shaderProgram.getUniformLocation("ambientLight"), ambientLight);
+        shaderProgram.setUniform(shaderProgram.getUniformLocation("specularPower"), 10f);
+        
+        // Process pointlights
+        int lights = pointLights != null ? pointLights.length : 0;
+        for (int i = 0; i < lights; i++) {
+        	PointLight currPointLight = new PointLight(pointLights[i]);
+			Vector3f lightPos = currPointLight.getPosition();
+			
+			Vector4f aux = new Vector4f(lightPos, 1);
+			aux.mul(viewMatrix);
+			lightPos.x = aux.x;
+			lightPos.y = aux.y;
+			lightPos.z = aux.z;
+			
+			shaderProgram.setUniform("pointLights", currPointLight, i);
+        }
+        
+        // Process spotLights
+        lights = spotLights != null ? spotLights.length : 0;
+        for (int i = 0; i < lights; i++) {
+        	SpotLight currSpotLight = new SpotLight(spotLights[i]);
+			Vector4f dir = new Vector4f(currSpotLight.getConeDirection(), 0);
+			dir.mul(viewMatrix);
+			
+			currSpotLight.setConeDirection(new Vector3f(dir.x, dir.y, dir.z));
+			Vector3f spotLightPos = currSpotLight.getPointLight().getPosition();
+			
+			Vector4f auxSpot = new Vector4f(spotLightPos, 1);
+			auxSpot.mul(viewMatrix);
+			spotLightPos.x = auxSpot.x;
+			spotLightPos.y = auxSpot.y;
+			spotLightPos.z = auxSpot.z;
+			
+			shaderProgram.setUniform("spotLights", currSpotLight, i);
+        }
+        
+        // Process directionalLight
+        DirectionalLight currDirLight = new DirectionalLight(directionalLight);
+		Vector4f dir = new Vector4f(currDirLight.getDirection(), 0);
+		dir.mul(viewMatrix);
+		currDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
+		shaderProgram.setUniform("directionalLight", currDirLight);
     }
 
     /**

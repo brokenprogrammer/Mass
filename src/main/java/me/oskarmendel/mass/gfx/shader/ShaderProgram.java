@@ -149,6 +149,21 @@ public class ShaderProgram {
             glUniformMatrix4fv(location, false, floatBuffer);
         }
     }
+    
+    /**
+     * Sets the entire PointLight array uniform with the specified 
+     * PointLights at the specified location.
+     * 
+     * @param location - Location name.
+     * @param spotLights - Array of PointLights to set.
+     */
+    public void setUniform(String location, PointLight[] pointLights) {
+    	int lights = pointLights != null ? pointLights.length : 0;
+    	
+    	for (int i = 0; i < lights; i++) {
+    		setUniform(location, pointLights[i], i);
+    	}
+    }
 
     /**
      * Sets the PointLight uniform variable with the specified location name.
@@ -166,6 +181,33 @@ public class ShaderProgram {
     }
     
     /**
+     * Sets the PointLight uniform variable with the specified 
+     * location name at the specified position.
+     * 
+     * @param location - Location name.
+     * @param pointLight - PointLight object to get values from.
+     * @param pos - Position of the PointLight to set.
+     */
+    public void setUniform(String location, PointLight pointLight, int pos) {
+    	setUniform(location + "[" + pos + "]", pointLight);
+    }
+    
+    /**
+     * Sets the entire SpotLight array uniform with the specified 
+     * spotlights at the specified location.
+     * 
+     * @param location - Location name.
+     * @param spotLights - Array of SpotLights to set.
+     */
+    public void setUniform(String location, SpotLight[] spotLights) {
+    	int lights = spotLights != null ? spotLights.length : 0;
+    	
+    	for (int i = 0; i < lights; i++) {
+    		setUniform(location, spotLights[i], i);
+    	}
+    }
+    
+    /**
      * Sets the SpotLight uniform variable with the specified location name.
      *
      * @param location - Location name.
@@ -175,6 +217,18 @@ public class ShaderProgram {
     	setUniform((location + ".pl"), spotLight.getPointLight());
     	setUniform(getUniformLocation(location + ".coneDirection"), spotLight.getConeDirection());
         setUniform(getUniformLocation(location + ".cutOff"), spotLight.getCutOff());
+    }
+    
+    /**
+     * Sets the SpotLight uniform variable with the specified 
+     * location name at the specified position.
+     * 
+     * @param location - Location name.
+     * @param pointLight - SpotLight object to get values from.
+     * @param pos - Position of the SpotLight to set.
+     */
+    public void setUniform(String location, SpotLight spotLight, int pos) {
+    	setUniform(location + "[" + pos + "]", spotLight);
     }
 
     /**
