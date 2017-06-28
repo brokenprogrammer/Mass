@@ -48,7 +48,7 @@ public class Texture {
      * Handle of the texture.
      */
     private final int id;
-
+    
     /**
      * Width of the texture.
      */
@@ -58,6 +58,16 @@ public class Texture {
      * Height of the texture.
      */
     private int height;
+    
+    /**
+     * Number of rows on the texture.
+     */
+    private int numRows = 1;
+    
+    /**
+     * Number of columns on the texture.
+     */
+    private int numCols = 1;
 
 
     /**
@@ -143,6 +153,42 @@ public class Texture {
     public void setHeight(int height) {
         this.height = height;
     }
+    
+    /**
+     * Getter for the number of rows of this texture.
+     * 
+     * @return - The number of rows of this texture.
+     */
+    public int getNumRows() {
+    	return this.numRows;
+    }
+    
+    /**
+     * Setter for the number of Rows of this texture.
+     * 
+     * @param rows - The number of rows value to set.
+     */
+    public void setNumRows(int rows) {
+    	this.numRows = rows;
+    }
+    
+    /**
+     * Getter for the number of columns of this texture.
+     * 
+     * @return - The number of columns of this texture.
+     */
+    public int getNumCols() {
+    	return this.numCols;
+    }
+    
+    /**
+     * Setter for the number of columns of this texture.
+     * 
+     * @param cols - The number of columns value to set.
+     */
+    public void setNumCols(int cols) {
+    	this.numCols= cols;
+    }
 
     /**
      * Deletes the texture.
@@ -213,5 +259,24 @@ public class Texture {
         }
 
         return createTexture(width, height, image);
+    }
+    
+    /**
+     * Loads a texture from a file at the specified path and sets the
+     * number of rows and columns to the specified values. 
+     * 
+     * @param path - File path of the texture file.
+     * @param numCols - Number of columns for this texture.
+     * @param numRows - Number of rows of this texture.
+     * 
+     * @return A Texture built from the specified file with specified 
+     * number of rows and columns.
+     */
+    public static Texture loadTexture(String path, int numCols, int numRows) {
+    	Texture t = loadTexture(path);
+    	t.setNumCols(numCols);
+    	t.setNumRows(numRows);
+    	
+    	return t;
     }
 }

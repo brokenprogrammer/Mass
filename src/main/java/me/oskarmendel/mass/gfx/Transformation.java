@@ -25,7 +25,10 @@
 package me.oskarmendel.mass.gfx;
 
 import me.oskarmendel.mass.entity.Entity;
+import me.oskarmendel.mass.util.QuatHelper;
+
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
@@ -38,14 +41,18 @@ import org.joml.Vector3f;
  */
 public class Transformation {
 
+	private final Matrix4f modelMatrix;
+
     private final Matrix4f projectionMatrix;
 
     private final Matrix4f modelViewMatrix;
+    
 
     /**
      *
      */
     public Transformation() {
+    	this.modelMatrix = new Matrix4f();
         this.projectionMatrix = new Matrix4f();
         this.modelViewMatrix = new Matrix4f();
     }
@@ -63,6 +70,16 @@ public class Transformation {
         projectionMatrix.perspective(fov, aspectRatio, zNear, zFar);
 
         return projectionMatrix;
+    }
+    
+    public Matrix4f buildModelMatrix(Entity entity) {
+    	Quaternionf rotation = QuatHelper.toQuat(entity.getRotation().x, 
+    			entity.getRotation().y, entity.getRotation().z);
+    	Vector3f position = entity.getPosition();
+    	
+    	return modelMatrix.translationRotateScale(position.x, position.y, position.z, 
+    			rotation.x, rotation.y, rotation.z, rotation.w, 
+    			entity.getScale(), entity.getScale(), entity.getScale());
     }
 
     public Matrix4f getModelViewMatrix(Entity entity, Matrix4f viewMatrix) {

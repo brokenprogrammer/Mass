@@ -27,6 +27,7 @@ package me.oskarmendel.mass.core;
 import me.oskarmendel.mass.entity.Entity;
 import me.oskarmendel.mass.entity.TestRoom;
 import me.oskarmendel.mass.entity.masster.MassterBall;
+import me.oskarmendel.mass.entity.mob.Player;
 import me.oskarmendel.mass.gfx.*;
 import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.light.PointLight;
@@ -35,6 +36,8 @@ import me.oskarmendel.mass.input.MouseHandler;
 import me.oskarmendel.mass.phys.Collidable;
 import me.oskarmendel.mass.phys.PhysicsSpace;
 import me.oskarmendel.mass.util.OBJLoader;
+import me.oskarmendel.mass.util.Timer;
+import me.oskarmendel.mass.util.assimp.StaticMeshLoader;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -93,20 +96,22 @@ public class Game {
     private final Vector3f cameraInc;
     
     private final MouseHandler mouseHandler;
+    private final Timer timer;
     
     private PhysicsSpace physicsSpace;
     
     // Temporary light variables.
     private Vector3f ambientLight;
-    private PointLight pointLight;
+    private PointLight[] pointLights;
     private DirectionalLight directionalLight;
     private float lightAngle;
-    private SpotLight spotLight;
+    private SpotLight[] spotLights;
     private float spotAngle = 0;
     private float spotInc = 1;
     
     MassterBall massterBall;
     TestRoom room;
+    Player player;
     
     /**
      * Default constructor for the game.
@@ -115,6 +120,7 @@ public class Game {
         renderer = new Renderer();
         camera = new Camera();
         mouseHandler = new MouseHandler();
+        timer = new Timer();
         cameraInc = new Vector3f(0, 0,0);
         lightAngle = -90;
     }
@@ -146,19 +152,26 @@ public class Game {
         // Create the GLFW screen.
         screen = new Screen(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, VSYNC);
         
+        timer.init();
+        
         mouseHandler.init(screen);
 
         // Initialize renderer.
         renderer.init();
-
+        
         Texture t = Texture.loadTexture("src/main/resources/textures/hexmap.png");
         try {
             Mesh cubeMesh = OBJLoader.loadMesh("src/main/resources/models/cube.obj");
-            Mesh testRoomMesh = OBJLoader.loadMesh("src/main/resources/models/room.obj");
+            //Mesh testRoomMesh = OBJLoader.loadMesh("src/main/resources/models/room.obj");
+            //src/main/resources/models/office/Amadeusmaps/Amadeus maps\cs_office_texture_0.jpg
+            Mesh[] testRoomMesh = StaticMeshLoader.load("src/main/resources/models/office/cs_office.obj", "src/main/resources/models/office/");
+            System.out.println(testRoomMesh.length);
             Material mat = new Material(t, 1.0f);
             cubeMesh.setMaterial(mat);
-            testRoomMesh.setMaterial(new Material());
-
+            //testRoomMesh.setMaterial(new Material());
+            
+            player = new Player(cubeMesh);
+            
             massterBall = new MassterBall(cubeMesh);
             massterBall.setPosition(0, -1, 0);
             
@@ -199,7 +212,7 @@ public class Game {
 //            cb.setPosition(new Vector3f(3, 4, -2)).setRotation(new Vector3f(10, 180, 10)).setScale(1).setHeight(3).setColor(new Color(1, 1, 0));
 //            cr2 = cb.build();
             
-            entities = new Entity[]{massterBall, room};
+            entities = new Entity[]{massterBall, room, player};
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -209,19 +222,21 @@ public class Game {
         Color lightColour = new Color(1, 1, 1);
         Vector3f lightPosition = new Vector3f(0, 0, 1);
         float lightIntensity = 1.0f;
-        pointLight = new PointLight(lightColour, lightPosition, lightIntensity);
+        PointLight pointLight = new PointLight(lightColour, lightPosition, lightIntensity);
         PointLight.Attenuation att = new PointLight.Attenuation(0.0f, 0.0f, 1.0f);
         pointLight.setAttenuation(att);
+        pointLights = new PointLight[]{pointLight};
         
         // Spot light example.
-        lightPosition = new Vector3f(0.0f, 0.0f, 10f);
+        lightPosition = new Vector3f(4.0f, -406.0f, -3.0f);
         pointLight = new PointLight(lightColour, lightPosition, lightIntensity);
         att = new PointLight.Attenuation(0.0f, 0.0f, 0.02f);
         pointLight.setAttenuation(att);
         Vector3f coneDir = new Vector3f(0, 0, -1);
         float cutOff = (float) Math.cos(Math.toRadians(140));
-        spotLight = new SpotLight(pointLight, coneDir, cutOff);
-
+        SpotLight spotLight = new SpotLight(pointLight, coneDir, cutOff);
+        spotLights = new SpotLight[]{spotLight};
+        
         // Directional light example.
         lightPosition = new Vector3f(-1, 0,0 );
         lightColour = new Color(1, 1, 1);
@@ -243,18 +258,9 @@ public class Game {
      * The game loop
      */
     public void gameLoop() {
-    	long lastFrameCheck = 0;
-    	long  lastTime = System.nanoTime();
-    	int frames = 0;
+    	int fps = 0;
     	
         while(running) {
-        	long now = System.nanoTime();
-        	long updateLength = now - lastTime;
-        	lastTime = now;
-        	frames++;
-        	
-        	lastFrameCheck += updateLength;
-        	
             // Check if the game should close.
             if (screen.isClosing()) {
                 running = false;
@@ -262,7 +268,7 @@ public class Game {
 
             // Handle input
             input();
-
+            
             // Update game and game logic.
             update();
 
@@ -270,11 +276,12 @@ public class Game {
 
             screen.update();
             
-            if (lastFrameCheck >= 1000000000) {
-        		System.out.println("FPS: " + frames);
-        		frames = 0;
-        		lastFrameCheck = 0;
-        	}
+            fps++;
+            if (timer.getTime() - timer.getLastTime() >= 1) {
+            	System.out.println(fps);
+            	timer.updateLastTime();
+            	fps = 0;
+            }
         }
     }
 
@@ -300,31 +307,38 @@ public class Game {
     	// Update mouse input.
     	mouseHandler.input();
     	
-        cameraInc.set(0, 0,0);
+        cameraInc.set(0, 0, 0);
 
         if (screen.isKeyPressed(GLFW_KEY_W)) {
-            cameraInc.z = -1;
+            cameraInc.z = -100;
+        	//player.move(0, 0, -1);
+           // player.forward();
         } else if (screen.isKeyPressed(GLFW_KEY_S)) {
-            cameraInc.z = 1;
+            cameraInc.z = 100;
+            //player.backward();
         }
 
         if (screen.isKeyPressed(GLFW_KEY_A)) {
-            cameraInc.x = -1;
+            cameraInc.x = -100;
+            //player.left();
+        	//player.move(-1, 0, 0);
         } else if (screen.isKeyPressed(GLFW_KEY_D)) {
-            cameraInc.x = 1;
+            cameraInc.x = 100;
+            //player.right();
+        	//player.move(1, 0, 0);
         }
 
         if (screen.isKeyPressed(GLFW_KEY_Z)) {
-            cameraInc.y = -1;
+            cameraInc.y = -100;
         } else if (screen.isKeyPressed(GLFW_KEY_X)) {
-            cameraInc.y = 1;
+            cameraInc.y = 100;
         }
 
-        float lightPos = spotLight.getPointLight().getPosition().z;
+        float lightPos = spotLights[0].getPointLight().getPosition().z;
         if (screen.isKeyPressed(GLFW_KEY_N)) {
-            this.spotLight.getPointLight().getPosition().z = lightPos + 0.1f;
+            this.spotLights[0].getPointLight().getPosition().z = lightPos + 0.1f;
         } else if (screen.isKeyPressed(GLFW_KEY_M)) {
-            this.spotLight.getPointLight().getPosition().z = lightPos - 0.1f;
+            this.spotLights[0].getPointLight().getPosition().z = lightPos - 0.1f;
         }
     }
 
@@ -333,12 +347,16 @@ public class Game {
      */
     public void update() {
         // Update camera position.
-        camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
-        
+        //camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
+        player.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP, camera.getRotation().y);
+    	camera.setPosition(player.getPosition().x, player.getPosition().y + 1.5f, player.getPosition().z);
+    	
         // Update camera based on mouse movements
         if (mouseHandler.isRightButtonPressed()) {
         	Vector2f rotVec = mouseHandler.getDispelVec();
         	camera.moveRotation(rotVec.x * 0.2f, rotVec.y * 0.2f, 0);
+        	player.moveRotation(rotVec.y * 0.2f, 0, 0);
+        	//System.out.println(camera.getPosition().y);
         }
         
         // Update the camera view matrix.
@@ -353,7 +371,7 @@ public class Game {
         }
         
         double spotAngleRad = Math.toRadians(spotAngle);
-        Vector3f coneDir = spotLight.getConeDirection();
+        Vector3f coneDir = spotLights[0].getConeDirection();
         coneDir.y = (float) Math.sin(spotAngleRad);
 
         // Update directional light direction.
@@ -383,7 +401,6 @@ public class Game {
         
         for (Entity entity : entities) {
             // Do something for every loaded entity.
-        	//entity.getRotation().y += 1.0f;
         	
         	// Update physics of all collidable entities.
         	if (entity instanceof Collidable) {
@@ -397,6 +414,6 @@ public class Game {
      */
     public void render() {
         renderer.render(this.camera, this.entities, ambientLight, 
-        		pointLight, spotLight, directionalLight);
+        		pointLights, spotLights, directionalLight);
     }
 }

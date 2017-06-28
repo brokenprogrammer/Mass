@@ -39,7 +39,12 @@ import org.joml.Vector3f;
  * @name Entity.java
  */
 public abstract class Entity {
-
+	
+	/**
+	 * 
+	 */
+	private boolean selected;
+	
     /**
      * The mesh for this Entity.
      */
@@ -59,6 +64,21 @@ public abstract class Entity {
      * The rotation of this Entity.
      */
     private final Vector3f rotation;
+    
+    /**
+     * 
+     */
+    private int texturePosition;
+    
+    /**
+     * 
+     */
+    private boolean disableFrustrumCulling;
+    
+    /**
+     * 
+     */
+    private boolean insideFrustrumCulling;
 
     /**
      * Default constructor for the Entity class.
@@ -66,11 +86,16 @@ public abstract class Entity {
      * and scale to 1.
      */
     protected  Entity() {
+    	selected = false;
+    	
         position = new Vector3f(0, 0, 0);
-
-        scale = 1;
-
         rotation = new Vector3f(0, 0, 0);
+        
+        scale = 1;
+        
+        texturePosition = 0;
+        insideFrustrumCulling = true;
+        disableFrustrumCulling = false;
     }
 
     /**
@@ -96,7 +121,23 @@ public abstract class Entity {
     	
     	this.meshes = meshes;
     }
-
+    
+    /**
+     * 
+     * @return
+     */
+    public boolean isSelected() {
+    	return this.selected;
+    }
+    
+    /**
+     * 
+     * @param selected
+     */
+    public void setSelected(boolean selected) {
+    	this.selected = selected;
+    }
+    
     /**
      * Getter for the position of this Entity.
      *
@@ -193,5 +234,55 @@ public abstract class Entity {
      */
     public void setMeshes(Mesh[] meshes) {
     	this.meshes = meshes;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public int getTexturePos() {
+    	return this.texturePosition;
+    }
+    
+    /**
+     * 
+     * @param texturePosition
+     */
+    public void setTexturePos(int texturePosition) {
+    	this.texturePosition = texturePosition;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public boolean insideFrustrum() {
+    	return this.insideFrustrumCulling;
+    }
+    
+    /**
+     * 
+     * @param insideFrustrum
+     * @return
+     */
+    public boolean setInsideFrtustrum(boolean insideFrustrum) {
+    	return this.insideFrustrumCulling = insideFrustrum;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public boolean isDisableFrustrumCulling() {
+    	return this.disableFrustrumCulling;
+    }
+    
+    /**
+     * 
+     * @param disableFrustrumCulling
+     * @return
+     */
+    public boolean setDisableFrustrumCulling(boolean disableFrustrumCulling) {
+    	return this.disableFrustrumCulling = disableFrustrumCulling;
     }
 }

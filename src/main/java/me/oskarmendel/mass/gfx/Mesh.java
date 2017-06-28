@@ -53,7 +53,8 @@ import static org.lwjgl.opengl.GL30.*;
 public class Mesh {
 
     private static final Color DEFAULT_COLOR = Color.WHITE;
-    private static final int MAX_WEIGHTS = 4;
+    
+    public static final int MAX_WEIGHTS = 4;
     
     /**
      * Vertice positions of this mesh.
@@ -68,9 +69,9 @@ public class Mesh {
     /**
      * The vertex array object for this mesh.
      */
-    private final int vaoId;
+    protected final int vaoId;
 
-    private final List<Integer> vboIdList;
+    protected final List<Integer> vboIdList;
     
     private final int vertexCount;
 
@@ -193,13 +194,9 @@ public class Mesh {
             }
         }
     }
-
-    /**
-     * Render method that draws the mesh then restores the
-     * state when finished.
-     */
-    public void render() {
-        Texture texture = material.getTexture();
+    
+    protected void initRenderer() {
+    	Texture texture = material.getTexture();
         if (texture != null) {
             // Activate first texture bank.
             glActiveTexture(GL_TEXTURE0);
@@ -207,21 +204,48 @@ public class Mesh {
             // Bind target texture.
             glBindTexture(GL_TEXTURE_2D, texture.getId());
         }
-
-        // Draw the mesh.
-        glBindVertexArray(getVaoId());
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
-
-        glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
-
-        // Restore state.
+        
+        //Texture normalMap = material.getNormalMap();
+        //if (normalMap != null) {
+        //	// Activate second texture bank
+        //    glActiveTexture(GL_TEXTURE1);
+        //    
+        //    // Bind the texture
+        //    glBindTexture(GL_TEXTURE_2D, normalMap.getId());
+        //}
+        
+	     // Draw the mesh.
+	    glBindVertexArray(getVaoId());
+	    glEnableVertexAttribArray(0);
+	    glEnableVertexAttribArray(1);
+	    glEnableVertexAttribArray(2);
+	    glEnableVertexAttribArray(3);
+	    glEnableVertexAttribArray(4);
+    }
+    
+    protected void endRenderer() {
+    	// Restore state.
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glDisableVertexAttribArray(2);
+        glDisableVertexAttribArray(3);
+        glDisableVertexAttribArray(4);
+        
         glBindVertexArray(0);
+        
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    /**
+     * Render method that draws the mesh then restores the
+     * state when finished.
+     */
+    public void render() {
+    	initRenderer();
+    	
+        glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+        
+        endRenderer();
     }
 
     /**
