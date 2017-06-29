@@ -153,6 +153,16 @@ public class Material {
         this.reflectance = reflectance;
         this.texture = texture;
     }
+    
+    /**
+     * Creates a new Material with the specified color and reflectance.
+     * 
+     * @param color - Color of the Material.
+     * @param reflectance - Reflectance value of this Material.
+     */
+    public Material(Color color, float reflectance) {
+    	this(color.toVector4f(), color.toVector4f(), color.toVector4f(), null, reflectance);
+    }
 
     /**
      * Getter for the ambient color of this Material.
