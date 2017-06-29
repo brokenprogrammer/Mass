@@ -31,9 +31,7 @@ import me.oskarmendel.mass.gfx.Texture;
 import me.oskarmendel.mass.util.assimp.StaticMeshLoader;
 
 /**
- * TODO: Create separate set of shaders for the skybox.
- * 	 	 Add javadoc to this class.
- * 			- Oskar Mendel 2017-06-29
+ * This class represents a SkyBox for a Scene.
  *
  * @author Oskar Mendel
  * @version 0.00.00
@@ -42,10 +40,14 @@ import me.oskarmendel.mass.util.assimp.StaticMeshLoader;
 public class SkyBox extends Entity {
 	
 	/**
+	 * Creates a new SkyBox by loading the model and 
+	 * texture at the specified paths.
 	 * 
-	 * @param modelPath
-	 * @param texturePath
-	 * @throws Exception
+	 * @param modelPath - Path for the SkyBox model to load.
+	 * @param texturePath - Path for the textures of the SkyBox model.
+	 * 
+	 * @throws Exception - Throws exception when load is unsuccessful to 
+	 * find specified resources.
 	 */
 	public SkyBox(String modelPath, String texturePath) throws Exception {
 		super();
@@ -60,10 +62,14 @@ public class SkyBox extends Entity {
 	}
 	
 	/**
+	 * Creates a new SkyBox by loading the specified model and
+	 * setting the texture to the specified color.
 	 * 
-	 * @param modelPath
-	 * @param color
-	 * @throws Exception
+	 * @param modelPath - Path for the SkyBox model to load.
+	 * @param color - Color to set for the Material of the SkyBox.
+	 * 
+	 * @throws Exception - Throws exception when load is unsuccessful to 
+	 * find specified resources.
 	 */
 	public SkyBox(String modelPath, Color color) throws Exception {
 		super();
