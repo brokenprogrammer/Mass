@@ -41,7 +41,7 @@ import org.joml.Vector3f;
 public abstract class Entity {
 	
 	/**
-	 * 
+	 * Boolean to represent if the entity is selected or not.
 	 */
 	private boolean selected;
 	
@@ -123,16 +123,18 @@ public abstract class Entity {
     }
     
     /**
+     * Getter for the selected value of this Entity.
      * 
-     * @return
+     * @return - True of the Entity is selected; false otherwise.
      */
     public boolean isSelected() {
     	return this.selected;
     }
     
     /**
+     * Setter for the selected value of this Entity.
      * 
-     * @param selected
+     * @param selected - The selected value to set.
      */
     public void setSelected(boolean selected) {
     	this.selected = selected;
