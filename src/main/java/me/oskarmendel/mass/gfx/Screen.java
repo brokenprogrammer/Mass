@@ -40,11 +40,36 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  * @name Screen.java
  */
 public class Screen {
+	
+	/**
+     * Field of View in Radians
+     */
+    public static final float FOV = (float) Math.toRadians(60.0f);
+    
+	/**
+     * Distance to near plane.
+     */
+    public static final float Z_NEAR = 0.01f;
+    
+    /**
+     * Distance to far plane.
+     */
+    public static final float Z_FAR = 1000.f;
 
     /**
      * The window handle
      */
     private long id;
+    
+    /**
+     * 
+     */
+    private int width;
+    
+    /**
+     * 
+     */
+    private int height;
 
     /**
      * Key callback for the window
@@ -66,7 +91,9 @@ public class Screen {
      * @param vsync - Set to true to put v-sync on.
      */
     public Screen (int width, int height, String title, boolean vsync) {
-        this.vsync = vsync;
+        this.width = width;
+        this.height = height;
+    	this.vsync = vsync;
 
         // Set resizeable to false.
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
@@ -170,5 +197,23 @@ public class Screen {
      */
     public boolean getVsync() {
     	return this.vsync;
+    }
+    
+    /**
+     * Returns the width of this screen.
+     * 
+     * @return - The width value of this screen.
+     */
+    public int getWidth() {
+    	return this.width;
+    }
+    
+    /**
+     * Returns the height of this screen.
+     * 
+     * @return - The height value of this screen.
+     */
+    public int getHeight() {
+    	return this.height;
     }
 }
