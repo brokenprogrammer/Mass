@@ -35,6 +35,7 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
@@ -52,8 +53,14 @@ import static org.lwjgl.opengl.GL30.*;
  */
 public class Mesh {
 
+	/**
+	 * 
+	 */
     private static final Color DEFAULT_COLOR = Color.WHITE;
     
+    /**
+     * 
+     */
     public static final int MAX_WEIGHTS = 4;
     
     /**
@@ -71,8 +78,14 @@ public class Mesh {
      */
     protected final int vaoId;
 
+    /**
+     * 
+     */
     protected final List<Integer> vboIdList;
     
+    /**
+     * 
+     */
     private final int vertexCount;
 
     /**
@@ -84,9 +97,12 @@ public class Mesh {
      *
      */
     private Color color;
+    
+    /**
+     * 
+     */
+    private float boundingRadius;
 
-    //public Mesh(float[] positions, float[] colors, int[] indices) { // Create shape with colors
-    //public Mesh(float[] positions, float[] textCoords, int[] indices, Texture texture) { // Create shape with texture
     public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices) {
         this(positions, textCoords, normals, indices, ArrayHelper.createEmptyArrayInt(MAX_WEIGHTS * positions.length / 3, 0), ArrayHelper.createEmptyArrayFloat(MAX_WEIGHTS * positions.length / 3, 0));
     }
@@ -103,6 +119,8 @@ public class Mesh {
         IntBuffer jointIndicesBuffer = null;
         IntBuffer indicesBuffer = null;
         try {
+        	calculateBoundingRadius(positions);
+        	
             color = DEFAULT_COLOR;
             vertexCount = indices.length;
             vboIdList = new ArrayList<>();
@@ -195,6 +213,16 @@ public class Mesh {
         }
     }
     
+    private void calculateBoundingRadius(float positions[]) {
+    	int len = positions.length;
+    	
+    	this.boundingRadius = 0;
+    	for (int i = 0; i < len; i++) {
+    		float pos = positions[i];
+    		boundingRadius = Math.max(Math.abs(pos), this.boundingRadius);
+    	}
+    }
+    
     protected void initRenderer() {
     	Texture texture = material.getTexture();
         if (texture != null) {
@@ -205,14 +233,14 @@ public class Mesh {
             glBindTexture(GL_TEXTURE_2D, texture.getId());
         }
         
-        //Texture normalMap = material.getNormalMap();
-        //if (normalMap != null) {
-        //	// Activate second texture bank
-        //    glActiveTexture(GL_TEXTURE1);
-        //    
-        //    // Bind the texture
-        //    glBindTexture(GL_TEXTURE_2D, normalMap.getId());
-        //}
+        Texture normalMap = material.getNormalMap();
+        if (normalMap != null) {
+        	// Activate second texture bank
+            glActiveTexture(GL_TEXTURE1);
+            
+            // Bind the texture
+            glBindTexture(GL_TEXTURE_2D, normalMap.getId());
+        }
         
 	     // Draw the mesh.
 	    glBindVertexArray(getVaoId());
@@ -296,6 +324,22 @@ public class Mesh {
      */
     public void setColor(Color color) {
         this.color = color;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public float getBoundingRadius() {
+    	return this.boundingRadius;
+    }
+    
+    /**
+     * 
+     * @param boundingRadius
+     */
+    public void setBoundingRadius(float boundingRadius) {
+    	this.boundingRadius = boundingRadius;
     }
 
     /**

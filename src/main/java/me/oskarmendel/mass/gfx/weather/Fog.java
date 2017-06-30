@@ -31,7 +31,7 @@ import me.oskarmendel.mass.gfx.Color;
  *
  * @author Oskar Mendel
  * @version 0.00.00
- * @name SkyBox.java
+ * @name Fog.java
  */
 public class Fog {
 	

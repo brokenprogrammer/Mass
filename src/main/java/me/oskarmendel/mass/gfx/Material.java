@@ -69,6 +69,11 @@ public class Material {
      * Texture for this material to use.
      */
     private Texture texture;
+    
+    /**
+     * Texture normal map for this material to use.
+     */
+    private Texture normalMap;
 
     /**
      * Default constructor for creating a new Material.
@@ -262,5 +267,33 @@ public class Material {
      */
     public void setTexture(Texture texture) {
         this.texture = texture;
+    }
+    
+    /**
+     * Checks if this Material has a normal map and 
+     * returns true if it has, false otherwise.
+     * 
+     * @return - True if this Material has a normal map; False otherwise.
+     */
+    public boolean hasNormalMap() {
+    	return this.normalMap != null;
+    }
+    
+    /**
+     * Getter for the normal map of this Material.
+     * 
+     * @return - The normal map of this Material.
+     */
+    public Texture getNormalMap() {
+    	return this.normalMap;
+    }
+    
+    /**
+     * Setter for the normal map of this Material.
+     * 
+     * @param normalMap - The normal map value to set.
+     */
+    public void setNormalMap(Texture normalMap) {
+    	
     }
 }

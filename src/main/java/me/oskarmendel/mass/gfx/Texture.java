@@ -30,6 +30,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImage.stbi_load;
@@ -76,6 +77,31 @@ public class Texture {
      */
     public Texture() {
         this.id = glGenTextures();
+    }
+    
+    /**
+     * Creates a new empty texture with the specified width, 
+     * height and pixel format.
+     * 
+     * @param width - Width of the Texture to create.
+     * @param height - Height of the Texture to create.
+     * @param pixelFormat - Pixel format of the Texture to create.
+     * 
+     * @throws Exception
+     */
+    public Texture(int width, int height, int pixelFormat) throws Exception {
+    	this.id = glGenTextures();
+    	this.width = width;
+    	this.height = height;
+    	
+    	glBindTexture(GL_TEXTURE_2D, this.id);
+    	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, this.width, this.height, 
+    			0, pixelFormat, GL_FLOAT, (ByteBuffer) null);
+    	
+    	this.setParameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    	this.setParameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    	this.setParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    	this.setParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
     /**
