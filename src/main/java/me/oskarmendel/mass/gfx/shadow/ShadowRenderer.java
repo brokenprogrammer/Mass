@@ -26,12 +26,16 @@ package me.oskarmendel.mass.gfx.shadow;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.joml.Matrix4f;
 
 import me.oskarmendel.mass.core.Camera;
 import me.oskarmendel.mass.core.Scene;
 import me.oskarmendel.mass.entity.Entity;
+import me.oskarmendel.mass.entity.animated.AnimatedEntity;
+import me.oskarmendel.mass.gfx.InstancedMesh;
+import me.oskarmendel.mass.gfx.Mesh;
 import me.oskarmendel.mass.gfx.Renderer;
 import me.oskarmendel.mass.gfx.SceneLight;
 import me.oskarmendel.mass.gfx.Screen;
@@ -50,6 +54,7 @@ import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL30.GL_DEPTH_ATTACHMENT;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE2;
 
 
 /**
@@ -125,8 +130,8 @@ public class ShadowRenderer {
 	private void setupDepthShader() {
 		depthShaderProgram = new ShaderProgram();
 		
-		Shader vertexShader = Shader.loadShader(GL_VERTEX_SHADER, "TODO");
-		Shader fragmentShader = Shader.loadShader(GL_FRAGMENT_SHADER, "TODO");
+		Shader vertexShader = Shader.loadShader(GL_VERTEX_SHADER, "src/main/resources/shaders/depth.vert");
+		Shader fragmentShader = Shader.loadShader(GL_FRAGMENT_SHADER, "src/main/resources/shaders/depth.frag");
 		
 		depthShaderProgram.attachShader(vertexShader);
 		depthShaderProgram.attachShader(fragmentShader);
@@ -189,7 +194,20 @@ public class ShadowRenderer {
 	 * @param transformation
 	 */
 	public void renderNonInstancedMeshes(Scene scene, Transformation transformation) {
+		depthShaderProgram.setUniform(depthShaderProgram.getUniformLocation("isInstanced"), 0);
 		
+		Map<Mesh, List<Entity>> mapMeshes = scene.getEntityMeshes();
+		
+		for (Mesh mesh : mapMeshes.keySet()) {
+			mesh.renderList(mapMeshes.get(mesh), (Entity entity) -> {
+				Matrix4f modelMatrix = transformation.buildModelMatrix(entity);
+				depthShaderProgram.setUniform(depthShaderProgram.getUniformLocation("modelNonInstancedMatrix"), modelMatrix);
+				if (entity instanceof AnimatedEntity) {
+					// TODO: If its animated render the shadows differently.
+					// Oskar Mendel - 2017-07-01
+				}
+			});
+		}
 	}
 	
 	/**
@@ -198,7 +216,22 @@ public class ShadowRenderer {
 	 * @param transformation
 	 */
 	public void renderInstancedMeshes(Scene scene, Transformation transformation) {
+		depthShaderProgram.setUniform(depthShaderProgram.getUniformLocation("isInstanced"), 1);
 		
+		Map<InstancedMesh, List<Entity>> mapMeshes = scene.getEntityInstancedMeshes();
+		for (InstancedMesh mesh : mapMeshes.keySet()) {
+			this.filteredEntities.clear();
+			
+			for (Entity e : mapMeshes.get(mesh)) {
+				if (e.insideFrustrum()) {
+					this.filteredEntities.add(e);
+				}
+			}
+			
+			bindTextures(GL_TEXTURE2);
+			
+			mesh.renderListInstanced(this.filteredEntities, transformation, null);
+		}
 	}
 	
 	/**
@@ -214,13 +247,19 @@ public class ShadowRenderer {
 	 * @param start
 	 */
 	public void bindTextures(int start) {
-		
+		this.shadowBuffer.bindTextures(start);
 	}
 	
 	/**
 	 * 
 	 */
 	public void delete() {
+		if (shadowBuffer != null) {
+			shadowBuffer.delete();
+		}
 		
+		if (depthShaderProgram != null) {
+			depthShaderProgram.delete();
+		}
 	}
 }

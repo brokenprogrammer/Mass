@@ -29,6 +29,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import me.oskarmendel.mass.gfx.Screen;
+import me.oskarmendel.mass.gfx.Transformation;
 import me.oskarmendel.mass.gfx.light.DirectionalLight;
 
 /**
@@ -86,7 +87,38 @@ public class ShadowCascade {
 	 * @param light
 	 */
 	public void update(Screen screen, Matrix4f viewMatrix, DirectionalLight light) {
+		float aspectRatio = (float) screen.getWidth() / (float) screen.getHeight();
+		// Build view matrix for this shadow cascade.
+		this.projectionViewMatrix.setPerspective(Screen.FOV, aspectRatio, zNear, zFar);
+		this.projectionViewMatrix.mul(viewMatrix);
 		
+		// Calculate frustum corners in space
+		float maxZ = Float.MIN_VALUE;
+		float minZ = Float.MAX_VALUE;
+		
+		for (int i = 0; i < FRUSTUM_CORNERS; i++) {
+			Vector3f corner = this.frustumCorners[i];
+			corner.set(0, 0, 0);
+			
+			this.projectionViewMatrix.frustumCorner(i, corner);
+			this.centr.add(corner);
+			this.centr.div(8.0f);
+			
+			minZ = Math.min(minZ, corner.z);
+			maxZ = Math.max(maxZ, corner.z);
+		}
+		
+		Vector3f lightDir = light.getDirection();
+		Vector3f lightPosInc = new Vector3f().set(lightDir);
+		float distance = maxZ - minZ;
+		
+		lightPosInc.mul(distance);
+		Vector3f lightPos = new Vector3f();
+        lightPos.set(this.centr);
+        lightPos.add(lightPosInc);
+        
+        updateLightViewMatrix(lightDir, lightPos);
+        updateLightProjectionMatrix();
 	}
 	
 	/**
@@ -95,14 +127,37 @@ public class ShadowCascade {
 	 * @param lightPosition
 	 */
 	private void updateLightViewMatrix(Vector3f lightDirection, Vector3f lightPosition) {
-		
+		float lightAngleX = (float) Math.toDegrees(Math.acos(lightDirection.z));
+        float lightAngleY = (float) Math.toDegrees(Math.asin(lightDirection.x));
+        float lightAngleZ = 0;
+        Transformation.updateGenericViewMatrix(lightPosition, new Vector3f(lightAngleX, lightAngleY, lightAngleZ), lightViewMatrix);
 	}
 	
 	/**
 	 * 
 	 */
 	private void updateLightProjectionMatrix() {
-		
+		float minX =  Float.MAX_VALUE;
+        float maxX = -Float.MIN_VALUE;
+        float minY =  Float.MAX_VALUE;
+        float maxY = -Float.MIN_VALUE;
+        float minZ =  Float.MAX_VALUE;
+        float maxZ = -Float.MIN_VALUE;
+        
+        for (int i = 0; i < FRUSTUM_CORNERS; i++) {
+            Vector3f corner = frustumCorners[i];
+            tmpVec.set(corner, 1);
+            tmpVec.mul(lightViewMatrix);
+            minX = Math.min(tmpVec.x, minX);
+            maxX = Math.max(tmpVec.x, maxX);
+            minY = Math.min(tmpVec.y, minY);
+            maxY = Math.max(tmpVec.y, maxY);
+            minZ = Math.min(tmpVec.z, minZ);
+            maxZ = Math.max(tmpVec.z, maxZ);
+        }
+        
+        float distz = maxZ - minZ;
+        this.orthoProjectionMatrix.setOrtho(minX, maxX, minY, maxY, 0, distz);
 	}
 	
 	/**

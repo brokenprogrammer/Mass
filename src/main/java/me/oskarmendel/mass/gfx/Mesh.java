@@ -26,12 +26,14 @@ package me.oskarmendel.mass.gfx;
 
 import org.lwjgl.system.MemoryUtil;
 
+import me.oskarmendel.mass.entity.Entity;
 import me.oskarmendel.mass.util.ArrayHelper;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -274,6 +276,25 @@ public class Mesh {
         glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
         
         endRenderer();
+    }
+    
+    /**
+     * 
+     * @param entities
+     * @param consumer
+     */
+    public void renderList(List<Entity> entities, Consumer<Entity> consumer) {
+    	initRenderer();
+    	
+    	for (Entity e : entities) {
+    		// Set up data required from the entity.
+    		consumer.accept(e);
+    		
+    		// Render the entity.
+    		glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+    	}
+    	
+    	endRenderer();
     }
 
     /**

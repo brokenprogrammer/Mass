@@ -24,7 +24,24 @@
 
 package me.oskarmendel.mass.gfx;
 
+import java.nio.ByteBuffer;
+
 import static org.lwjgl.opengl.GL11.glGenTextures;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glDeleteTextures;
+import static org.lwjgl.opengl.GL11.glTexParameteri;
+import static org.lwjgl.opengl.GL11.glTexImage2D;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_COMPONENT;
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_NONE;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
+import static org.lwjgl.opengl.GL14.GL_TEXTURE_COMPARE_MODE;
 
 /**
  * 
@@ -41,6 +58,14 @@ public class ArrayTexture {
 	
 	private final int height;
 	
+	/**
+	 * 
+	 * @param size
+	 * @param width
+	 * @param height
+	 * @param pixelFormat
+	 * @throws Exception
+	 */
 	public ArrayTexture(int size, int width, int height, int pixelFormat) throws Exception {
 		this.ids = new int[size];
 		glGenTextures(ids);
@@ -49,23 +74,46 @@ public class ArrayTexture {
 		this.height = height;
 		
 		for (int i = 0; i < size; i++) {
-			//TODO: Build textures. - Oskar Mendel 2017-06-30
+			glBindTexture(GL_TEXTURE_2D, ids[i]);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, this.width, this.height, 0, pixelFormat, GL_FLOAT, (ByteBuffer) null);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		}
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public int[] getIds() {
 		return this.ids;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public int getWidth() {
 		return this.width;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public int getHeight() {
 		return this.height;
 	}
 	
+	/**
+	 * 
+	 */
 	public void delete() {
-		
+		for (int id : this.ids) {
+			glDeleteTextures(id);
+		}
 	}
 }
