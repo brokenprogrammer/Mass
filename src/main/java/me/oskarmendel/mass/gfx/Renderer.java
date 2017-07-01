@@ -25,18 +25,25 @@
 package me.oskarmendel.mass.gfx;
 
 import me.oskarmendel.mass.core.Camera;
+import me.oskarmendel.mass.core.Scene;
 import me.oskarmendel.mass.entity.Entity;
+import me.oskarmendel.mass.gfx.filter.FrustumCullingFilter;
 import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.light.PointLight;
 import me.oskarmendel.mass.gfx.light.SpotLight;
 import me.oskarmendel.mass.gfx.shader.Shader;
 import me.oskarmendel.mass.gfx.shader.ShaderProgram;
+import me.oskarmendel.mass.gfx.shadow.ShadowRenderer;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Performs the rendering process.
@@ -47,46 +54,68 @@ import static org.lwjgl.opengl.GL20.*;
  */
 public class Renderer {
 
-    Transformation transformation;
-
-    /**
-     * Field of View in Radians
-     */
-    private static final float FOV = (float) Math.toRadians(60.0f);
-    
     private static final int MAX_POINT_LIGHTS = 5;
+    
     private static final int MAX_SPOT_LIGHTS = 5;
     
     /**
-     * Distance to near plane.
+     * 
      */
-    private static final float Z_NEAR = 0.01f;
-
-    /**
-     * Distance to far plane.
-     */
-    private static final float Z_FAR = 1000.f;
-
-    private ShaderProgram shaderProgram;
+    private final Transformation transformation;
+    
+    private final ShadowRenderer shadowRenderer;
+    
+    private ShaderProgram defaultShaderProgram;
+    
+    private ShaderProgram skyBoxShaderProgram;
+    
+    private final float specularPower;
+    
+    private final FrustumCullingFilter frustumFilter;
+    
+    private final List<Entity> filteredEntities;
 
     /**
      *
      */
     public Renderer() {
-        transformation = new Transformation();
+        this.transformation = new Transformation();
+        this.specularPower = 10f;
+        this.shadowRenderer = new ShadowRenderer();
+        this.frustumFilter = new FrustumCullingFilter();
+        this.filteredEntities = new ArrayList<>();
     }
 
     /**
      * Initializes the renderer.
      */
-    public void init() {
-        //TODO SHOULD THE INIT METHOD REALLY CREATE A SHADER PROGRAM?
-        Shader vertexShader = Shader.loadShader(GL_VERTEX_SHADER, "src/main/resources/shaders/default.vert");
-        Shader fragmentShader = Shader.loadShader(GL_FRAGMENT_SHADER, "src/main/resources/shaders/default.frag");
-        shaderProgram = new ShaderProgram();
-        shaderProgram.attachShader(vertexShader);
-        shaderProgram.attachShader(fragmentShader);
-        shaderProgram.link();
+    public void init() throws Exception {
+    	shadowRenderer.init();
+    	
+    	setupSkyBoxShader();
+    	setupDefaultShader();
+    }
+    
+    public void setupSkyBoxShader() {
+    	this.skyBoxShaderProgram = new ShaderProgram();
+    	
+    	Shader vertexShader = Shader.loadShader(GL_VERTEX_SHADER, "src/main/resources/shaders/skybox.vert");
+		Shader fragmentShader = Shader.loadShader(GL_FRAGMENT_SHADER, "src/main/resources/shaders/skybox.frag");
+		
+		this.skyBoxShaderProgram.attachShader(vertexShader);
+		this.skyBoxShaderProgram.attachShader(fragmentShader);
+		this.skyBoxShaderProgram.link();
+    }
+    
+    public void setupDefaultShader() {
+    	this.defaultShaderProgram = new ShaderProgram();
+    	
+    	Shader vertexShader = Shader.loadShader(GL_VERTEX_SHADER, "src/main/resources/shaders/default.vert");
+		Shader fragmentShader = Shader.loadShader(GL_FRAGMENT_SHADER, "src/main/resources/shaders/default.frag");
+		
+		this.defaultShaderProgram.attachShader(vertexShader);
+		this.defaultShaderProgram.attachShader(fragmentShader);
+		this.defaultShaderProgram.link();
     }
 
     /**
@@ -98,36 +127,63 @@ public class Renderer {
      * @param spotLights
      * @param directionalLight
      */
-    public void render(Camera camera, Entity[] entities, Vector3f ambientLight,
-                       PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight) {
+    public void render(Screen screen, Camera camera, Scene scene, boolean changed) {
         clear();
 
-        shaderProgram.use();
-        Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, 800, 600, Z_NEAR, Z_FAR);
-        shaderProgram.setUniform(shaderProgram.getUniformLocation("projectionMatrix"), projectionMatrix);
-
-        Matrix4f viewMatrix = camera.getViewMatrix();
-        
-        // Update light uniforms.
-        renderLights(viewMatrix, ambientLight, pointLights, spotLights, directionalLight);
-
-        shaderProgram.setUniform(shaderProgram.getUniformLocation("texture_sampler"), 0);
-
-        for (Entity entity : entities) {
-            // Set the world matrix for this entity
-        	for (Mesh mesh : entity.getMeshes()) {
-	            Matrix4f modelViewMatrix =
-	                    transformation.getModelViewMatrix(entity, viewMatrix);
-	            shaderProgram.setUniform(shaderProgram.getUniformLocation("modelViewMatrix"), modelViewMatrix);
-	
-	            // Render the mesh for this entity
-	            shaderProgram.setUniform("material", mesh.getMaterial());
-	
-	            mesh.render();
-        	}
+        //TODO: if (screen.getOptions().frustumCulling) { - Oskar Mendel 2017-07-01
+        if (true) {
+        	this.frustumFilter.updateFrustum(screen.getProjectionMatrix(), camera.getViewMatrix());
+        	this.frustumFilter.filter(scene.getEntityMeshes());
+        	this.frustumFilter.filter(scene.getEntityInstancedMeshes());
         }
-
-        shaderProgram.stopUse();
+        
+        // Render depth map.
+        if (scene.isRenderShadows() && changed) {
+        	shadowRenderer.render(screen, scene, camera, transformation, this);
+        }
+        
+        glViewport(0, 0, screen.getWidth(), screen.getHeight());
+        
+        // Update projection matrix
+        screen.updateProjectionMatrix();
+        
+        renderScene(screen, camera, scene);
+        renderSkyBox(screen, camera, scene);
+        
+//        shaderProgram.use();
+//        Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, 800, 600, Z_NEAR, Z_FAR);
+//        shaderProgram.setUniform(shaderProgram.getUniformLocation("projectionMatrix"), projectionMatrix);
+//
+//        Matrix4f viewMatrix = camera.getViewMatrix();
+//        
+//        // Update light uniforms.
+//        renderLights(viewMatrix, ambientLight, pointLights, spotLights, directionalLight);
+//
+//        shaderProgram.setUniform(shaderProgram.getUniformLocation("texture_sampler"), 0);
+//
+//        for (Entity entity : entities) {
+//            // Set the world matrix for this entity
+//        	for (Mesh mesh : entity.getMeshes()) {
+//	            Matrix4f modelViewMatrix =
+//	                    transformation.getModelViewMatrix(entity, viewMatrix);
+//	            shaderProgram.setUniform(shaderProgram.getUniformLocation("modelViewMatrix"), modelViewMatrix);
+//	
+//	            // Render the mesh for this entity
+//	            shaderProgram.setUniform("material", mesh.getMaterial());
+//	
+//	            mesh.render();
+//        	}
+//        }
+//
+//        shaderProgram.stopUse();
+    }
+    
+    private void renderSkyBox(Screen screen, Camera camera, Scene scene) {
+    	
+    }
+    
+    private void renderScene(Screen screen, Camera camera, Scene scene) {
+    	
     }
     
     /**
@@ -143,8 +199,8 @@ public class Renderer {
     	
     	// TODO: Throw error if too many lights? - Oskar Mendel 2017-06-28
     	
-    	shaderProgram.setUniform(shaderProgram.getUniformLocation("ambientLight"), ambientLight);
-        shaderProgram.setUniform(shaderProgram.getUniformLocation("specularPower"), 10f);
+    	this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("ambientLight"), ambientLight);
+    	this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("specularPower"), 10f);
         
         // Process pointlights
         int lights = pointLights != null ? pointLights.length : 0;
@@ -158,7 +214,7 @@ public class Renderer {
 			lightPos.y = aux.y;
 			lightPos.z = aux.z;
 			
-			shaderProgram.setUniform("pointLights", currPointLight, i);
+			this.defaultShaderProgram.setUniform("pointLights", currPointLight, i);
         }
         
         // Process spotLights
@@ -177,7 +233,7 @@ public class Renderer {
 			spotLightPos.y = auxSpot.y;
 			spotLightPos.z = auxSpot.z;
 			
-			shaderProgram.setUniform("spotLights", currSpotLight, i);
+			this.defaultShaderProgram.setUniform("spotLights", currSpotLight, i);
         }
         
         // Process directionalLight
@@ -185,7 +241,7 @@ public class Renderer {
 		Vector4f dir = new Vector4f(currDirLight.getDirection(), 0);
 		dir.mul(viewMatrix);
 		currDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
-		shaderProgram.setUniform("directionalLight", currDirLight);
+		this.defaultShaderProgram.setUniform("directionalLight", currDirLight);
     }
 
     /**
@@ -199,7 +255,16 @@ public class Renderer {
      * Destroy all resources used by the renderer.
      */
     public void dispose() {
-        // Destroy the shader program.
-        shaderProgram.delete();
+        if (this.shadowRenderer != null) {
+        	this.shadowRenderer.delete();
+        }
+        
+        if (this.skyBoxShaderProgram != null) {
+        	this.skyBoxShaderProgram.delete();
+        }
+        
+        if (this.defaultShaderProgram != null) {
+        	this.defaultShaderProgram.delete();
+        }
     }
 }
