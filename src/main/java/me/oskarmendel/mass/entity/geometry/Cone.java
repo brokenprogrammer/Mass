@@ -26,6 +26,7 @@ package me.oskarmendel.mass.entity.geometry;
 
 import java.util.ArrayList;
 
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
@@ -104,7 +105,7 @@ public class Cone extends Entity implements Geometry {
 	 * @param rotation - Rotation of the cone.
 	 * @param scale - Scale of the cone.
 	 */
-	public Cone(Vector3f position, Vector3f rotation, float scale) {
+	public Cone(Vector3f position, Quaternionf rotation, float scale) {
 		super();
 	
 		height = 1;
@@ -122,7 +123,7 @@ public class Cone extends Entity implements Geometry {
 		setMesh(mesh);
 		
 		setPosition(position.x, position.y, position.z);
-		setRotation(rotation.x, rotation.y, rotation.z);
+		setRotation(rotation);
 		setScale(scale);
 	}
 	
@@ -135,7 +136,7 @@ public class Cone extends Entity implements Geometry {
 	 * @param scale - Scale of the cone.
 	 * @param color - Color of the cone.
 	 */
-	public Cone(Vector3f position, Vector3f rotation, float scale, Color color) {
+	public Cone(Vector3f position, Quaternionf rotation, float scale, Color color) {
 		super();
 		
 		height = 1;
@@ -157,7 +158,7 @@ public class Cone extends Entity implements Geometry {
 		setMesh(mesh);
 		
 		setPosition(position.x, position.y, position.z);
-		setRotation(rotation.x, rotation.y, rotation.z);
+		setRotation(rotation);
 		setScale(scale);
 	}
 	
@@ -170,7 +171,7 @@ public class Cone extends Entity implements Geometry {
 	 * @param scale - Scale of the cone.
 	 * @param texture - Texture of the cone.
 	 */
-	public Cone(Vector3f position, Vector3f rotation, float scale, Texture texture) {
+	public Cone(Vector3f position, Quaternionf rotation, float scale, Texture texture) {
 		super();
 		
 		height = 1;
@@ -188,7 +189,7 @@ public class Cone extends Entity implements Geometry {
 		setMesh(mesh);
 		
 		setPosition(position.x, position.y, position.z);
-		setRotation(rotation.x, rotation.y, rotation.z);
+		setRotation(rotation);
 		setScale(scale);
 	}
 	

@@ -37,7 +37,6 @@ import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 
 import me.oskarmendel.mass.gfx.Mesh;
-import me.oskarmendel.mass.util.QuatHelper;
 
 /**
  * This class represents an Mob in the game.
@@ -147,12 +146,12 @@ public class Player extends MobBase {
 	 */
 	public void moveRotation(float x, float y, float z) {
 		this.rigidBody.activate();
-		this.rigidBody.setAngularVelocity(new Vector3f(0, x, 0));
+		this.rigidBody.setAngularVelocity(new Vector3f(0, -x, 0));
 	}
 
 	@Override
 	public void initPhysics() {
-		motionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(5, -400, -4), 1.0f)));
+		motionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(5, -35, -4), 1.0f)));
 		
 		// Construct collision shape based on the mesh vertices in the Mesh.
 		ObjectArrayList<Vector3f> points = new ObjectArrayList<Vector3f>();
@@ -182,10 +181,7 @@ public class Player extends MobBase {
 		r = t.getRotation(r);
 
 		this.setPosition(v.x, v.y, v.z);
-		this.setRotation(
-				(float) Math.toDegrees(QuatHelper.getPitch(r)), 
-				(float) Math.toDegrees(QuatHelper.getYaw(r)), 
-				(float) Math.toDegrees(QuatHelper.getRoll(r)));
+		this.setRotation(r.w, r.x, r.y, r.z);
 	}
 
 	@Override

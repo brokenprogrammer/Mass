@@ -24,6 +24,7 @@
 
 package me.oskarmendel.mass.entity.geometry.builder;
 
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import me.oskarmendel.mass.entity.geometry.Cylinder;
@@ -71,8 +72,8 @@ public class CylinderBuilder implements GeometryBuilder {
 	 * @return This CylinderBuilder object.
 	 */
 	@Override
-	public CylinderBuilder setRotation(Vector3f rotation) {
-		cylinder.setRotation(rotation.x, rotation.y, rotation.z);
+	public CylinderBuilder setRotation(Quaternionf rotation) {
+		cylinder.setRotation(rotation);
 		return this;
 	}
 

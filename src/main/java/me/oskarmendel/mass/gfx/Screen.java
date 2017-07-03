@@ -32,6 +32,8 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+import org.joml.Matrix4f;
+
 /**
  * Handles the window of the application.
  *
@@ -40,11 +42,36 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  * @name Screen.java
  */
 public class Screen {
+	
+	/**
+     * Field of View in Radians
+     */
+    public static final float FOV = (float) Math.toRadians(60.0f);
+    
+	/**
+     * Distance to near plane.
+     */
+    public static final float Z_NEAR = 0.01f;
+    
+    /**
+     * Distance to far plane.
+     */
+    public static final float Z_FAR = 1000.f;
 
     /**
      * The window handle
      */
     private long id;
+    
+    /**
+     * 
+     */
+    private int width;
+    
+    /**
+     * 
+     */
+    private int height;
 
     /**
      * Key callback for the window
@@ -55,6 +82,11 @@ public class Screen {
      * Value showing if v-sync is on or off.
      */
     private boolean vsync;
+    
+    /**
+     * 
+     */
+    private final Matrix4f projectionMatrix;
 
     /**
      * Creates a new GLFW window and its OpenGL context with
@@ -66,7 +98,9 @@ public class Screen {
      * @param vsync - Set to true to put v-sync on.
      */
     public Screen (int width, int height, String title, boolean vsync) {
-        this.vsync = vsync;
+        this.width = width;
+        this.height = height;
+    	this.vsync = vsync;
 
         // Set resizeable to false.
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
@@ -115,6 +149,15 @@ public class Screen {
         glEnable(GL_BLEND);
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
+        this.projectionMatrix = new Matrix4f();
+    }
+    
+    /**
+     * 
+     */
+    public void init() {
+    	
     }
 
     /**
@@ -138,14 +181,6 @@ public class Screen {
     }
 
     /**
-     * Destroys the window and releases the callbacks.
-     */
-    public void destroy() {
-        glfwDestroyWindow(id);
-        keyCallback.free();
-    }
-
-    /**
      * Returns if the window should close or not.
      *
      * @return true if the window should close, else false.
@@ -164,11 +199,66 @@ public class Screen {
     }
     
     /**
+     * Returns the width of this screen.
+     * 
+     * @return - The width value of this screen.
+     */
+    public int getWidth() {
+    	return this.width;
+    }
+    
+    /**
+     * Returns the height of this screen.
+     * 
+     * @return - The height value of this screen.
+     */
+    public int getHeight() {
+    	return this.height;
+    }
+    
+    /**
      * Returns the vsync value for this screen.
      * 
      * @return - The vsync value set for this screen.
      */
     public boolean getVsync() {
     	return this.vsync;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public Matrix4f getProjectionMatrix() {
+    	return this.projectionMatrix;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public Matrix4f updateProjectionMatrix() {
+    	float aspectRatio = (float) width / (float) height;
+        return projectionMatrix.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
+    }
+    
+    /**
+     * 
+     * @param matrix
+     * @param width
+     * @param height
+     * @return
+     */
+    public static Matrix4f updateProjectionMatrix(Matrix4f matrix, int width, int height) {
+    	float aspectRatio = (float) width / (float) height;
+        return matrix.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
+    }
+    
+    /**
+     * Destroys the window and releases the callbacks.
+     */
+    public void destroy() {
+        glfwDestroyWindow(id);
+        keyCallback.free();
     }
 }

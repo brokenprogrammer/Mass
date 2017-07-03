@@ -26,6 +26,8 @@ package me.oskarmendel.mass.util;
 
 import javax.vecmath.Quat4f;
 
+import org.joml.Quaternionf;
+
 /**
  * Helper class for working with Quaternions.  
  *
@@ -34,6 +36,31 @@ import javax.vecmath.Quat4f;
  * @name QuatHelper.java
  */
 public class QuatHelper {
+	
+	/**
+	 * 
+	 * @param pitch
+	 * @param yaw
+	 * @param roll
+	 * @return
+	 */
+	public static Quaternionf toQuat(float pitch, float yaw, float roll) {
+		Quaternionf quat = new Quaternionf();
+		
+		float t0 = (float) Math.cos(yaw * 0.5f);
+		float t1 = (float) Math.sin(yaw * 0.5f);
+		float t2 = (float) Math.cos(roll * 0.5f);
+		float t3 = (float) Math.sin(roll * 0.5f);
+		float t4 = (float) Math.cos(pitch * 0.5f);
+		float t5 = (float) Math.sin(pitch * 0.5f);
+		
+		quat.w = t0 * t2 * t4 + t1 * t3 * t5;
+		quat.x = t0 * t3 * t4 - t1 * t2 * t5;
+		quat.y = t0 * t2 * t5 + t1 * t3 * t4;
+		quat.z = t1 * t2 * t4 - t0 * t3 * t5;
+		
+		return quat;
+	}
 	
 	/**
 	 * Getter for the pitch value of the specified quaternion.

@@ -24,6 +24,7 @@
 
 package me.oskarmendel.mass.entity.geometry.builder;
 
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import me.oskarmendel.mass.entity.geometry.Sphere;
@@ -79,8 +80,8 @@ public class SphereBuilder implements GeometryBuilder{
 	 * @return This SphereBuilder object.
 	 */
 	@Override
-	public SphereBuilder setRotation(Vector3f rotation) {
-		sphere.setRotation(rotation.x, rotation.y, rotation.z);
+	public SphereBuilder setRotation(Quaternionf rotation) {
+		sphere.setRotation(rotation);
 		return this;
 	}
 

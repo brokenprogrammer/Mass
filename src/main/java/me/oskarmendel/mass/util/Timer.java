@@ -25,7 +25,7 @@
 package me.oskarmendel.mass.util;
 
 /**
- * 
+ * Utility class to help working with Time spent and current time.
  *
  * @author Oskar Mendel
  * @version 0.00.00

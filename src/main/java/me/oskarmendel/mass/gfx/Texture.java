@@ -30,6 +30,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 import static org.lwjgl.stb.STBImage.stbi_failure_reason;
 import static org.lwjgl.stb.STBImage.stbi_load;
@@ -48,7 +49,7 @@ public class Texture {
      * Handle of the texture.
      */
     private final int id;
-
+    
     /**
      * Width of the texture.
      */
@@ -58,6 +59,16 @@ public class Texture {
      * Height of the texture.
      */
     private int height;
+    
+    /**
+     * Number of rows on the texture.
+     */
+    private int numRows = 1;
+    
+    /**
+     * Number of columns on the texture.
+     */
+    private int numCols = 1;
 
 
     /**
@@ -66,6 +77,31 @@ public class Texture {
      */
     public Texture() {
         this.id = glGenTextures();
+    }
+    
+    /**
+     * Creates a new empty texture with the specified width, 
+     * height and pixel format.
+     * 
+     * @param width - Width of the Texture to create.
+     * @param height - Height of the Texture to create.
+     * @param pixelFormat - Pixel format of the Texture to create.
+     * 
+     * @throws Exception
+     */
+    public Texture(int width, int height, int pixelFormat) throws Exception {
+    	this.id = glGenTextures();
+    	this.width = width;
+    	this.height = height;
+    	
+    	glBindTexture(GL_TEXTURE_2D, this.id);
+    	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, this.width, this.height, 
+    			0, pixelFormat, GL_FLOAT, (ByteBuffer) null);
+    	
+    	this.setParameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    	this.setParameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    	this.setParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    	this.setParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
     /**
@@ -143,6 +179,42 @@ public class Texture {
     public void setHeight(int height) {
         this.height = height;
     }
+    
+    /**
+     * Getter for the number of rows of this texture.
+     * 
+     * @return - The number of rows of this texture.
+     */
+    public int getNumRows() {
+    	return this.numRows;
+    }
+    
+    /**
+     * Setter for the number of Rows of this texture.
+     * 
+     * @param rows - The number of rows value to set.
+     */
+    public void setNumRows(int rows) {
+    	this.numRows = rows;
+    }
+    
+    /**
+     * Getter for the number of columns of this texture.
+     * 
+     * @return - The number of columns of this texture.
+     */
+    public int getNumCols() {
+    	return this.numCols;
+    }
+    
+    /**
+     * Setter for the number of columns of this texture.
+     * 
+     * @param cols - The number of columns value to set.
+     */
+    public void setNumCols(int cols) {
+    	this.numCols= cols;
+    }
 
     /**
      * Deletes the texture.
@@ -213,5 +285,24 @@ public class Texture {
         }
 
         return createTexture(width, height, image);
+    }
+    
+    /**
+     * Loads a texture from a file at the specified path and sets the
+     * number of rows and columns to the specified values. 
+     * 
+     * @param path - File path of the texture file.
+     * @param numCols - Number of columns for this texture.
+     * @param numRows - Number of rows of this texture.
+     * 
+     * @return A Texture built from the specified file with specified 
+     * number of rows and columns.
+     */
+    public static Texture loadTexture(String path, int numCols, int numRows) {
+    	Texture t = loadTexture(path);
+    	t.setNumCols(numCols);
+    	t.setNumRows(numRows);
+    	
+    	return t;
     }
 }

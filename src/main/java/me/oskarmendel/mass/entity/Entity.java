@@ -25,6 +25,8 @@
 package me.oskarmendel.mass.entity;
 
 import me.oskarmendel.mass.gfx.Mesh;
+
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
@@ -39,7 +41,12 @@ import org.joml.Vector3f;
  * @name Entity.java
  */
 public abstract class Entity {
-
+	
+	/**
+	 * Boolean to represent if the entity is selected or not.
+	 */
+	private boolean selected;
+	
     /**
      * The mesh for this Entity.
      */
@@ -58,7 +65,22 @@ public abstract class Entity {
     /**
      * The rotation of this Entity.
      */
-    private final Vector3f rotation;
+    private final Quaternionf rotation;
+    
+    /**
+     * 
+     */
+    private int texturePosition;
+    
+    /**
+     * 
+     */
+    private boolean disableFrustrumCulling;
+    
+    /**
+     * 
+     */
+    private boolean insideFrustrumCulling;
 
     /**
      * Default constructor for the Entity class.
@@ -66,11 +88,16 @@ public abstract class Entity {
      * and scale to 1.
      */
     protected  Entity() {
+    	selected = false;
+    	
         position = new Vector3f(0, 0, 0);
-
+        rotation =  new Quaternionf();
+        
         scale = 1;
-
-        rotation = new Vector3f(0, 0, 0);
+        
+        texturePosition = 0;
+        insideFrustrumCulling = true;
+        disableFrustrumCulling = false;
     }
 
     /**
@@ -96,7 +123,25 @@ public abstract class Entity {
     	
     	this.meshes = meshes;
     }
-
+    
+    /**
+     * Getter for the selected value of this Entity.
+     * 
+     * @return - True of the Entity is selected; false otherwise.
+     */
+    public boolean isSelected() {
+    	return this.selected;
+    }
+    
+    /**
+     * Setter for the selected value of this Entity.
+     * 
+     * @param selected - The selected value to set.
+     */
+    public void setSelected(boolean selected) {
+    	this.selected = selected;
+    }
+    
     /**
      * Getter for the position of this Entity.
      *
@@ -143,7 +188,7 @@ public abstract class Entity {
      *
      * @return - Rotation of this Entity.
      */
-    public Vector3f getRotation() {
+    public Quaternionf getRotation() {
         return this.rotation;
     }
 
@@ -151,14 +196,24 @@ public abstract class Entity {
      * Setter for the rotation of this Entity. Sets the rotation
      * vector to the specified x, y and z.
      *
-     * @param x - X Rotation.
-     * @param y - Y Rotation.
-     * @param z - Z Rotation.
+     * @param q - Rotation quaternion.
      */
-    public void setRotation(float x, float y, float z) {
-        this.rotation.x = x;
-        this.rotation.y = y;
-        this.rotation.z = z;
+    public void setRotation(Quaternionf q) {
+        this.rotation.set(q);
+    }
+    
+    /**
+     * 
+     * @param w
+     * @param x
+     * @param y
+     * @param z
+     */
+    public void setRotation(float w, float x, float y, float z) {
+    	this.rotation.w = w;
+    	this.rotation.x = x;
+    	this.rotation.y = y;
+    	this.rotation.z = z;
     }
 
     /**
@@ -193,5 +248,55 @@ public abstract class Entity {
      */
     public void setMeshes(Mesh[] meshes) {
     	this.meshes = meshes;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public int getTexturePos() {
+    	return this.texturePosition;
+    }
+    
+    /**
+     * 
+     * @param texturePosition
+     */
+    public void setTexturePos(int texturePosition) {
+    	this.texturePosition = texturePosition;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public boolean insideFrustrum() {
+    	return this.insideFrustrumCulling;
+    }
+    
+    /**
+     * 
+     * @param insideFrustrum
+     * @return
+     */
+    public boolean setInsideFrtustrum(boolean insideFrustrum) {
+    	return this.insideFrustrumCulling = insideFrustrum;
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public boolean isDisableFrustrumCulling() {
+    	return this.disableFrustrumCulling;
+    }
+    
+    /**
+     * 
+     * @param disableFrustrumCulling
+     * @return
+     */
+    public boolean setDisableFrustrumCulling(boolean disableFrustrumCulling) {
+    	return this.disableFrustrumCulling = disableFrustrumCulling;
     }
 }

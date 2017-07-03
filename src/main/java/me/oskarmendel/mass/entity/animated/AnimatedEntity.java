@@ -22,54 +22,17 @@
  * SOFTWARE.
  */
 
-package me.oskarmendel.mass.entity.geometry.builder;
+package me.oskarmendel.mass.entity.animated;
 
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-
-import me.oskarmendel.mass.entity.geometry.Geometry;
+import me.oskarmendel.mass.entity.Entity;
 
 /**
- * Interface for all geometric builders containing 
- * methods shared between all the builders.
- *
+ * 
+ * 
  * @author Oskar Mendel
  * @version 0.00.00
- * @name GeometryBuilder.java
+ * @name AnimatedEntity.java
  */
-public interface GeometryBuilder {
-	
-	/**
-	 * Sets the position of the Geometric object to build.
-	 * 
-	 * @param position - Position of the geometric object.
-	 * 
-	 * @return This builder object.
-	 */
-	GeometryBuilder setPosition(Vector3f position);
-	
-	/**
-	 * Sets the rotation of the Geometric object to build.
-	 * 
-	 * @param rotation - Rotation of the geometric object.
-	 * 
-	 * @return This builder object.
-	 */
-	GeometryBuilder setRotation(Quaternionf rotation);
-	
-	/**
-	 * Sets the scale of the Geometric object to build.
-	 * 
-	 * @param scale - Scale of the geometric object.
-	 * 
-	 * @return This builder object.
-	 */
-	GeometryBuilder setScale(float scale);
-	
-	/**
-	 * Builds the object using all the specified values.
-	 * 
-	 * @return Geometric object built using the values given to the builder.
-	 */
-	Geometry build();
+public class AnimatedEntity extends Entity {
+
 }

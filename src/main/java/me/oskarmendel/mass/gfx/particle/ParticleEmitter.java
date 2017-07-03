@@ -22,54 +22,16 @@
  * SOFTWARE.
  */
 
-package me.oskarmendel.mass.entity.geometry.builder;
-
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-
-import me.oskarmendel.mass.entity.geometry.Geometry;
+package me.oskarmendel.mass.gfx.particle;
 
 /**
- * Interface for all geometric builders containing 
- * methods shared between all the builders.
+ * Interface to use when defining a new particle emitter.
  *
  * @author Oskar Mendel
  * @version 0.00.00
- * @name GeometryBuilder.java
+ * @name ParticleEmitter.java
  */
-public interface GeometryBuilder {
+public interface ParticleEmitter {
 	
-	/**
-	 * Sets the position of the Geometric object to build.
-	 * 
-	 * @param position - Position of the geometric object.
-	 * 
-	 * @return This builder object.
-	 */
-	GeometryBuilder setPosition(Vector3f position);
-	
-	/**
-	 * Sets the rotation of the Geometric object to build.
-	 * 
-	 * @param rotation - Rotation of the geometric object.
-	 * 
-	 * @return This builder object.
-	 */
-	GeometryBuilder setRotation(Quaternionf rotation);
-	
-	/**
-	 * Sets the scale of the Geometric object to build.
-	 * 
-	 * @param scale - Scale of the geometric object.
-	 * 
-	 * @return This builder object.
-	 */
-	GeometryBuilder setScale(float scale);
-	
-	/**
-	 * Builds the object using all the specified values.
-	 * 
-	 * @return Geometric object built using the values given to the builder.
-	 */
-	Geometry build();
+	void delete();
 }
