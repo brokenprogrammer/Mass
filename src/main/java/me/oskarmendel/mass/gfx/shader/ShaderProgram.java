@@ -28,6 +28,7 @@ import me.oskarmendel.mass.gfx.Material;
 import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.light.PointLight;
 import me.oskarmendel.mass.gfx.light.SpotLight;
+import me.oskarmendel.mass.gfx.weather.Fog;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -107,6 +108,16 @@ public class ShaderProgram {
     public void setUniform(int location, float value) {
         glUniform1f(location, value);
     }
+    
+    /**
+     * 
+     * @param location
+     * @param value
+     * @param pos
+     */
+    public void setUniform(String location, float value, int pos) {
+    	setUniform(getUniformLocation(location + "[" + pos + "]"), value);
+    }
 
     /**
      * Sets the uniform variable at the specified location.
@@ -148,6 +159,16 @@ public class ShaderProgram {
             value.get(floatBuffer);
             glUniformMatrix4fv(location, false, floatBuffer);
         }
+    }
+    
+    /**
+     * 
+     * @param location
+     * @param value
+     * @param pos
+     */
+    public void setUniform(String location, Matrix4f value, int pos) {
+    	setUniform(getUniformLocation(location + "[" + pos + "]"), value);
     }
     
     /**
@@ -255,6 +276,17 @@ public class ShaderProgram {
         setUniform(getUniformLocation(location + ".specular"), material.getSpecularColor());
         setUniform(getUniformLocation(location + ".hasTexture"), material.isTextured() ? 1 : 0);
         setUniform(getUniformLocation(location + ".reflectance"), material.getReflectance());
+    }
+    
+    /**
+     * 
+     * @param location
+     * @param fog
+     */
+    public void setUniform(String location, Fog fog) {
+    	setUniform(getUniformLocation(location + ".activeFog"), fog.isActive() ? 1 : 0);
+    	setUniform(getUniformLocation(location + ".color"), fog.getColor().toVector3f());
+    	setUniform(getUniformLocation(location + ".density"), fog.getDensity());
     }
 
     /**

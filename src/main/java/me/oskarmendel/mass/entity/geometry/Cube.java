@@ -29,6 +29,8 @@ import me.oskarmendel.mass.gfx.Color;
 import me.oskarmendel.mass.gfx.Material;
 import me.oskarmendel.mass.gfx.Mesh;
 import me.oskarmendel.mass.gfx.Texture;
+
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
@@ -139,7 +141,7 @@ public class Cube extends Entity {
      * @param rotation - Rotation of the cube.
      * @param scale - Scale of the cube.
      */
-    public Cube(Vector3f position, Vector3f rotation, float scale) {
+    public Cube(Vector3f position, Quaternionf rotation, float scale) {
         super();
 
         Mesh mesh = new Mesh(CUBE_POSITIONS, CUBE_TEXTURE_COORDINATES, CUBE_NORMALS, CUBE_INDICES);
@@ -149,7 +151,7 @@ public class Cube extends Entity {
         setMesh(mesh);
 
         setPosition(position.x, position.y, position.z);
-        setRotation(rotation.x, rotation.y, rotation.z);
+        setRotation(rotation);
         setScale(scale);
     }
 
@@ -162,7 +164,7 @@ public class Cube extends Entity {
      * @param scale - Scale of the cube.
      * @param color - Color of the cube.
      */
-    public Cube(Vector3f position, Vector3f rotation, float scale, Color color) {
+    public Cube(Vector3f position, Quaternionf rotation, float scale, Color color) {
         super();
 
         Mesh mesh = new Mesh(CUBE_POSITIONS, CUBE_TEXTURE_COORDINATES, CUBE_NORMALS, CUBE_INDICES);
@@ -176,7 +178,7 @@ public class Cube extends Entity {
         setMesh(mesh);
 
         setPosition(position.x, position.y, position.z);
-        setRotation(rotation.x, rotation.y, rotation.z);
+        setRotation(rotation);
         setScale(scale);
     }
 
@@ -189,7 +191,7 @@ public class Cube extends Entity {
      * @param scale - Scale of the cube.
      * @param texture - Texture of the cube.
      */
-    public Cube(Vector3f position, Vector3f rotation, float scale, Texture texture) {
+    public Cube(Vector3f position, Quaternionf rotation, float scale, Texture texture) {
         super();
 
         Mesh mesh = new Mesh(CUBE_POSITIONS, CUBE_TEXTURE_COORDINATES, CUBE_NORMALS, CUBE_INDICES);
@@ -199,7 +201,7 @@ public class Cube extends Entity {
         setMesh(mesh);
 
         setPosition(position.x, position.y, position.z);
-        setRotation(rotation.x, rotation.y, rotation.z);
+        setRotation(rotation);
         setScale(scale);
     }
 }

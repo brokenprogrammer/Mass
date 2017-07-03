@@ -147,7 +147,7 @@ public class Player extends MobBase {
 	 */
 	public void moveRotation(float x, float y, float z) {
 		this.rigidBody.activate();
-		this.rigidBody.setAngularVelocity(new Vector3f(0, x, 0));
+		this.rigidBody.setAngularVelocity(new Vector3f(0, -x, 0));
 	}
 
 	@Override
@@ -182,10 +182,11 @@ public class Player extends MobBase {
 		r = t.getRotation(r);
 
 		this.setPosition(v.x, v.y, v.z);
-		this.setRotation(
+		/*this.setRotation(
 				(float) Math.toDegrees(QuatHelper.getPitch(r)), 
 				(float) Math.toDegrees(QuatHelper.getYaw(r)), 
-				(float) Math.toDegrees(QuatHelper.getRoll(r)));
+				(float) Math.toDegrees(QuatHelper.getRoll(r)));*/
+		this.setRotation(r.w, r.x, r.y, r.z);
 	}
 
 	@Override

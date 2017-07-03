@@ -4,7 +4,7 @@ in vec3 position;
 in vec2 texCoord;
 in vec3 vertexNormal;
 
-out outTexCoord;
+out vec2 outTexCoord;
 
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;

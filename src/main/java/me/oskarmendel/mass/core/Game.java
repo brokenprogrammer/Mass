@@ -25,13 +25,13 @@
 package me.oskarmendel.mass.core;
 
 import me.oskarmendel.mass.entity.Entity;
+import me.oskarmendel.mass.entity.SkyBox;
 import me.oskarmendel.mass.entity.TestRoom;
 import me.oskarmendel.mass.entity.masster.MassterBall;
 import me.oskarmendel.mass.entity.mob.Player;
 import me.oskarmendel.mass.gfx.*;
 import me.oskarmendel.mass.gfx.light.DirectionalLight;
-import me.oskarmendel.mass.gfx.light.PointLight;
-import me.oskarmendel.mass.gfx.light.SpotLight;
+import me.oskarmendel.mass.gfx.weather.Fog;
 import me.oskarmendel.mass.input.MouseHandler;
 import me.oskarmendel.mass.phys.Collidable;
 import me.oskarmendel.mass.phys.PhysicsSpace;
@@ -100,18 +100,11 @@ public class Game {
     
     private PhysicsSpace physicsSpace;
     
-    // Temporary light variables.
-    private Vector3f ambientLight;
-    private PointLight[] pointLights;
-    private DirectionalLight directionalLight;
-    private float lightAngle;
-    private SpotLight[] spotLights;
-    private float spotAngle = 0;
-    private float spotInc = 1;
-    
     MassterBall massterBall;
     TestRoom room;
     Player player;
+    
+    Scene scene;
     
     /**
      * Default constructor for the game.
@@ -122,7 +115,6 @@ public class Game {
         mouseHandler = new MouseHandler();
         timer = new Timer();
         cameraInc = new Vector3f(0, 0,0);
-        lightAngle = -90;
     }
 
     private Entity[] entities;
@@ -157,15 +149,20 @@ public class Game {
         mouseHandler.init(screen);
 
         // Initialize renderer.
-        renderer.init();
+        try {
+			renderer.init();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+        
+        scene = new Scene();
+        scene.setRenderShadows(false);
         
         Texture t = Texture.loadTexture("src/main/resources/textures/hexmap.png");
         try {
             Mesh cubeMesh = OBJLoader.loadMesh("src/main/resources/models/cube.obj");
-            //Mesh testRoomMesh = OBJLoader.loadMesh("src/main/resources/models/room.obj");
-            //src/main/resources/models/office/Amadeusmaps/Amadeus maps\cs_office_texture_0.jpg
             Mesh[] testRoomMesh = StaticMeshLoader.load("src/main/resources/models/office/cs_office.obj", "src/main/resources/models/office/");
-            System.out.println(testRoomMesh.length);
+            
             Material mat = new Material(t, 1.0f);
             cubeMesh.setMaterial(mat);
             //testRoomMesh.setMaterial(new Material());
@@ -177,70 +174,16 @@ public class Game {
             
             room = new TestRoom(testRoomMesh);
             room.setPosition(0, -1, 0);
-
-//            Cube c = new Cube(new Vector3f(6, 2, -2), new Vector3f(0, 0 ,0), 0.5f);
-//            Cube c2 = new Cube(new Vector3f(0, -2, -2), new Vector3f(0, 0 ,0), 0.5f);
-//            Cube c3 = new Cube(new Vector3f(-2, 0, -2), new Vector3f(0, 0 ,0), 0.5f);
-//            Cube c4 = new Cube(new Vector3f(2, 0, -2), new Vector3f(0, 0 ,0), 0.5f);
-//
-//            c.getMesh().getMaterial().setAmbientColor(new Color(0, 1, 0).toVector4f());
-//            c.getMesh().getMaterial().setDiffuseColor(new Color(0, 1, 0).toVector4f());
-//            c.getMesh().getMaterial().setSpecularColor(new Color(0, 1, 0).toVector4f());
-//
-//            c2.getMesh().getMaterial().setAmbientColor(new Color(0, 0, 1).toVector4f());
-//            c2.getMesh().getMaterial().setDiffuseColor(new Color(0, 0, 1).toVector4f());
-//            c2.getMesh().getMaterial().setSpecularColor(new Color(0, 0, 1).toVector4f());
-//            
-//            s = new Sphere(new Vector3f(0, 4, -2), new Vector3f(0, 0 ,0), 1f, 1, new Color(1, 0, 0));
-//            Sphere s2;//= new Sphere(new Vector3f(0, -4, -2), new Vector3f(0, 0 ,0), 1f, 1, t);
-//
-//            SphereBuilder sb = new SphereBuilder();
-//            sb.setPosition(new Vector3f(0, -4, -2)).setRotation(new Vector3f(0, 0, 0)).setScale(1).setColor(new Color(0, 1, 0)).setSubdivisions(3);
-//            s2 = sb.build();
-//            
-//            Cone co = new Cone(new Vector3f(0, 2, -2), new Vector3f(0, 0 ,0), 1f, t);
-//            Cone co2;// = new Cone(new Vector3f(-2, 3, -2), new Vector3f(0, 0 ,0), 1f, new Color(1, 0, 1));
-//            
-//            ConeBuilder cob = new ConeBuilder();
-//            cob.setPosition(new Vector3f(-2, 3, -2)).setRotation(new Vector3f(00, 0, 0)).setScale(1).setHeight(3).setColor(new Color(1, 0.8f, 1));
-//            co2 = cob.build();
-//            
-//            Cylinder cr = new Cylinder(new Vector3f(3, 2, -2), new Vector3f(10, 180, 10), 1f, t);
-//            Cylinder cr2; // = new Cylinder(new Vector3f(3, 4, -2), new Vector3f(10, 180, 10), 1f, new Color(1, 1, 0));
-//            
-//            CylinderBuilder cb = new CylinderBuilder();
-//            cb.setPosition(new Vector3f(3, 4, -2)).setRotation(new Vector3f(10, 180, 10)).setScale(1).setHeight(3).setColor(new Color(1, 1, 0));
-//            cr2 = cb.build();
+            
+            float skyBoxScale = 300.0f;
+            SkyBox skyBox = new SkyBox("src/main/resources/models/skybox.obj", new Color(1f, 0.0f, 0.0f));
+            skyBox.setScale(skyBoxScale);
+            scene.setSkyBox(skyBox);
             
             entities = new Entity[]{massterBall, room, player};
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // Position light example.
-        ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
-        Color lightColour = new Color(1, 1, 1);
-        Vector3f lightPosition = new Vector3f(0, 0, 1);
-        float lightIntensity = 1.0f;
-        PointLight pointLight = new PointLight(lightColour, lightPosition, lightIntensity);
-        PointLight.Attenuation att = new PointLight.Attenuation(0.0f, 0.0f, 1.0f);
-        pointLight.setAttenuation(att);
-        pointLights = new PointLight[]{pointLight};
-        
-        // Spot light example.
-        lightPosition = new Vector3f(4.0f, -406.0f, -3.0f);
-        pointLight = new PointLight(lightColour, lightPosition, lightIntensity);
-        att = new PointLight.Attenuation(0.0f, 0.0f, 0.02f);
-        pointLight.setAttenuation(att);
-        Vector3f coneDir = new Vector3f(0, 0, -1);
-        float cutOff = (float) Math.cos(Math.toRadians(140));
-        SpotLight spotLight = new SpotLight(pointLight, coneDir, cutOff);
-        spotLights = new SpotLight[]{spotLight};
-        
-        // Directional light example.
-        lightPosition = new Vector3f(-1, 0,0 );
-        lightColour = new Color(1, 1, 1);
-        directionalLight = new DirectionalLight(lightColour, lightPosition, lightIntensity);
 
         physicsSpace = new PhysicsSpace();
         
@@ -250,8 +193,32 @@ public class Game {
         	}
         }
         
+        scene.setEntities(entities);
+        scene.setEntityMeshes(entities);
+        scene.setFog(Fog.NO_FOG);
+        
+        // Initialize all the lights for the scene.
+        initLights();
+        
         // Initialization done, set running to true.
         running = true;
+    }
+    
+    /**
+     * 
+     */
+    public void initLights() {
+    	SceneLight sceneLight = new SceneLight();
+    	scene.setSceneLight(sceneLight);
+    	
+    	// Ambient Light
+    	sceneLight.setAmbientLight(new Vector3f(0.3f, 0.3f, 0.3f));
+    	
+    	// Directional Light
+    	float intensity = 1.0f;
+    	Vector3f direction = new Vector3f(0, 1, 1);
+    	DirectionalLight directionalLight = new DirectionalLight(Color.WHITE, direction, intensity);
+    	sceneLight.setDirectionalLight(directionalLight);
     }
 
     /**
@@ -333,13 +300,6 @@ public class Game {
         } else if (screen.isKeyPressed(GLFW_KEY_X)) {
             cameraInc.y = 100;
         }
-
-        float lightPos = spotLights[0].getPointLight().getPosition().z;
-        if (screen.isKeyPressed(GLFW_KEY_N)) {
-            this.spotLights[0].getPointLight().getPosition().z = lightPos + 0.1f;
-        } else if (screen.isKeyPressed(GLFW_KEY_M)) {
-            this.spotLights[0].getPointLight().getPosition().z = lightPos - 0.1f;
-        }
     }
 
     /**
@@ -356,13 +316,12 @@ public class Game {
         	Vector2f rotVec = mouseHandler.getDispelVec();
         	camera.moveRotation(rotVec.x * 0.2f, rotVec.y * 0.2f, 0);
         	player.moveRotation(rotVec.y * 0.2f, 0, 0);
-        	//System.out.println(camera.getPosition().y);
         }
         
         // Update the camera view matrix.
         camera.updateViewMatrix();
         
-        // Update spot light direction.
+        /* // Update spot light direction.
         spotAngle += spotInc * 0.05f;
         if (spotAngle > 2) {
         	spotInc = -1;
@@ -395,7 +354,7 @@ public class Game {
 
         double angRad = Math.toRadians(lightAngle);
         directionalLight.getDirection().x = (float) Math.sin(angRad);
-        directionalLight.getDirection().y = (float) Math.cos(angRad);
+        directionalLight.getDirection().y = (float) Math.cos(angRad);*/
         
         physicsSpace.tick();
         
@@ -413,7 +372,6 @@ public class Game {
      * Renders the game.
      */
     public void render() {
-        renderer.render(this.camera, this.entities, ambientLight, 
-        		pointLights, spotLights, directionalLight);
+        renderer.render(this.screen, this.camera, this.scene, true);
     }
 }

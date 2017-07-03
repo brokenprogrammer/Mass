@@ -27,12 +27,15 @@ package me.oskarmendel.mass.gfx;
 import me.oskarmendel.mass.core.Camera;
 import me.oskarmendel.mass.core.Scene;
 import me.oskarmendel.mass.entity.Entity;
+import me.oskarmendel.mass.entity.SkyBox;
+import me.oskarmendel.mass.entity.animated.AnimatedEntity;
 import me.oskarmendel.mass.gfx.filter.FrustumCullingFilter;
 import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.light.PointLight;
 import me.oskarmendel.mass.gfx.light.SpotLight;
 import me.oskarmendel.mass.gfx.shader.Shader;
 import me.oskarmendel.mass.gfx.shader.ShaderProgram;
+import me.oskarmendel.mass.gfx.shadow.ShadowCascade;
 import me.oskarmendel.mass.gfx.shadow.ShadowRenderer;
 
 import org.joml.Matrix4f;
@@ -41,9 +44,11 @@ import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Performs the rendering process.
@@ -178,12 +183,91 @@ public class Renderer {
 //        shaderProgram.stopUse();
     }
     
+    /**
+     * 
+     * @param screen
+     * @param camera
+     * @param scene
+     */
     private void renderSkyBox(Screen screen, Camera camera, Scene scene) {
-    	
+    	SkyBox skyBox = scene.getSkyBox();
+    	if (skyBox != null) {
+    		this.skyBoxShaderProgram.use();
+    		
+    		this.skyBoxShaderProgram.setUniform(skyBoxShaderProgram.getUniformLocation("texture_sampler"), 0);
+    		
+    		Matrix4f projectionMatrix = screen.getProjectionMatrix();
+    		this.skyBoxShaderProgram.setUniform(skyBoxShaderProgram.getUniformLocation("projectionMatrix"), projectionMatrix);
+    		
+    		Matrix4f viewMatrix = camera.getViewMatrix();
+    		float m30 = viewMatrix.m30();
+    		viewMatrix.m30(0);
+    		float m31 = viewMatrix.m31();
+    		viewMatrix.m31(0);
+    		float m32 = viewMatrix.m32();
+    		viewMatrix.m32(0);
+    		
+    		Mesh mesh = skyBox.getMesh();
+    		Matrix4f modelViewMatrix = this.transformation.buildModelViewMatrix(skyBox, viewMatrix);
+    		
+    		this.skyBoxShaderProgram.setUniform(this.skyBoxShaderProgram.getUniformLocation("modelViewMatrix"), modelViewMatrix);
+    		this.skyBoxShaderProgram.setUniform(this.skyBoxShaderProgram.getUniformLocation("ambientLight"), scene.getSceneLight().getAmbientLight());
+    		this.skyBoxShaderProgram.setUniform(this.skyBoxShaderProgram.getUniformLocation("color"), mesh.getMaterial().getAmbientColor());
+    		this.skyBoxShaderProgram.setUniform(this.skyBoxShaderProgram.getUniformLocation("hasTexture"), mesh.getMaterial().isTextured() ? 1 : 0);
+    		
+    		mesh.render();
+    		
+    		viewMatrix.m30(m30);
+    		viewMatrix.m31(m31);
+    		viewMatrix.m32(m32);
+    		
+    		this.skyBoxShaderProgram.stopUse();
+    	}
     }
     
+    /**
+     * 
+     * @param screen
+     * @param camera
+     * @param scene
+     */
     private void renderScene(Screen screen, Camera camera, Scene scene) {
+    	this.defaultShaderProgram.use();
     	
+    	Matrix4f viewMatrix = camera.getViewMatrix();
+    	Matrix4f projectionMatrix = screen.getProjectionMatrix();
+    	
+    	this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("viewMatrix"), viewMatrix);
+    	this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("projectionMatrix"), projectionMatrix);
+    	
+    	List<ShadowCascade> shadowCascades = this.shadowRenderer.getShadowCascades();
+    	for (int i = 0; i < ShadowRenderer.NUM_CASCADES; i++) {
+    		ShadowCascade shadowCascade = shadowCascades.get(i);
+    		this.defaultShaderProgram.setUniform("orthoProjectionMatrix", shadowCascade.getOrthoProjectionMatrix(), i);
+    		this.defaultShaderProgram.setUniform("cascadeFarPlanes", ShadowRenderer.CASCADE_SPLITS[i], i);
+    		this.defaultShaderProgram.setUniform("lightViewMatrix", shadowCascade.getLightViewMatrix(), i);
+    	}
+    	
+    	SceneLight sceneLight = scene.getSceneLight();
+    	renderLights(viewMatrix, sceneLight);
+    	
+    	this.defaultShaderProgram.setUniform("fog", scene.getFog());
+    	this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("texture_sampler"), 0);
+    	this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("normalMap"), 1);
+    	
+    	int start = 2;
+    	for (int i = 0; i < ShadowRenderer.NUM_CASCADES; i++) {
+    		this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("shadowMap_" + i), start + i);
+    	}
+    	
+    	this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("renderShadow"), scene.isRenderShadows() ? 1 : 0);
+    	
+    	renderNonInstancedMeshes(scene);
+    	
+    	renderInstancedMeshes(scene, viewMatrix);
+    	
+    	
+    	this.defaultShaderProgram.stopUse();
     }
     
     /**
@@ -194,15 +278,15 @@ public class Renderer {
      * @param spotLights
      * @param directionalLight
      */
-    private void renderLights(Matrix4f viewMatrix, Vector3f ambientLight, 
-    		PointLight[] pointLights, SpotLight[] spotLights, DirectionalLight directionalLight) {
+    private void renderLights(Matrix4f viewMatrix, SceneLight sceneLight) {
     	
     	// TODO: Throw error if too many lights? - Oskar Mendel 2017-06-28
     	
-    	this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("ambientLight"), ambientLight);
+    	this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("ambientLight"), sceneLight.getAmbientLight());
     	this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("specularPower"), 10f);
         
         // Process pointlights
+    	PointLight[] pointLights = sceneLight.getPointLights();
         int lights = pointLights != null ? pointLights.length : 0;
         for (int i = 0; i < lights; i++) {
         	PointLight currPointLight = new PointLight(pointLights[i]);
@@ -218,6 +302,7 @@ public class Renderer {
         }
         
         // Process spotLights
+        SpotLight[] spotLights = sceneLight.getSpotLights();
         lights = spotLights != null ? spotLights.length : 0;
         for (int i = 0; i < lights; i++) {
         	SpotLight currSpotLight = new SpotLight(spotLights[i]);
@@ -237,11 +322,52 @@ public class Renderer {
         }
         
         // Process directionalLight
-        DirectionalLight currDirLight = new DirectionalLight(directionalLight);
+        DirectionalLight currDirLight = new DirectionalLight(sceneLight.getDirectionalLight());
 		Vector4f dir = new Vector4f(currDirLight.getDirection(), 0);
 		dir.mul(viewMatrix);
 		currDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
 		this.defaultShaderProgram.setUniform("directionalLight", currDirLight);
+    }
+    
+    /**
+     * 
+     * @param scene
+     */
+    private void renderNonInstancedMeshes(Scene scene) {
+    	this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("isInstanced"), 0);
+    	
+    	// Render each mesh
+    	Map<Mesh, List<Entity>> mapMeshes = scene.getEntityMeshes();
+    	for (Mesh mesh : mapMeshes.keySet()) {
+    		 this.defaultShaderProgram.setUniform("material", mesh.getMaterial());
+    		 
+    		 Texture texture = mesh.getMaterial().getTexture();
+    		 if (texture != null) {
+    			 this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("numCols"), texture.getNumCols());
+    			 this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("numRows"), texture.getNumRows());
+    		 }
+    		 
+    		 this.shadowRenderer.bindTextures(GL_TEXTURE2);
+    		 
+    		 mesh.renderList(mapMeshes.get(mesh), (Entity entity) -> {
+    			 this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("selectedNonInstanced"), entity.isSelected() ? 1.0f : 0.0f);
+    			 Matrix4f modelMatrix = this.transformation.buildModelMatrix(entity);
+    			 this.defaultShaderProgram.setUniform(this.defaultShaderProgram.getUniformLocation("modelNonInstancedMatrix"), modelMatrix);
+    			 if (entity instanceof AnimatedEntity) {
+    				// TODO: If its animated render the shadows differently.
+ 					// Oskar Mendel - 2017-07-03
+    			 }
+    		 });
+    	}
+    }
+    
+    /**
+     * 
+     * @param scene
+     * @param viewMatrix
+     */
+    private void renderInstancedMeshes(Scene scene, Matrix4f viewMatrix) {
+    	
     }
 
     /**

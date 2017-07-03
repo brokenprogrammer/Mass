@@ -25,7 +25,6 @@
 package me.oskarmendel.mass.gfx;
 
 import me.oskarmendel.mass.entity.Entity;
-import me.oskarmendel.mass.util.QuatHelper;
 
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -72,26 +71,20 @@ public class Transformation {
         return projectionMatrix;
     }
     
+    public Matrix4f buildModelViewMatrix(Entity entity, Matrix4f viewMatrix) {
+    	return buildModelViewMatrix(buildModelMatrix(entity), viewMatrix);
+    }
+    
+    public Matrix4f buildModelViewMatrix(Matrix4f modelMatrix, Matrix4f viewMatrix) {
+    	return viewMatrix.mulAffine(modelMatrix, this.modelViewMatrix);
+    }
+    
     public Matrix4f buildModelMatrix(Entity entity) {
-    	Quaternionf rotation = QuatHelper.toQuat(entity.getRotation().x, 
-    			entity.getRotation().y, entity.getRotation().z);
+    	Quaternionf rotation = entity.getRotation();
     	Vector3f position = entity.getPosition();
     	
     	return modelMatrix.translationRotateScale(position.x, position.y, position.z, 
     			rotation.x, rotation.y, rotation.z, rotation.w, 
     			entity.getScale(), entity.getScale(), entity.getScale());
-    }
-
-    public Matrix4f getModelViewMatrix(Entity entity, Matrix4f viewMatrix) {
-        Vector3f rotation = entity.getRotation();
-
-        modelViewMatrix.identity().translate(entity.getPosition()).
-                rotateX((float)Math.toRadians(-rotation.x)).
-                rotateY((float)Math.toRadians(-rotation.y)).
-                rotateZ((float)Math.toRadians(-rotation.z)).
-                scale(entity.getScale());
-
-        Matrix4f viewCurr = new Matrix4f(viewMatrix);
-        return viewCurr.mul(modelViewMatrix);
     }
 }

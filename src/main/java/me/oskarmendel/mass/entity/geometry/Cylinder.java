@@ -26,6 +26,7 @@ package me.oskarmendel.mass.entity.geometry;
 
 import java.util.ArrayList;
 
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
@@ -103,7 +104,7 @@ public class Cylinder extends Entity implements Geometry {
 	 * @param rotation - Rotation of the cylinder.
 	 * @param scale - Scale of the cylinder.
 	 */
-	public Cylinder(Vector3f position, Vector3f rotation, float scale) {
+	public Cylinder(Vector3f position, Quaternionf rotation, float scale) {
 		super();
 		
 		height = 1;
@@ -121,7 +122,7 @@ public class Cylinder extends Entity implements Geometry {
 		setMesh(mesh);
 		
 		setPosition(position.x, position.y, position.z);
-		setRotation(rotation.x, rotation.y, rotation.z);
+		setRotation(rotation);
 		setScale(scale);
 	}
 	
@@ -134,7 +135,7 @@ public class Cylinder extends Entity implements Geometry {
 	 * @param scale - Scale of the cylinder.
 	 * @param color - Color of the cylinder.
 	 */
-	public Cylinder(Vector3f position, Vector3f rotation, float scale, Color color) {
+	public Cylinder(Vector3f position, Quaternionf rotation, float scale, Color color) {
 		super();
 		
 		height = 1;
@@ -156,7 +157,7 @@ public class Cylinder extends Entity implements Geometry {
 		setMesh(mesh);
 		
 		setPosition(position.x, position.y, position.z);
-		setRotation(rotation.x, rotation.y, rotation.z);
+		setRotation(rotation);
 		setScale(scale);
 	}
 	
@@ -169,7 +170,7 @@ public class Cylinder extends Entity implements Geometry {
 	 * @param scale - Scale of the cylinder.
 	 * @param texture - Texture of the cylinder.
 	 */
-	public Cylinder(Vector3f position, Vector3f rotation, float scale, Texture texture) {
+	public Cylinder(Vector3f position, Quaternionf rotation, float scale, Texture texture) {
 		super();
 		
 		height = 1;
@@ -187,7 +188,7 @@ public class Cylinder extends Entity implements Geometry {
 		setMesh(mesh);
 		
 		setPosition(position.x, position.y, position.z);
-		setRotation(rotation.x, rotation.y, rotation.z);
+		setRotation(rotation);
 		setScale(scale);
 	}
 	

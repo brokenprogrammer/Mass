@@ -24,6 +24,7 @@
 
 package me.oskarmendel.mass.entity.geometry.builder;
 
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import me.oskarmendel.mass.entity.geometry.Cone;
@@ -70,8 +71,8 @@ public class ConeBuilder implements GeometryBuilder{
 	 * @return This ConeBuilder object.
 	 */
 	@Override
-	public ConeBuilder setRotation(Vector3f rotation) {
-		cone.setRotation(rotation.x, rotation.y, rotation.z);
+	public ConeBuilder setRotation(Quaternionf rotation) {
+		cone.setRotation(rotation);
 		return this;
 	}
 

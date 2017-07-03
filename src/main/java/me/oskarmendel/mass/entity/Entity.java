@@ -25,6 +25,8 @@
 package me.oskarmendel.mass.entity;
 
 import me.oskarmendel.mass.gfx.Mesh;
+
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 /**
@@ -63,7 +65,7 @@ public abstract class Entity {
     /**
      * The rotation of this Entity.
      */
-    private final Vector3f rotation;
+    private final Quaternionf rotation;
     
     /**
      * 
@@ -89,7 +91,7 @@ public abstract class Entity {
     	selected = false;
     	
         position = new Vector3f(0, 0, 0);
-        rotation = new Vector3f(0, 0, 0);
+        rotation =  new Quaternionf();
         
         scale = 1;
         
@@ -186,7 +188,7 @@ public abstract class Entity {
      *
      * @return - Rotation of this Entity.
      */
-    public Vector3f getRotation() {
+    public Quaternionf getRotation() {
         return this.rotation;
     }
 
@@ -194,14 +196,24 @@ public abstract class Entity {
      * Setter for the rotation of this Entity. Sets the rotation
      * vector to the specified x, y and z.
      *
-     * @param x - X Rotation.
-     * @param y - Y Rotation.
-     * @param z - Z Rotation.
+     * @param q - Rotation quaternion.
      */
-    public void setRotation(float x, float y, float z) {
-        this.rotation.x = x;
-        this.rotation.y = y;
-        this.rotation.z = z;
+    public void setRotation(Quaternionf q) {
+        this.rotation.set(q);
+    }
+    
+    /**
+     * 
+     * @param w
+     * @param x
+     * @param y
+     * @param z
+     */
+    public void setRotation(float w, float x, float y, float z) {
+    	this.rotation.w = w;
+    	this.rotation.x = x;
+    	this.rotation.y = y;
+    	this.rotation.z = z;
     }
 
     /**

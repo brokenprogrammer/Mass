@@ -24,6 +24,7 @@
 
 package me.oskarmendel.mass.entity.geometry.builder;
 
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import me.oskarmendel.mass.entity.geometry.Geometry;
@@ -54,7 +55,7 @@ public interface GeometryBuilder {
 	 * 
 	 * @return This builder object.
 	 */
-	GeometryBuilder setRotation(Vector3f rotation);
+	GeometryBuilder setRotation(Quaternionf rotation);
 	
 	/**
 	 * Sets the scale of the Geometric object to build.

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
@@ -105,7 +106,7 @@ public class Sphere extends Entity implements Geometry {
 	 * @param scale - Scale of the sphere.
 	 * @param iterations - Number of subdivisions.
 	 */
-	public Sphere(Vector3f position, Vector3f rotation, float scale, int iterations) {
+	public Sphere(Vector3f position, Quaternionf rotation, float scale, int iterations) {
 		super();
 		
 		generateVertices();
@@ -120,7 +121,7 @@ public class Sphere extends Entity implements Geometry {
 		setMesh(mesh);
 		
 		setPosition(position.x, position.y, position.z);
-        setRotation(rotation.x, rotation.y, rotation.z);
+        setRotation(rotation);
         setScale(scale);
 	}
 	
@@ -136,7 +137,7 @@ public class Sphere extends Entity implements Geometry {
 	 * @param iterations - Number of subdivisions.
 	 * @param color - Color of the sphere.
 	 */
-	public Sphere(Vector3f position, Vector3f rotation, float scale, int iterations, Color color) {
+	public Sphere(Vector3f position, Quaternionf rotation, float scale, int iterations, Color color) {
 		super();
 		
 		generateVertices();
@@ -155,7 +156,7 @@ public class Sphere extends Entity implements Geometry {
 		setMesh(mesh);
 		
 		setPosition(position.x, position.y, position.z);
-        setRotation(rotation.x, rotation.y, rotation.z);
+        setRotation(rotation);
         setScale(scale);
 	}
 	
@@ -171,7 +172,7 @@ public class Sphere extends Entity implements Geometry {
 	 * @param iterations - Number of subdivisions.
 	 * @param texture - Texture of the sphere.
 	 */
-	public Sphere(Vector3f position, Vector3f rotation, float scale, int iterations, Texture texture) {
+	public Sphere(Vector3f position, Quaternionf rotation, float scale, int iterations, Texture texture) {
 		super();
 		
 		generateVertices();
@@ -186,7 +187,7 @@ public class Sphere extends Entity implements Geometry {
 		setMesh(mesh);
 		
 		setPosition(position.x, position.y, position.z);
-        setRotation(rotation.x, rotation.y, rotation.z);
+        setRotation(rotation);
         setScale(scale);
 	}
 	
