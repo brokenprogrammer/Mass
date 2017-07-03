@@ -172,7 +172,7 @@ public class Game {
             massterBall = new MassterBall(cubeMesh);
             massterBall.setPosition(0, -1, 0);
             
-            room = new TestRoom(testRoomMesh);
+            room = new TestRoom(testRoomMesh, 0.1f);
             room.setPosition(0, -1, 0);
             
             float skyBoxScale = 300.0f;
@@ -277,28 +277,28 @@ public class Game {
         cameraInc.set(0, 0, 0);
 
         if (screen.isKeyPressed(GLFW_KEY_W)) {
-            cameraInc.z = -100;
+            cameraInc.z = -10;
         	//player.move(0, 0, -1);
            // player.forward();
         } else if (screen.isKeyPressed(GLFW_KEY_S)) {
-            cameraInc.z = 100;
+            cameraInc.z = 10;
             //player.backward();
         }
 
         if (screen.isKeyPressed(GLFW_KEY_A)) {
-            cameraInc.x = -100;
+            cameraInc.x = -10;
             //player.left();
         	//player.move(-1, 0, 0);
         } else if (screen.isKeyPressed(GLFW_KEY_D)) {
-            cameraInc.x = 100;
+            cameraInc.x = 10;
             //player.right();
         	//player.move(1, 0, 0);
         }
 
         if (screen.isKeyPressed(GLFW_KEY_Z)) {
-            cameraInc.y = -100;
+            cameraInc.y = -5;
         } else if (screen.isKeyPressed(GLFW_KEY_X)) {
-            cameraInc.y = 100;
+            cameraInc.y = 5;
         }
     }
 

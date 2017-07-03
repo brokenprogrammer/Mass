@@ -115,9 +115,6 @@ public class MassterBall extends Entity implements Collidable{
 		this.rigidBody.getWorldTransform(new Transform()).getRotation(r);
 		
 		this.setPosition(v.x, v.y, v.z);
-		/*this.setRotation((float) Math.toDegrees(QuatHelper.getPitch(r)), 
-				(float) Math.toDegrees(QuatHelper.getYaw(r)), 
-				(float) Math.toDegrees(QuatHelper.getRoll(r)));*/
 		this.setRotation(r.w, r.x, r.y, r.z);
 	}
 

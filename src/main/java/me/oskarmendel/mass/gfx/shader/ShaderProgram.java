@@ -36,6 +36,8 @@ import org.joml.Vector4f;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.FloatBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.opengl.GL20.*;
@@ -53,12 +55,74 @@ public class ShaderProgram {
      * Stores the handle of the program.
      */
     private final int id;
+    
+    private final Map<String, Integer> uniformLocations;
 
     /**
      * Create a shader program.
      */
     public ShaderProgram() {
         id = glCreateProgram();
+        
+        uniformLocations = new HashMap<>();
+    }
+    
+    public void createUniform(String uniform) {
+    	this.uniformLocations.put(uniform, this.getUniformLocation(uniform));
+    }
+    
+    public void createUniform(String uniform, int size) {
+    	for (int i = 0; i < size; i++) {    		
+    		this.createUniform(uniform + "[" + i + "]");
+    	}
+    }
+    
+    public void createPointLightUniform(String uniform, int size) {
+    	for (int i = 0; i < size; i++) {
+    		createPointLightUniform(uniform + "[" + i + "]");
+    	}
+    }
+    
+    public void createPointLightUniform(String uniform) {
+    	createUniform(uniform + ".color");
+        createUniform(uniform + ".position");
+        createUniform(uniform + ".intensity");
+        createUniform(uniform + ".att.constant");
+        createUniform(uniform + ".att.linear");
+        createUniform(uniform + ".att.exponent");
+    }
+    
+    public void createSpotLightUniform(String uniform, int size) {
+    	for (int i = 0; i < size; i++) {
+    		createSpotLightUniform(uniform + "[" + i + "]");
+    	}
+    }
+    
+    public void createSpotLightUniform(String uniform) {
+    	createPointLightUniform(uniform + ".pl");
+        createUniform(uniform + ".conedir");
+        createUniform(uniform + ".cutoff");
+    }
+    
+    public void createDirectionalLightUniform(String uniform) {
+    	createUniform(uniform + ".color");
+    	createUniform(uniform + ".direction");
+    	createUniform(uniform + ".intensity");
+    }
+    
+    public void createMaterialUniform(String uniform) {
+    	createUniform(uniform + ".ambient");
+        createUniform(uniform + ".diffuse");
+        createUniform(uniform + ".specular");
+        createUniform(uniform + ".hasTexture");
+        createUniform(uniform + ".hasNormalMap");
+        createUniform(uniform + ".reflectance");
+    }
+    
+    public void createFogUniform(String uniform) {
+    	createUniform(uniform + ".activeFog");
+        createUniform(uniform + ".color");
+        createUniform(uniform + ".density");
     }
 
     /**
@@ -95,8 +159,8 @@ public class ShaderProgram {
      * @param location - Uniform location.
      * @param value - Value to set at the specified location.
      */
-    public void setUniform(int location, int value) {
-        glUniform1i(location, value);
+    public void setUniform(String location, int value) {
+        glUniform1i(uniformLocations.get(location), value);
     }
 
     /**
@@ -105,8 +169,8 @@ public class ShaderProgram {
      * @param location - Uniform location.
      * @param value - Value to set at the specified location.
      */
-    public void setUniform(int location, float value) {
-        glUniform1f(location, value);
+    public void setUniform(String location, float value) {
+        glUniform1f(uniformLocations.get(location), value);
     }
     
     /**
@@ -116,7 +180,7 @@ public class ShaderProgram {
      * @param pos
      */
     public void setUniform(String location, float value, int pos) {
-    	setUniform(getUniformLocation(location + "[" + pos + "]"), value);
+    	setUniform((location + "[" + pos + "]"), value);
     }
 
     /**
@@ -125,12 +189,8 @@ public class ShaderProgram {
      * @param location - Uniform location.
      * @param value - Value to set at the specified location.
      */
-    public void setUniform(int location, Vector3f value) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            FloatBuffer floatBuffer = stack.mallocFloat(3);
-            value.get(floatBuffer);
-            glUniform3fv(location, floatBuffer);
-        }
+    public void setUniform(String location, Vector3f value) {
+        glUniform3f(uniformLocations.get(location), value.x, value.y, value.z);
     }
 
     /**
@@ -139,12 +199,8 @@ public class ShaderProgram {
      * @param location - Uniform location.
      * @param value - Value to set at the specified location.
      */
-    public void setUniform(int location, Vector4f value) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            FloatBuffer floatBuffer = stack.mallocFloat(4);
-            value.get(floatBuffer);
-            glUniform4fv(location, floatBuffer);
-        }
+    public void setUniform(String location, Vector4f value) {
+        glUniform4f(uniformLocations.get(location), value.x, value.y, value.z, value.w);
     }
 
     /**
@@ -153,11 +209,11 @@ public class ShaderProgram {
      * @param location - Uniform location.
      * @param value - Value to set at the specified location.
      */
-    public void setUniform(int location, Matrix4f value) {
+    public void setUniform(String location, Matrix4f value) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             FloatBuffer floatBuffer = stack.mallocFloat(4*4);
             value.get(floatBuffer);
-            glUniformMatrix4fv(location, false, floatBuffer);
+            glUniformMatrix4fv(uniformLocations.get(location), false, floatBuffer);
         }
     }
     
@@ -168,7 +224,7 @@ public class ShaderProgram {
      * @param pos
      */
     public void setUniform(String location, Matrix4f value, int pos) {
-    	setUniform(getUniformLocation(location + "[" + pos + "]"), value);
+    	setUniform((location + "[" + pos + "]"), value);
     }
     
     /**
@@ -193,12 +249,12 @@ public class ShaderProgram {
      * @param pointLight - PointLight object to get values from.
      */
     public void setUniform(String location, PointLight pointLight) {
-        setUniform(getUniformLocation(location + ".color"), pointLight.getColor().toVector3f());
-        setUniform(getUniformLocation(location + ".position"), pointLight.getPosition());
-        setUniform(getUniformLocation(location + ".intensity"), pointLight.getIntensity());
-        setUniform(getUniformLocation(location + ".att.constant"), pointLight.getAttenuation().getConstant());
-        setUniform(getUniformLocation(location + ".att.linear"), pointLight.getAttenuation().getLinear());
-        setUniform(getUniformLocation(location + ".att.exponent"), pointLight.getAttenuation().getExponent());
+        setUniform((location + ".color"), pointLight.getColor().toVector3f());
+        setUniform((location + ".position"), pointLight.getPosition());
+        setUniform((location + ".intensity"), pointLight.getIntensity());
+        setUniform((location + ".att.constant"), pointLight.getAttenuation().getConstant());
+        setUniform((location + ".att.linear"), pointLight.getAttenuation().getLinear());
+        setUniform((location + ".att.exponent"), pointLight.getAttenuation().getExponent());
     }
     
     /**
@@ -236,8 +292,8 @@ public class ShaderProgram {
      */
     public void setUniform(String location, SpotLight spotLight) {
     	setUniform((location + ".pl"), spotLight.getPointLight());
-    	setUniform(getUniformLocation(location + ".coneDirection"), spotLight.getConeDirection());
-        setUniform(getUniformLocation(location + ".cutOff"), spotLight.getCutOff());
+    	setUniform((location + ".coneDirection"), spotLight.getConeDirection());
+        setUniform((location + ".cutOff"), spotLight.getCutOff());
     }
     
     /**
@@ -259,9 +315,9 @@ public class ShaderProgram {
      * @param directionalLight - DirectionalLight object to get values from.
      */
     public void setUniform(String location, DirectionalLight directionalLight) {
-        setUniform(getUniformLocation(location + ".color"), directionalLight.getColor().toVector3f());
-        setUniform(getUniformLocation(location + ".direction"), directionalLight.getDirection());
-        setUniform(getUniformLocation(location + ".intensity"), directionalLight.getIntensity());
+        setUniform((location + ".color"), directionalLight.getColor().toVector3f());
+        setUniform((location + ".direction"), directionalLight.getDirection());
+        setUniform((location + ".intensity"), directionalLight.getIntensity());
     }
 
     /**
@@ -271,11 +327,11 @@ public class ShaderProgram {
      * @param material - Material object to get values from.
      */
     public void setUniform(String location, Material material) {
-        setUniform(getUniformLocation(location + ".ambient"), material.getAmbientColor());
-        setUniform(getUniformLocation(location + ".diffuse"), material.getDiffuseColor());
-        setUniform(getUniformLocation(location + ".specular"), material.getSpecularColor());
-        setUniform(getUniformLocation(location + ".hasTexture"), material.isTextured() ? 1 : 0);
-        setUniform(getUniformLocation(location + ".reflectance"), material.getReflectance());
+        setUniform((location + ".ambient"), material.getAmbientColor());
+        setUniform((location + ".diffuse"), material.getDiffuseColor());
+        setUniform((location + ".specular"), material.getSpecularColor());
+        setUniform((location + ".hasTexture"), material.isTextured() ? 1 : 0);
+        setUniform((location + ".reflectance"), material.getReflectance());
     }
     
     /**
@@ -284,9 +340,9 @@ public class ShaderProgram {
      * @param fog
      */
     public void setUniform(String location, Fog fog) {
-    	setUniform(getUniformLocation(location + ".activeFog"), fog.isActive() ? 1 : 0);
-    	setUniform(getUniformLocation(location + ".color"), fog.getColor().toVector3f());
-    	setUniform(getUniformLocation(location + ".density"), fog.getDensity());
+    	setUniform((location + ".activeFog"), fog.isActive() ? 1 : 0);
+    	setUniform((location + ".color"), fog.getColor().toVector3f());
+    	setUniform((location + ".density"), fog.getDensity());
     }
 
     /**

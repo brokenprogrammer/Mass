@@ -34,6 +34,7 @@ import javax.vecmath.Vector3f;
 import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.IndexedMesh;
+import com.bulletphysics.collision.shapes.ScaledBvhTriangleMeshShape;
 import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
@@ -86,6 +87,18 @@ public class TestRoom extends Entity implements Collidable {
 	
 	/**
 	 * 
+	 * @param meshes
+	 * @param scale
+	 */
+	public TestRoom(Mesh[] meshes, float scale) {
+		super(meshes);
+		this.setScale(scale);
+		
+		initPhysics();
+	}
+	
+	/**
+	 * 
 	 */
 	@Override
 	public void initPhysics() {
@@ -113,8 +126,9 @@ public class TestRoom extends Entity implements Collidable {
 			vertArray.addIndexedMesh(indexedMesh);
 		}
 		
-		collisionShape = new BvhTriangleMeshShape(vertArray, false);
-		
+		BvhTriangleMeshShape collShape = new BvhTriangleMeshShape(vertArray, false);
+		System.out.println("SCALE: " + this.getScale());
+		collisionShape = new ScaledBvhTriangleMeshShape(collShape, new Vector3f(this.getScale(), this.getScale(), this.getScale()));
 		
 		RigidBodyConstructionInfo groundRigidBodyCI = new RigidBodyConstructionInfo(0, groundMotionState, collisionShape, new Vector3f(0,0,0)); 
 		rigidBody = new RigidBody(groundRigidBodyCI);

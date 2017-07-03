@@ -136,6 +136,12 @@ public class ShadowRenderer {
 		depthShaderProgram.attachShader(vertexShader);
 		depthShaderProgram.attachShader(fragmentShader);
 		depthShaderProgram.link();
+		
+		depthShaderProgram.createUniform("isInstanced");
+		depthShaderProgram.createUniform("modelNonInstancedMatrix");
+		depthShaderProgram.createUniform("lightViewMatrix");
+		depthShaderProgram.createUniform("jointsMatrix");
+		depthShaderProgram.createUniform("orthoProjectionMatrix");
 	}
 	
 	/**
@@ -174,8 +180,8 @@ public class ShadowRenderer {
 		for (int i = 0; i < NUM_CASCADES; i++) {
 			ShadowCascade shadowCascade = shadowCascades.get(i);
 			
-			depthShaderProgram.setUniform(depthShaderProgram.getUniformLocation("orthoProjectionMatrix"), shadowCascade.getOrthoProjectionMatrix());
-			depthShaderProgram.setUniform(depthShaderProgram.getUniformLocation("lightViewMatrix"), shadowCascade.getLightViewMatrix());
+			depthShaderProgram.setUniform(("orthoProjectionMatrix"), shadowCascade.getOrthoProjectionMatrix());
+			depthShaderProgram.setUniform(("lightViewMatrix"), shadowCascade.getLightViewMatrix());
 			
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowBuffer.getDepthMapTexture().getIds()[i], 0);
 			
@@ -194,14 +200,14 @@ public class ShadowRenderer {
 	 * @param transformation
 	 */
 	public void renderNonInstancedMeshes(Scene scene, Transformation transformation) {
-		depthShaderProgram.setUniform(depthShaderProgram.getUniformLocation("isInstanced"), 0);
+		depthShaderProgram.setUniform(("isInstanced"), 0);
 		
 		Map<Mesh, List<Entity>> mapMeshes = scene.getEntityMeshes();
 		
 		for (Mesh mesh : mapMeshes.keySet()) {
 			mesh.renderList(mapMeshes.get(mesh), (Entity entity) -> {
 				Matrix4f modelMatrix = transformation.buildModelMatrix(entity);
-				depthShaderProgram.setUniform(depthShaderProgram.getUniformLocation("modelNonInstancedMatrix"), modelMatrix);
+				depthShaderProgram.setUniform(("modelNonInstancedMatrix"), modelMatrix);
 				if (entity instanceof AnimatedEntity) {
 					// TODO: If its animated render the shadows differently.
 					// Oskar Mendel - 2017-07-01
@@ -216,7 +222,7 @@ public class ShadowRenderer {
 	 * @param transformation
 	 */
 	public void renderInstancedMeshes(Scene scene, Transformation transformation) {
-		depthShaderProgram.setUniform(depthShaderProgram.getUniformLocation("isInstanced"), 1);
+		depthShaderProgram.setUniform(("isInstanced"), 1);
 		
 		Map<InstancedMesh, List<Entity>> mapMeshes = scene.getEntityInstancedMeshes();
 		for (InstancedMesh mesh : mapMeshes.keySet()) {
