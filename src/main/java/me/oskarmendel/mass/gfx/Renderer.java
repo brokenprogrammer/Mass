@@ -46,7 +46,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE2;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -74,21 +73,21 @@ public class Renderer {
     
     private ShaderProgram skyBoxShaderProgram;
     
-    private final float specularPower;
+    //private final float specularPower;
     
     private final FrustumCullingFilter frustumFilter;
     
-    private final List<Entity> filteredEntities;
+    //private final List<Entity> filteredEntities;
 
     /**
      *
      */
     public Renderer() {
         this.transformation = new Transformation();
-        this.specularPower = 10f;
+        //this.specularPower = 10f;
         this.shadowRenderer = new ShadowRenderer();
         this.frustumFilter = new FrustumCullingFilter();
-        this.filteredEntities = new ArrayList<>();
+        //this.filteredEntities = new ArrayList<>();
     }
 
     /**
@@ -192,8 +191,8 @@ public class Renderer {
         // Update projection matrix
         screen.updateProjectionMatrix();
         
-        renderScene(screen, camera, scene);
         renderSkyBox(screen, camera, scene);
+        renderScene(screen, camera, scene);
     }
     
     /**
@@ -348,29 +347,27 @@ public class Renderer {
      */
     private void renderNonInstancedMeshes(Scene scene) {
     	this.defaultShaderProgram.setUniform(("isInstanced"), 0);
-    	
     	// Render each mesh
     	Map<Mesh, List<Entity>> mapMeshes = scene.getEntityMeshes();
     	for (Mesh mesh : mapMeshes.keySet()) {
-    		 this.defaultShaderProgram.setUniform("material", mesh.getMaterial());
+    		this.defaultShaderProgram.setUniform("material", mesh.getMaterial());
     		 
-    		 Texture texture = mesh.getMaterial().getTexture();
-    		 if (texture != null) {
-    			 this.defaultShaderProgram.setUniform(("numCols"), texture.getNumCols());
-    			 this.defaultShaderProgram.setUniform(("numRows"), texture.getNumRows());
-    		 }
+    		Texture texture = mesh.getMaterial().getTexture();
+    		if (texture != null) {
+    			this.defaultShaderProgram.setUniform(("numCols"), texture.getNumCols());
+    			this.defaultShaderProgram.setUniform(("numRows"), texture.getNumRows());
+    		}
     		 
-    		 this.shadowRenderer.bindTextures(GL_TEXTURE2);
-    		 
-    		 mesh.renderList(mapMeshes.get(mesh), (Entity entity) -> {
-    			 this.defaultShaderProgram.setUniform(("selectedNonInstanced"), entity.isSelected() ? 1.0f : 0.0f);
-    			 Matrix4f modelMatrix = this.transformation.buildModelMatrix(entity);
-    			 this.defaultShaderProgram.setUniform(("modelNonInstancedMatrix"), modelMatrix);
-    			 if (entity instanceof AnimatedEntity) {
-    				// TODO: If its animated render the shadows differently.
- 					// Oskar Mendel - 2017-07-03
-    			 }
-    		 });
+			this.shadowRenderer.bindTextures(GL_TEXTURE2);
+			mesh.renderList(mapMeshes.get(mesh), (Entity entity) -> {
+				this.defaultShaderProgram.setUniform(("selectedNonInstanced"), entity.isSelected() ? 1.0f : 0.0f);
+				Matrix4f modelMatrix = this.transformation.buildModelMatrix(entity);
+				this.defaultShaderProgram.setUniform(("modelNonInstancedMatrix"), modelMatrix);
+				if (entity instanceof AnimatedEntity) {
+					// TODO: If its animated render the shadows differently.
+					// Oskar Mendel - 2017-07-03
+				}
+			});
     	}
     }
     

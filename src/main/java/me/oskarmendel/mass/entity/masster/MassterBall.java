@@ -38,7 +38,6 @@ import com.bulletphysics.linearmath.Transform;
 import me.oskarmendel.mass.entity.Entity;
 import me.oskarmendel.mass.gfx.Mesh;
 import me.oskarmendel.mass.phys.Collidable;
-import me.oskarmendel.mass.util.QuatHelper;
 
 /**
  * This class represents the MassterBall used by the Masster.
