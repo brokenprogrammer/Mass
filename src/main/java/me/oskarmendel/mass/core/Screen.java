@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.oskarmendel.mass.gfx;
+package me.oskarmendel.mass.core;
 
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;

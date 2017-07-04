@@ -27,7 +27,7 @@ package me.oskarmendel.mass.input;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
 
-import me.oskarmendel.mass.gfx.Screen;
+import me.oskarmendel.mass.core.Screen;
 
 import static org.lwjgl.glfw.GLFW.*;
 

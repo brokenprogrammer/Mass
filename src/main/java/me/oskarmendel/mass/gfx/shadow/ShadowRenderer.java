@@ -32,13 +32,13 @@ import org.joml.Matrix4f;
 
 import me.oskarmendel.mass.core.Camera;
 import me.oskarmendel.mass.core.Scene;
+import me.oskarmendel.mass.core.SceneLight;
+import me.oskarmendel.mass.core.Screen;
 import me.oskarmendel.mass.entity.Entity;
 import me.oskarmendel.mass.entity.animated.AnimatedEntity;
 import me.oskarmendel.mass.gfx.InstancedMesh;
 import me.oskarmendel.mass.gfx.Mesh;
 import me.oskarmendel.mass.gfx.Renderer;
-import me.oskarmendel.mass.gfx.SceneLight;
-import me.oskarmendel.mass.gfx.Screen;
 import me.oskarmendel.mass.gfx.Transformation;
 import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.shader.Shader;

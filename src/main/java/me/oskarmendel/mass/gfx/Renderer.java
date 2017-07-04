@@ -26,6 +26,8 @@ package me.oskarmendel.mass.gfx;
 
 import me.oskarmendel.mass.core.Camera;
 import me.oskarmendel.mass.core.Scene;
+import me.oskarmendel.mass.core.SceneLight;
+import me.oskarmendel.mass.core.Screen;
 import me.oskarmendel.mass.entity.Entity;
 import me.oskarmendel.mass.entity.SkyBox;
 import me.oskarmendel.mass.entity.animated.AnimatedEntity;

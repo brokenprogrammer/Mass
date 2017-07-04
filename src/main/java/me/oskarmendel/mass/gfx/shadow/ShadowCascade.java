@@ -28,7 +28,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import me.oskarmendel.mass.gfx.Screen;
+import me.oskarmendel.mass.core.Screen;
 import me.oskarmendel.mass.gfx.Transformation;
 import me.oskarmendel.mass.gfx.light.DirectionalLight;
 

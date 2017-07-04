@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.oskarmendel.mass.gfx;
+package me.oskarmendel.mass.core;
 
 import org.joml.Vector3f;
 

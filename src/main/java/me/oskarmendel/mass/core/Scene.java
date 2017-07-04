@@ -33,7 +33,6 @@ import me.oskarmendel.mass.entity.Entity;
 import me.oskarmendel.mass.entity.SkyBox;
 import me.oskarmendel.mass.gfx.InstancedMesh;
 import me.oskarmendel.mass.gfx.Mesh;
-import me.oskarmendel.mass.gfx.SceneLight;
 import me.oskarmendel.mass.gfx.particle.ParticleEmitter;
 import me.oskarmendel.mass.gfx.weather.Fog;
 
