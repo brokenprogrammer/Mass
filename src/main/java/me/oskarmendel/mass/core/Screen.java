@@ -82,6 +82,11 @@ public class Screen {
      * Value showing if v-sync is on or off.
      */
     private boolean vsync;
+
+    /**
+     *
+     */
+    private final ScreenOptions screenOptions;
     
     /**
      * 
@@ -96,11 +101,13 @@ public class Screen {
      * @param height - Height of the screen.
      * @param title - Title of the window.
      * @param vsync - Set to true to put v-sync on.
+     * @param options - The Screen options for this Screen.
      */
-    public Screen (int width, int height, String title, boolean vsync) {
+    public Screen (int width, int height, String title, boolean vsync, ScreenOptions options) {
         this.width = width;
         this.height = height;
     	this.vsync = vsync;
+    	this.screenOptions = options;
 
         // Set resizeable to false.
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
@@ -226,7 +233,16 @@ public class Screen {
     public boolean getVsync() {
     	return this.vsync;
     }
-    
+
+    /**
+     * Returns the Screen options for this Screen.
+     *
+     * @return - The ScreenOptions value for this Screen.
+     */
+    public ScreenOptions getScreenOptions() {
+        return this.screenOptions;
+    }
+
     /**
      * 
      * @return

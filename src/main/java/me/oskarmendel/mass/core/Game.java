@@ -147,8 +147,11 @@ public class Game implements Runnable {
             throw new IllegalStateException("Unable to initialize GLFW.");
         }
 
+        ScreenOptions screenOptions = new ScreenOptionsBuilder().cullFace(false).showTriangles(false)
+                .showFPS(false).compatibleProfile(false).antialiasing(false).frustumCulling(true).build();
+
         // Create the GLFW screen.
-        screen = new Screen(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, VSYNC);
+        screen = new Screen(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, VSYNC, screenOptions);
         
         timer.init();
         
