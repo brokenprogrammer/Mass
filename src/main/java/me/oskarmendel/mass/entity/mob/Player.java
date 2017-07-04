@@ -28,6 +28,8 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
+import com.bulletphysics.collision.dispatch.CollisionFlags;
+import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.ConvexHullShape;
 import com.bulletphysics.dynamics.RigidBody;
@@ -47,6 +49,8 @@ import me.oskarmendel.mass.gfx.Mesh;
  * @name MobBase.java
  */
 public class Player extends MobBase {
+	
+	private static int WALK_SPEED = 5;
 	
 	// Component manager
 		// Updateable component
@@ -113,9 +117,15 @@ public class Player extends MobBase {
 	 * @param camY - Camera y rotation to use for movement.
 	 */
 	public void movePosition(float deltaX, float deltaY, float deltaZ, float camY) {
+		
+		deltaX *= WALK_SPEED;
+		deltaY *= WALK_SPEED;
+		deltaZ *= WALK_SPEED;
+		
 		Transform controllTransform = new Transform();
 		this.rigidBody.getMotionState().getWorldTransform(controllTransform);
-		Vector3f position = controllTransform.origin;
+		//Vector3f position = controllTransform.origin;
+		Vector3f position = new Vector3f(0, 0, 0);
 		
 		if (deltaZ != 0) {
             position.x += (float)Math.sin(Math.toRadians(camY)) * -1.0f * deltaZ;
@@ -130,10 +140,8 @@ public class Player extends MobBase {
 
         position.y += deltaY;
         
-        controllTransform.transform(new Vector3f(deltaX, deltaY, deltaZ));
-        
+        this.rigidBody.setLinearVelocity(position);
         this.rigidBody.activate();
-        this.rigidBody.setWorldTransform(controllTransform);
 	}
 	
 	/**
@@ -162,13 +170,15 @@ public class Player extends MobBase {
 			points.add(v);
 		}
 		
-		fallInertia = new Vector3f(0,0,0); 
+		fallInertia = new Vector3f(0,1,0); 
 		collisionShape = new ConvexHullShape(points);
 		collisionShape.calculateLocalInertia(mass,fallInertia);
 		
 		// Construct the RigidBody.
 		RigidBodyConstructionInfo rigidBodyCI = new RigidBodyConstructionInfo(mass, motionState, collisionShape, fallInertia); 
 		rigidBody = new RigidBody(rigidBodyCI);
+		rigidBody.setCollisionFlags(rigidBody.getCollisionFlags() | CollisionFlags.CHARACTER_OBJECT);
+		rigidBody.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
 		//rigidBody.setDamping(0.999f, 1);
 	}
 

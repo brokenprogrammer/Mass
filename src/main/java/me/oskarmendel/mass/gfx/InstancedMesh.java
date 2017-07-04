@@ -69,19 +69,30 @@ public class InstancedMesh extends Mesh {
 	
 	private static final int INSTANCE_SIZE_BYTES = MATRIX_SIZE_BYTES + FLOAT_SIZE_BYTES * 2 + FLOAT_SIZE_BYTES;
 	
+	/**
+	 * Number of instances for this InstancedMesh.
+	 */
 	private final int instances;
 	
+	/**
+	 * VBO for the instanced data.
+	 */
 	private final int instancedDataVbo;
 	
+	/**
+	 * Data buffer for the instanced data.
+	 */
 	private FloatBuffer instancedDataBuffer;
 	
 	/**
+	 * Creates a new InstancedMesh object by using the specified vertex positions, texture coordinates, normal coordinates,
+	 * indices and number of instances.
 	 * 
-	 * @param positions
-	 * @param textCoords
-	 * @param normals
-	 * @param indices
-	 * @param instances
+	 * @param positions - Vertex positions.
+     * @param textCoords - Texture coordinates.
+     * @param normals - Normal coordinates.
+     * @param indices - Indices.
+     * @param instances - Number of instances.
 	 */
 	public InstancedMesh(float[] positions, float[] textCoords, float[] normals, int[] indices, int instances) {
 		super(positions, textCoords, normals, indices,  ArrayHelper.createEmptyArrayInt(MAX_WEIGHTS * positions.length / 3, 0), ArrayHelper.createEmptyArrayFloat(MAX_WEIGHTS * positions.length / 3, 0) );
@@ -125,7 +136,8 @@ public class InstancedMesh extends Mesh {
 	}
 	
 	/**
-	 * 
+	 * Initialize rendering by binding the textures and VAOs used
+     * for this instanced mesh.
 	 */
 	@Override
 	protected void initRenderer() {
@@ -140,7 +152,8 @@ public class InstancedMesh extends Mesh {
 	}
 	
 	/**
-	 * 
+	 * End the rendering cleans up after rendering by resetting the used
+     * vertex attribute arrays and unbinds the VAO.
 	 */
 	@Override
 	protected void endRenderer() {
@@ -155,21 +168,23 @@ public class InstancedMesh extends Mesh {
 	}
 	
 	/**
+	 * Render method that renders a list of entities that uses this instanced mesh.
 	 * 
-	 * @param entities
-	 * @param transformation
-	 * @param viewMatrix
+	 * @param entities - List of entities to render.
+	 * @param transformation - Transformation object.
+	 * @param viewMatrix - View matrix.
 	 */
 	public void renderListInstanced(List<Entity> entities, Transformation transformation, Matrix4f viewMatrix) {
 		renderListInstanced(entities, false, transformation, viewMatrix);
 	}
 	
 	/**
+	 * Render method that renders a list of entities that uses this instanced mesh.
 	 * 
-	 * @param entities
-	 * @param bbrd
-	 * @param transformation
-	 * @param viewMatrix
+	 * @param entities - List of entities to render.
+	 * @param bbrd - billboard.
+	 * @param transformation- Transformation object.
+	 * @param viewMatrix - View matrix.
 	 */
 	public void renderListInstanced(List<Entity> entities, boolean bbrd, Transformation transformation, 
 			Matrix4f viewMatrix) {
@@ -187,12 +202,12 @@ public class InstancedMesh extends Mesh {
 	}
 	
 	/**
+	 * Renders a chunk.
 	 * 
-	 * @param entities
-	 * @param depthMap
-	 * @param transformation
-	 * @param viewMatrix
-	 * @param lightViewMatrix
+	 * @param entities - List of entities to render.
+	 * @param depthMap - Depth map.
+	 * @param transformation - Transformation object.
+	 * @param viewMatrix - View matrix.
 	 */
 	private void renderChunkInstanced(List<Entity> entities, boolean bbrd, Transformation transformation, 
 			Matrix4f viewMatrix) {
@@ -236,7 +251,8 @@ public class InstancedMesh extends Mesh {
 	}
 	
 	/**
-	 * 
+	 * Deletes this instanced mesh and deletes the vertex array object and the
+     * vertex buffer object.
 	 */
 	@Override
 	public void delete() {

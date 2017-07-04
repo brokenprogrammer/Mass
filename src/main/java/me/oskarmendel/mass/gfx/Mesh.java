@@ -86,29 +86,49 @@ public class Mesh {
     protected final List<Integer> vboIdList;
     
     /**
-     * 
+     * Amount of vertices in this Mesh.
      */
     private final int vertexCount;
 
     /**
-     *
+     * Material value for this Mesh.
      */
     private Material material;
 
     /**
-     *
+     * Color value for this Mesh.
      */
     private Color color;
     
     /**
-     * 
+     * Bounding radius of this Mesh.
      */
     private float boundingRadius;
 
+    /**
+     * Creates a new Mesh object by using the specified vertex positions, texture coordinates, normal coordinates 
+     * and indices. Sets the jointIndices and weights to empty arrays.
+     * 
+     * @param positions - Vertex positions.
+     * @param textCoords - Texture coordinates.
+     * @param normals - Normal coordinates.
+     * @param indices - Indices.
+     */
     public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices) {
         this(positions, textCoords, normals, indices, ArrayHelper.createEmptyArrayInt(MAX_WEIGHTS * positions.length / 3, 0), ArrayHelper.createEmptyArrayFloat(MAX_WEIGHTS * positions.length / 3, 0));
     }
     
+    /**
+     * Creates a new Mesh object by using the specified vertex positions, texture coordinates, normal coordinates 
+     * indices, jointIndices and weights.
+     * 
+     * @param positions - Vertex positions.
+     * @param textCoords - Texture coordinates.
+     * @param normals - Normal coordinates.
+     * @param indices - Indices.
+     * @param jointIndices - Joint indices.
+     * @param weights - Weights.
+     */
     public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices, int[] jointIndices, float[] weights) {
         this.positions = positions;
     	this.indices = indices;
@@ -215,6 +235,11 @@ public class Mesh {
         }
     }
     
+    /**
+     * Calculates the bounding radius based upon the vertices of this Mesh.
+     * 
+     * @param positions - Array of vertices.
+     */
     private void calculateBoundingRadius(float positions[]) {
     	int len = positions.length;
     	
@@ -225,6 +250,10 @@ public class Mesh {
     	}
     }
     
+    /**
+     * Initialize rendering by binding the textures and VAOs used
+     * for this mesh.
+     */
     protected void initRenderer() {
     	Texture texture = material.getTexture();
         if (texture != null) {
@@ -253,6 +282,10 @@ public class Mesh {
 	    glEnableVertexAttribArray(4);
     }
     
+    /**
+     * End the rendering cleans up after rendering by resetting the used
+     * vertex attribute arrays and unbinds the VAO.
+     */
     protected void endRenderer() {
     	// Restore state.
         glDisableVertexAttribArray(0);
@@ -279,19 +312,23 @@ public class Mesh {
     }
     
     /**
+     * Render method that renders a list of entities then restores the 
+     * state when finished.
      * 
-     * @param entities
-     * @param consumer
+     * @param entities - List of entities to render.
+     * @param consumer - Consumer for the entities.
      */
     public void renderList(List<Entity> entities, Consumer<Entity> consumer) {
     	initRenderer();
     	
     	for (Entity e : entities) {
-    		// Set up data required from the entity.
-    		consumer.accept(e);
-    		
-    		// Render the entity.
-    		glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+    		if (e.insideFrustrum()) {
+	    		// Set up data required from the entity.
+	    		consumer.accept(e);
+	    		
+	    		// Render the entity.
+	    		glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+    		}
     	}
     	
     	endRenderer();
@@ -316,48 +353,54 @@ public class Mesh {
     }
 
     /**
+     * Getter for the material of this Mesh.
      *
-     * @return
+     * @return - The material of this mesh.
      */
     public Material getMaterial() {
         return this.material;
     }
 
     /**
+     * Setter for the material of this Mesh.
      *
-     * @param material
+     * @param material - The material value to set.
      */
     public void setMaterial(Material material) {
         this.material = material;
     }
 
     /**
+     * Getter for the color value of this Mesh.
      *
-     * @return
+     * @return - The color value of this Mesh.
      */
     public Color getColor() {
         return this.color;
     }
 
     /**
+     * Setter for the color value of this Mesh.
      *
-     * @param color
+     * @param color - The color value to set.
      */
     public void setColor(Color color) {
         this.color = color;
     }
     
     /**
+     * Getter for the bounding radius value for this Mesh.
      * 
-     * @return
+     * @return - The bounding radius value for this Mesh.
      */
     public float getBoundingRadius() {
     	return this.boundingRadius;
     }
     
     /**
+     * Setter for the bounding radius for this Mesh.
      * 
-     * @param boundingRadius
+     * @param boundingRadius - The bounding radius value to set.
      */
     public void setBoundingRadius(float boundingRadius) {
     	this.boundingRadius = boundingRadius;

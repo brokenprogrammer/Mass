@@ -95,9 +95,11 @@ public class FrustumCullingFilter {
 		Vector3f position;
 		
 		for (Entity e : entities) {
-			boundingRadius = e.getScale() * meshBoundingRadius;
-			position = e.getPosition();
-			e.setInsideFrtustrum(insideFrustum(position.x, position.y, position.z, boundingRadius));
+			if (!e.isDisableFrustrumCulling()) {
+				boundingRadius = e.getScale() * meshBoundingRadius;
+				position = e.getPosition();
+				e.setInsideFrtustrum(insideFrustum(position.x, position.y, position.z, boundingRadius));
+			}
 		}
 	}
 	

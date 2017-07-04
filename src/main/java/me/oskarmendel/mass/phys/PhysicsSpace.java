@@ -79,8 +79,7 @@ public class PhysicsSpace {
 	//private CollisionShape groundShape;
 	
 	/**
-	 * TODO: Add an actual visible shape for the ground shape.
-	 * Oskar Mendel 2017-06-16.
+	 * 
 	 */
 	public PhysicsSpace() {
 		// TODO: Comments on stuff.
@@ -92,15 +91,6 @@ public class PhysicsSpace {
 		
 		dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, broadPhase, solver, collisionConfiguration);
 		dynamicsWorld.setGravity(new Vector3f(0, -10, 0));
-		
-		
-//		groundShape = new StaticPlaneShape(new Vector3f(0, 1, 0), 1);
-//		
-//		DefaultMotionState groundMotionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(0, -1, 0), 1.0f))); 
-//		RigidBodyConstructionInfo groundRigidBodyCI = new RigidBodyConstructionInfo(0, groundMotionState, groundShape, new Vector3f(0,0,0)); 
-//		RigidBody groundRigidBody = new RigidBody(groundRigidBodyCI); 
-		
-		//dynamicsWorld.addRigidBody(groundRigidBody);
 	}
 	
 	/**

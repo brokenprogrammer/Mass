@@ -53,14 +53,14 @@ import static org.lwjgl.glfw.GLFW.*;
  * @version 0.00.00
  * @name Game.java
  */
-public class Game {
+public class Game implements Runnable {
 
     public static final int SCREEN_WIDTH = 800;
     public static final int SCREEN_HEIGHT = 600;
 
     public static final String SCREEN_TITLE = "Mass";
 
-    public static final boolean VSYNC = true;
+    public static final boolean VSYNC = false;
 
     public static final float CAMERA_POS_STEP = 0.05f;
 
@@ -79,6 +79,8 @@ public class Game {
      * GLFW window or screen used by the game.
      */
     private Screen screen;
+    
+    private final Thread gameLoopThread;
 
     /**
      * Renderer to handle rendering.
@@ -89,7 +91,9 @@ public class Game {
      * Camera of the game to handle the view of the game.
      */
     private final Camera camera;
-
+    
+    private boolean sceneChanged = true;
+    
     /**
      * Handles camera updates.
      */
@@ -111,6 +115,7 @@ public class Game {
      */
     public Game() {
         renderer = new Renderer();
+        gameLoopThread = new Thread(this, "GAME_LOOP_THREAD");
         camera = new Camera();
         mouseHandler = new MouseHandler();
         timer = new Timer();
@@ -123,9 +128,10 @@ public class Game {
      * This method should be called to initialize and start the game.
      */
     public void start() {
-        init();
-        gameLoop();
-        dispose();
+        //init();
+        //gameLoop();
+        //dispose();
+    	gameLoopThread.run();
     }
 
     /**
@@ -174,6 +180,7 @@ public class Game {
             
             room = new TestRoom(testRoomMesh, 0.1f);
             room.setPosition(0, -1, 0);
+            room.setDisableFrustrumCulling(true);
             
             float skyBoxScale = 300.0f;
             SkyBox skyBox = new SkyBox("src/main/resources/models/skybox.obj", new Color(1f, 0.0f, 0.0f));
@@ -219,6 +226,18 @@ public class Game {
     	Vector3f direction = new Vector3f(0, 1, 1);
     	DirectionalLight directionalLight = new DirectionalLight(Color.WHITE, direction, intensity);
     	sceneLight.setDirectionalLight(directionalLight);
+    }
+    
+    @Override
+    public void run() {
+    	try {
+    		init();
+    		gameLoop();
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    	} finally {
+    		this.dispose();
+    	}
     }
 
     /**
@@ -271,34 +290,40 @@ public class Game {
      * Handles input.
      */
     private void input() {
+    	sceneChanged = false;
+    	
     	// Update mouse input.
     	mouseHandler.input();
     	
         cameraInc.set(0, 0, 0);
 
         if (screen.isKeyPressed(GLFW_KEY_W)) {
-            cameraInc.z = -10;
+            cameraInc.z = -1;
         	//player.move(0, 0, -1);
            // player.forward();
+            sceneChanged = true;
         } else if (screen.isKeyPressed(GLFW_KEY_S)) {
-            cameraInc.z = 10;
+            cameraInc.z = 1;
             //player.backward();
+            sceneChanged = true;
         }
 
         if (screen.isKeyPressed(GLFW_KEY_A)) {
-            cameraInc.x = -10;
+            cameraInc.x = -1;
             //player.left();
         	//player.move(-1, 0, 0);
+            sceneChanged = true;
         } else if (screen.isKeyPressed(GLFW_KEY_D)) {
-            cameraInc.x = 10;
+            cameraInc.x = 1;
             //player.right();
         	//player.move(1, 0, 0);
+            sceneChanged = true;
         }
 
         if (screen.isKeyPressed(GLFW_KEY_Z)) {
-            cameraInc.y = -5;
+            cameraInc.y = -1;
         } else if (screen.isKeyPressed(GLFW_KEY_X)) {
-            cameraInc.y = 5;
+            cameraInc.y = 1;
         }
     }
 
@@ -308,7 +333,7 @@ public class Game {
     public void update() {
         // Update camera position.
         //camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
-        player.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP, camera.getRotation().y);
+        player.movePosition(cameraInc.x, cameraInc.y, cameraInc.z, camera.getRotation().y);
     	camera.setPosition(player.getPosition().x, player.getPosition().y + 1.5f, player.getPosition().z);
     	
         // Update camera based on mouse movements
@@ -316,47 +341,11 @@ public class Game {
         	Vector2f rotVec = mouseHandler.getDispelVec();
         	camera.moveRotation(rotVec.x * 0.2f, rotVec.y * 0.2f, 0);
         	player.moveRotation(rotVec.y * 0.2f, 0, 0);
+        	sceneChanged = true;
         }
         
         // Update the camera view matrix.
         camera.updateViewMatrix();
-        
-        /* // Update spot light direction.
-        spotAngle += spotInc * 0.05f;
-        if (spotAngle > 2) {
-        	spotInc = -1;
-        } else if (spotAngle < -2) {
-        	spotInc = 1;
-        }
-        
-        double spotAngleRad = Math.toRadians(spotAngle);
-        Vector3f coneDir = spotLights[0].getConeDirection();
-        coneDir.y = (float) Math.sin(spotAngleRad);
-
-        // Update directional light direction.
-        lightAngle += 1.1f;
-        if (lightAngle > 90) {
-            directionalLight.setIntensity(0);
-            if (lightAngle >= 360) {
-                lightAngle = -90;
-            }
-        } else if (lightAngle <= -80 || lightAngle >= 80) {
-            float factor = 1 - (Math.abs(lightAngle) -80) / 10.0f;
-            directionalLight.setIntensity(factor);
-            directionalLight.getColor().setGreen(Math.max(factor, 0.9f));
-            directionalLight.getColor().setBlue(Math.max(factor, 0.5f));
-        } else {
-            directionalLight.setIntensity(1);
-            directionalLight.getColor().setRed(1);
-            directionalLight.getColor().setGreen(1);
-            directionalLight.getColor().setBlue(1);
-        }
-
-        double angRad = Math.toRadians(lightAngle);
-        directionalLight.getDirection().x = (float) Math.sin(angRad);
-        directionalLight.getDirection().y = (float) Math.cos(angRad);*/
-        
-        physicsSpace.tick();
         
         for (Entity entity : entities) {
             // Do something for every loaded entity.
@@ -366,12 +355,14 @@ public class Game {
         		((Collidable) entity).updatePhysics();
         	}
         }
+        
+        physicsSpace.tick();
     }
 
     /**
      * Renders the game.
      */
     public void render() {
-        renderer.render(this.screen, this.camera, this.scene, true);
+        renderer.render(this.screen, this.camera, this.scene, sceneChanged);
     }
 }

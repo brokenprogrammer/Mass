@@ -44,7 +44,7 @@ import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL14.GL_TEXTURE_COMPARE_MODE;
 
 /**
- * 
+ * This class represents an array of textures.
  * 
  * @author Oskar Mendel
  * @version 0.00.00
@@ -52,18 +52,29 @@ import static org.lwjgl.opengl.GL14.GL_TEXTURE_COMPARE_MODE;
  */
 public class ArrayTexture {
 	
+	/**
+	 * Array of ids for all the textures created and stored in this texture array.
+	 */
 	private final int[] ids;
 	
+	/**
+	 * Width of the textures within this texture array.
+	 */
 	private final int width;
 	
+	/**
+	 * Height of the textures within this texture array.
+	 */
 	private final int height;
 	
 	/**
+	 * Creates a new Array of Textures with the specified width and height.
 	 * 
-	 * @param size
-	 * @param width
-	 * @param height
-	 * @param pixelFormat
+	 * @param size - Amount of textures to create.
+	 * @param width - Width value of the textures.
+	 * @param height - Height value of the textures.
+	 * @param pixelFormat - Pixel format to use for the textures.
+	 * 
 	 * @throws Exception
 	 */
 	public ArrayTexture(int size, int width, int height, int pixelFormat) throws Exception {
@@ -85,31 +96,36 @@ public class ArrayTexture {
 	}
 	
 	/**
+	 * Getter for the array of texture ids.
 	 * 
-	 * @return
+	 * @return - Array of texture ids stored in this texture array.
 	 */
 	public int[] getIds() {
 		return this.ids;
 	}
 	
 	/**
+	 * Getter for the width value of the textures stored in 
+	 * this texture array.
 	 * 
-	 * @return
+	 * @return - Width value of the textures stored in this texture array.
 	 */
 	public int getWidth() {
 		return this.width;
 	}
 	
 	/**
+	 * Getter for the height value of the textures stored in 
+	 * this texture array.
 	 * 
-	 * @return
+	 * @return - Height value of the textures stored in this texture array.
 	 */
 	public int getHeight() {
 		return this.height;
 	}
 	
 	/**
-	 * 
+	 * Deletes all the textures created in this texture array.
 	 */
 	public void delete() {
 		for (int id : this.ids) {

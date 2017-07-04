@@ -143,7 +143,9 @@ public class Screen {
 
         // Setting the clear color.
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
 
         // Enable OpenGL blending that gives support for transparencies.
         glEnable(GL_BLEND);

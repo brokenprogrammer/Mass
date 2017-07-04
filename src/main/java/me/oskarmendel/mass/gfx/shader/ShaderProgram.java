@@ -56,6 +56,9 @@ public class ShaderProgram {
      */
     private final int id;
     
+    /**
+     * HashMap to store uniform locations within a ShaderProgram.
+     */
     private final Map<String, Integer> uniformLocations;
 
     /**
@@ -67,22 +70,48 @@ public class ShaderProgram {
         uniformLocations = new HashMap<>();
     }
     
+    /**
+     * Creates a new uniform by storing the specified uniform together
+     * with its uniform location in the uniformLocations HashMap.
+     * 
+     * @param uniform - Uniform identifier.
+     */
     public void createUniform(String uniform) {
     	this.uniformLocations.put(uniform, this.getUniformLocation(uniform));
     }
     
+    /**
+     * Creates a new uniform array by storing the specified uniform together
+     * with its uniform location in the uniformLocations HashMap.
+     * 
+     * @param uniform - Uniform identifier.
+     * @param size - Amount of uniforms to create.
+     */
     public void createUniform(String uniform, int size) {
     	for (int i = 0; i < size; i++) {    		
     		this.createUniform(uniform + "[" + i + "]");
     	}
     }
     
+    /**
+     * Creates a new PointLight uniform array by storing the specified uniform together
+     * with its uniform location in the uniformLocations HashMap.
+     * 
+     * @param uniform - Uniform identifier.
+     * @param size - Amount of uniforms to create.
+     */
     public void createPointLightUniform(String uniform, int size) {
     	for (int i = 0; i < size; i++) {
     		createPointLightUniform(uniform + "[" + i + "]");
     	}
     }
     
+    /**
+     * Creates a new PointLight uniform by storing the specified uniform
+     * together with its uniform location in the uniformsLocation HashMap.
+     * 
+     * @param uniform - Uniform identifier.
+     */
     public void createPointLightUniform(String uniform) {
     	createUniform(uniform + ".color");
         createUniform(uniform + ".position");
@@ -92,24 +121,49 @@ public class ShaderProgram {
         createUniform(uniform + ".att.exponent");
     }
     
+    /**
+     * Creates a new SpotLight uniform array by storing the specified uniform together
+     * with its uniform location in the uniformLocations HashMap.
+     * 
+     * @param uniform - Uniform identifier.
+     * @param size - Amount of uniforms to create.
+     */
     public void createSpotLightUniform(String uniform, int size) {
     	for (int i = 0; i < size; i++) {
     		createSpotLightUniform(uniform + "[" + i + "]");
     	}
     }
     
+    /**
+     * Creates a new SpotLight uniform by storing the specified uniform
+     * together with its uniform location in the uniformsLocation HashMap.
+     * 
+     * @param uniform - Uniform identifier.
+     */
     public void createSpotLightUniform(String uniform) {
     	createPointLightUniform(uniform + ".pl");
         createUniform(uniform + ".conedir");
         createUniform(uniform + ".cutoff");
     }
     
+    /**
+     * Creates a new DirectionalLight uniform by storing the specified uniform
+     * together with its uniform location in the uniformsLocation HashMap.
+     * 
+     * @param uniform - Uniform identifier.
+     */
     public void createDirectionalLightUniform(String uniform) {
     	createUniform(uniform + ".color");
     	createUniform(uniform + ".direction");
     	createUniform(uniform + ".intensity");
     }
     
+    /**
+     * Creates a new Material uniform by storing the specified uniform
+     * together with its uniform location in the uniformsLocation HashMap.
+     * 
+     * @param uniform - Uniform identifier.
+     */
     public void createMaterialUniform(String uniform) {
     	createUniform(uniform + ".ambient");
         createUniform(uniform + ".diffuse");
@@ -119,6 +173,12 @@ public class ShaderProgram {
         createUniform(uniform + ".reflectance");
     }
     
+    /**
+     * Creates a new Fog uniform by storing the specified uniform
+     * together with its uniform location in the uniformsLocation HashMap.
+     * 
+     * @param uniform - Uniform identifier.
+     */
     public void createFogUniform(String uniform) {
     	createUniform(uniform + ".activeFog");
         createUniform(uniform + ".color");
@@ -126,8 +186,9 @@ public class ShaderProgram {
     }
 
     /**
-     * Attatch a shader to this shader program.
+     * Attach a shader to this shader program.
      *
+     * @param shader - Shader to attach to this ShaderProgram.
      */
     public void attachShader(Shader shader) {
         glAttachShader(id, shader.getId());
@@ -174,10 +235,11 @@ public class ShaderProgram {
     }
     
     /**
+     * Set the uniform variable at the specified location.
      * 
-     * @param location
-     * @param value
-     * @param pos
+     * @param location - Uniform location.
+     * @param value - Value to set at the specified location.
+     * @param pos - Array position for the value to set.
      */
     public void setUniform(String location, float value, int pos) {
     	setUniform((location + "[" + pos + "]"), value);
@@ -218,10 +280,11 @@ public class ShaderProgram {
     }
     
     /**
+     * Set the uniform variable at the specified location.
      * 
-     * @param location
-     * @param value
-     * @param pos
+     * @param location - Uniform location.
+     * @param value - Value to set at the specified location.
+     * @param pos - Array position for the value to set.
      */
     public void setUniform(String location, Matrix4f value, int pos) {
     	setUniform((location + "[" + pos + "]"), value);
@@ -335,9 +398,10 @@ public class ShaderProgram {
     }
     
     /**
+     * Sets the Fog uniform variable with the specified location name.
      * 
-     * @param location
-     * @param fog
+     * @param location - Location name.
+     * @param fog - Fog object to retrieve values from.
      */
     public void setUniform(String location, Fog fog) {
     	setUniform((location + ".activeFog"), fog.isActive() ? 1 : 0);
