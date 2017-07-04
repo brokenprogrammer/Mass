@@ -152,7 +152,9 @@ public class Game implements Runnable {
 
         // Create the GLFW screen.
         screen = new Screen(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, VSYNC, screenOptions);
-        
+
+        screen.init();
+
         timer.init();
         
         mouseHandler.init(screen);
