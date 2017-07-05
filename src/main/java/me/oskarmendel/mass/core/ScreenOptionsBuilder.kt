@@ -32,36 +32,90 @@ package me.oskarmendel.mass.core
  * @name ScreenOptionsBuilder.java
  */
 class ScreenOptionsBuilder {
+
+    /**
+     * Boolean value to switch the OpenGL cull face option on or off.
+     */
     var cullFace : Boolean = false
         private set
 
+    /**
+     * Boolean value to switch the OpenGL polygon mode option on or off.
+     */
     var showTriangles : Boolean = false
         private set
 
+    /**
+     * Boolean value to switch the show fps option on or off.
+     */
     var showFPS : Boolean = false
         private set
 
+    /**
+     * Boolean value to switch the OpenGL compatible profile option on or off.
+     */
     var compatibleProfile : Boolean = false
         private set
 
+    /**
+     * Boolean value to switch the Anti-Aliasing option on or off.
+     */
     var antialiasing : Boolean = false
         private set
 
+    /**
+     * Boolean value to switch the frustum culling option on or off.
+     */
     var frustumCulling : Boolean = false
         private set
 
+    /**
+     * Sets the cullFace value of the ScreenOptions object to build.
+     *
+     * @param cullFace - Boolean value to set for the cullFace option.
+     */
     fun cullFace(cullFace : Boolean) = apply { this.cullFace = cullFace }
 
+    /**
+     * Sets the showTriangles value of the ScreenOptions object to build.
+     *
+     * @param showTriangles - Boolean value to set for the showTriangles option.
+     */
     fun showTriangles(showTriangles : Boolean) = apply { this.showTriangles = showTriangles }
 
+    /**
+     * Sets the showFPS value of the ScreenOptions object to build.
+     *
+     * @param showFPS - Boolean value to set for the showFPS option.
+     */
     fun showFPS(showFPS : Boolean) = apply { this.showFPS = showFPS }
 
+    /**
+     * Sets the compatibleProfile value of the ScreenOptions object to build.
+     *
+     * @param compatibleProfile - Boolean value to set for the compatibleProfile option.
+     */
     fun compatibleProfile(compatibleProfile : Boolean) = apply { this.compatibleProfile = compatibleProfile }
 
+    /**
+     * Sets the antialiasing value of the ScreenOptions object to build.
+     *
+     * @param antialiasing - Boolean value to set for the antialiasing option.
+     */
     fun antialiasing(antialiasing : Boolean) = apply { this.antialiasing = antialiasing }
 
+    /**
+     * Sets the frustumCulling value of the ScreenOptions object to build.
+     *
+     * @param frustumCulling - Boolean value to set for the frustumCulling option.
+     */
     fun frustumCulling(frustumCulling : Boolean) = apply { this.frustumCulling = frustumCulling }
 
+    /**
+     * Builds the ScreenOptions object and returns the newly created ScreenOptions object.
+     *
+     * @return - ScreenOptions object built from values entered in this ScreenOptionsBuilder.
+     */
     fun build() = ScreenOptions(this.cullFace, this.showTriangles, this.showFPS,
             this.compatibleProfile, this.antialiasing, this.frustumCulling)
 }
