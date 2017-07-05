@@ -26,12 +26,14 @@ package me.oskarmendel.mass.phys;
 
 import javax.vecmath.Vector3f;
 
+import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
+import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
 import com.bulletphysics.collision.broadphase.DbvtBroadphase;
-import com.bulletphysics.collision.dispatch.CollisionDispatcher;
-import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
+import com.bulletphysics.collision.dispatch.*;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.character.KinematicCharacterController;
 import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 
@@ -86,10 +88,11 @@ public class PhysicsSpace {
 		broadPhase = new DbvtBroadphase();
 		collisionConfiguration = new DefaultCollisionConfiguration();
 		dispatcher = new CollisionDispatcher(collisionConfiguration);
-		
+
 		solver = new SequentialImpulseConstraintSolver();
 		
 		dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, broadPhase, solver, collisionConfiguration);
+		dynamicsWorld.getBroadphase().getOverlappingPairCache().setInternalGhostPairCallback(new GhostPairCallback());
 		dynamicsWorld.setGravity(new Vector3f(0, -10, 0));
 	}
 	
@@ -108,7 +111,23 @@ public class PhysicsSpace {
 	public void addRigidBody(RigidBody rigidBody) {
 		this.dynamicsWorld.addRigidBody(rigidBody);
 	}
-	
+
+	/**
+	 *
+	 * @param ghostObject
+	 */
+	public void addCollisionObject(PairCachingGhostObject ghostObject) {
+		this.dynamicsWorld.addCollisionObject(ghostObject, CollisionFilterGroups.CHARACTER_FILTER, (short)(CollisionFilterGroups.STATIC_FILTER | CollisionFilterGroups.DEFAULT_FILTER));
+	}
+
+	/**
+	 *
+	 * @param characterController
+	 */
+	public void addAction(KinematicCharacterController characterController) {
+		this.dynamicsWorld.addAction(characterController);
+	}
+
 	/**
 	 * Steps the physics simulation one tick.
 	 */

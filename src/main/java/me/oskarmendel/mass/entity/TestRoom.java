@@ -128,8 +128,9 @@ public class TestRoom extends Entity implements Collidable {
 		
 		BvhTriangleMeshShape collShape = new BvhTriangleMeshShape(vertArray, false);
 		System.out.println("SCALE: " + this.getScale());
-		collisionShape = new ScaledBvhTriangleMeshShape(collShape, new Vector3f(this.getScale(), this.getScale(), this.getScale()));
-		
+		//collisionShape = new ScaledBvhTriangleMeshShape(collShape, new Vector3f(this.getcale(), this.getScale(), this.getScale()));
+		collisionShape = collShape;
+		collisionShape.setLocalScaling(new Vector3f(this.getScale(), this.getScale(), this.getScale()));
 		RigidBodyConstructionInfo groundRigidBodyCI = new RigidBodyConstructionInfo(0, groundMotionState, collisionShape, new Vector3f(0,0,0)); 
 		rigidBody = new RigidBody(groundRigidBodyCI);
 		this.rigidBody.activate();

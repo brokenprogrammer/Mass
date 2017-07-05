@@ -109,7 +109,7 @@ public class Game implements Runnable {
     Player player;
     
     Scene scene;
-    
+
     /**
      * Default constructor for the game.
      */
@@ -201,7 +201,12 @@ public class Game implements Runnable {
         
         for (Entity ent : entities) {
         	if (ent instanceof Collidable) {
-        		physicsSpace.addRigidBody(((Collidable) ent).getRigidBody());
+        	    if (ent instanceof Player) {
+                    physicsSpace.addCollisionObject(((Player) ent).getGhostObject());
+                    physicsSpace.addAction(((Player) ent).getCharacterController());
+                } else {
+                    physicsSpace.addRigidBody(((Collidable) ent).getRigidBody());
+                }
         	}
         }
         
@@ -304,24 +309,17 @@ public class Game implements Runnable {
 
         if (screen.isKeyPressed(GLFW_KEY_W)) {
             cameraInc.z = -1;
-        	//player.move(0, 0, -1);
-           // player.forward();
             sceneChanged = true;
         } else if (screen.isKeyPressed(GLFW_KEY_S)) {
             cameraInc.z = 1;
-            //player.backward();
             sceneChanged = true;
         }
 
         if (screen.isKeyPressed(GLFW_KEY_A)) {
             cameraInc.x = -1;
-            //player.left();
-        	//player.move(-1, 0, 0);
             sceneChanged = true;
         } else if (screen.isKeyPressed(GLFW_KEY_D)) {
             cameraInc.x = 1;
-            //player.right();
-        	//player.move(1, 0, 0);
             sceneChanged = true;
         }
 
@@ -339,7 +337,7 @@ public class Game implements Runnable {
         // Update camera position.
         //camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
         player.movePosition(cameraInc.x, cameraInc.y, cameraInc.z, camera.getRotation().y);
-    	camera.setPosition(player.getPosition().x, player.getPosition().y + 1.5f, player.getPosition().z);
+        camera.setPosition(player.getPosition().x, player.getPosition().y + 1.5f, player.getPosition().z);
     	
         // Update camera based on mouse movements
         if (mouseHandler.isRightButtonPressed()) {

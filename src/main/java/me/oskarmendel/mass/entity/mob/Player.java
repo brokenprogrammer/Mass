@@ -30,15 +30,21 @@ import javax.vecmath.Vector3f;
 
 import com.bulletphysics.collision.dispatch.CollisionFlags;
 import com.bulletphysics.collision.dispatch.CollisionObject;
+import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
+import com.bulletphysics.collision.shapes.CapsuleShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.ConvexHullShape;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.dynamics.character.KinematicCharacterController;
 import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 
 import me.oskarmendel.mass.gfx.Mesh;
+import me.oskarmendel.mass.gfx.Transformation;
+import org.joml.Quaternionf;
 
 /**
  * This class represents an Mob in the game.
@@ -50,7 +56,7 @@ import me.oskarmendel.mass.gfx.Mesh;
  */
 public class Player extends MobBase {
 	
-	private static int WALK_SPEED = 5;
+	private static float WALK_SPEED = 0.1f;
 	
 	// Component manager
 		// Updateable component
@@ -72,13 +78,23 @@ public class Player extends MobBase {
 	/**
 	 * Shape of the Player entity.
 	 */
-	private CollisionShape collisionShape;
+	private CapsuleShape collisionShape;
 	
 	/**
 	 * RigidBody for the Player entity.
 	 */
 	private RigidBody rigidBody;
-	
+
+	/**
+	 *
+	 */
+	private PairCachingGhostObject ghostObject;
+
+	/**
+	 *
+	 */
+	private KinematicCharacterController characterController;
+
 	/**
 	 * MotionState for the Player entity.
 	 * Bullet physics uses the MotionState to handle frame 
@@ -121,10 +137,7 @@ public class Player extends MobBase {
 		deltaX *= WALK_SPEED;
 		deltaY *= WALK_SPEED;
 		deltaZ *= WALK_SPEED;
-		
-		Transform controllTransform = new Transform();
-		this.rigidBody.getMotionState().getWorldTransform(controllTransform);
-		//Vector3f position = controllTransform.origin;
+
 		Vector3f position = new Vector3f(0, 0, 0);
 		
 		if (deltaZ != 0) {
@@ -139,9 +152,8 @@ public class Player extends MobBase {
         }
 
         position.y += deltaY;
-        
-        this.rigidBody.setLinearVelocity(position);
-        this.rigidBody.activate();
+
+		characterController.setWalkDirection(position);
 	}
 	
 	/**
@@ -153,50 +165,64 @@ public class Player extends MobBase {
 	 * @param z - Value to move the z rotation by.
 	 */
 	public void moveRotation(float x, float y, float z) {
-		this.rigidBody.activate();
-		this.rigidBody.setAngularVelocity(new Vector3f(0, -x, 0));
+		//this.rigidBody.activate();
+		//this.rigidBody.setAngularVelocity(new Vector3f(0, -x, 0));
+		Transform t = new Transform();
+		ghostObject.getWorldTransform(t);
+		//TODO: FIX ROTATION. - Oskar Mendel 2017-07-05
+		this.setRotation(this.getRotation().rotate(0, -x, 0));
 	}
 
 	@Override
 	public void initPhysics() {
-		motionState = new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), new Vector3f(5, -35, -4), 1.0f)));
-		
-		// Construct collision shape based on the mesh vertices in the Mesh.
-		ObjectArrayList<Vector3f> points = new ObjectArrayList<Vector3f>();
-		float[] positions = getMesh().getPositions();
-		
-		for (int i = 0; i < positions.length; i+= 3) {
-			Vector3f v = new Vector3f(positions[i], positions[i + 1], positions[i + 2]);
-			points.add(v);
-		}
-		
-		fallInertia = new Vector3f(0,1,0); 
-		collisionShape = new ConvexHullShape(points);
-		collisionShape.calculateLocalInertia(mass,fallInertia);
-		
-		// Construct the RigidBody.
-		RigidBodyConstructionInfo rigidBodyCI = new RigidBodyConstructionInfo(mass, motionState, collisionShape, fallInertia); 
-		rigidBody = new RigidBody(rigidBodyCI);
-		rigidBody.setCollisionFlags(rigidBody.getCollisionFlags() | CollisionFlags.CHARACTER_OBJECT);
-		rigidBody.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
-		//rigidBody.setDamping(0.999f, 1);
+		Transform startTranform = new Transform();
+		startTranform.setIdentity();
+		startTranform.origin.set(5, -35, -4);
+
+		collisionShape = new CapsuleShape(0.5f, 1);
+
+		ghostObject = new PairCachingGhostObject();
+		ghostObject.setWorldTransform(startTranform);
+		// set getOverlappingPairCache & setInternalGhostPairCallback
+		ghostObject.setCollisionShape(collisionShape);
+		ghostObject.setCollisionFlags(CollisionFlags.CHARACTER_OBJECT);
+
+		characterController = new KinematicCharacterController(ghostObject, collisionShape, 0.5f);
+		characterController.setGravity(10);
+		characterController.setMaxJumpHeight(1.5f);
 	}
 
 	@Override
 	public void updatePhysics() {
 		Transform t = new Transform();
-		this.rigidBody.getWorldTransform(t);
+		this.ghostObject.getWorldTransform(t);
 		Vector3f v = t.origin;
-		Quat4f r = new Quat4f(); 
+		Quat4f r = new Quat4f();
 		r = t.getRotation(r);
-
+		//TODO: FIX ROTATION. - Oskar Mendel 2017-07-05
 		this.setPosition(v.x, v.y, v.z);
-		this.setRotation(r.w, r.x, r.y, r.z);
+		this.setRotation(r.x, r.y, r.z, r.w);
 	}
 
 	@Override
 	public RigidBody getRigidBody() {
 		return this.rigidBody;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public KinematicCharacterController getCharacterController() {
+		return this.characterController;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public PairCachingGhostObject getGhostObject() {
+		return this.ghostObject;
 	}
 
 	@Override
