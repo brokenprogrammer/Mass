@@ -62,21 +62,21 @@ public class Screen {
      * The window handle
      */
     private long id;
+
+    /**
+     * Title for this Screen.
+     */
+    private final String title;
     
     /**
-     * 
+     * Width for this Screen.
      */
     private int width;
     
     /**
-     * 
+     * Height for this Screen.
      */
     private int height;
-
-    /**
-     * Key callback for the window
-     */
-    private final GLFWKeyCallback keyCallback;
 
     /**
      * Value showing if v-sync is on or off.
@@ -84,12 +84,12 @@ public class Screen {
     private boolean vsync;
 
     /**
-     *
+     * ScreenOptions object that contains options for this Screen.
      */
     private final ScreenOptions screenOptions;
     
     /**
-     * 
+     * Projection matrix for the Screen.
      */
     private final Matrix4f projectionMatrix;
 
@@ -104,13 +104,30 @@ public class Screen {
      * @param options - The Screen options for this Screen.
      */
     public Screen (int width, int height, String title, boolean vsync, ScreenOptions options) {
+        this.title = title;
         this.width = width;
         this.height = height;
     	this.vsync = vsync;
     	this.screenOptions = options;
-
+        this.projectionMatrix = new Matrix4f();
+    }
+    
+    /**
+     * Initializes the Screen by settings its callbacks and applying options specified in the
+     * ScreenOptions object for this Screen.
+     */
+    public void init() {
         // Set resizeable to false.
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+
+        if (this.screenOptions.getCompatibleProfile()) {
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+        } else {
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        }
 
         // Create the window
         id = glfwCreateWindow(width, height, title, NULL, NULL);
@@ -127,18 +144,18 @@ public class Screen {
         // Create OpenGL context
         glfwMakeContextCurrent(id);
 
+        // Enable v-sync
+        if (this.getVsync()) {
+            glfwSwapInterval(1);
+        }
+
         // Make the window visible
         glfwShowWindow(id);
 
         GL.createCapabilities();
 
-        // Enable v-sync
-        if (vsync) {
-            glfwSwapInterval(1);
-        }
-
         // Set key callback
-        keyCallback = new GLFWKeyCallback() {
+        GLFWKeyCallback keyCallback = new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
@@ -150,23 +167,26 @@ public class Screen {
 
         // Setting the clear color.
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_STENCIL_TEST);
 
+        if (screenOptions.getShowTriangles()) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+
         // Enable OpenGL blending that gives support for transparencies.
         glEnable(GL_BLEND);
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        
-        this.projectionMatrix = new Matrix4f();
-    }
-    
-    /**
-     * 
-     */
-    public void init() {
-    	
+
+        if (screenOptions.getCullFace()) {
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+        }
+
+        // Antialiasing
+        if (screenOptions.getAntialiasing()) {
+            glfwWindowHint(GLFW_SAMPLES, 4);
+        }
     }
 
     /**
@@ -244,16 +264,19 @@ public class Screen {
     }
 
     /**
-     * 
-     * @return
+     * Getter for the projectionMatrix of this Screen.
+     *
+     * @return - The projectionMatrix of this Screen.
      */
     public Matrix4f getProjectionMatrix() {
     	return this.projectionMatrix;
     }
     
     /**
-     * 
-     * @return
+     * Updates the projectionMatrix based of the aspectRatio and returns
+     * the updated projectionMatrix.
+     *
+     * @return - Updated projectionMatrix.
      */
     public Matrix4f updateProjectionMatrix() {
     	float aspectRatio = (float) width / (float) height;
@@ -261,11 +284,14 @@ public class Screen {
     }
     
     /**
-     * 
-     * @param matrix
-     * @param width
-     * @param height
-     * @return
+     * Updates the specified projectionMatrix based on the specified with and
+     * height.
+     *
+     * @param matrix - ProjectionMatrix to update.
+     * @param width - Target width.
+     * @param height - Target height.
+     *
+     * @return - Updated projectionMatrix.
      */
     public static Matrix4f updateProjectionMatrix(Matrix4f matrix, int width, int height) {
     	float aspectRatio = (float) width / (float) height;
@@ -277,6 +303,6 @@ public class Screen {
      */
     public void destroy() {
         glfwDestroyWindow(id);
-        keyCallback.free();
+        //keyCallback.free();
     }
 }
