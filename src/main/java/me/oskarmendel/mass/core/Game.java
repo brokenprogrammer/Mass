@@ -32,6 +32,8 @@ import me.oskarmendel.mass.entity.mob.Player;
 import me.oskarmendel.mass.gfx.*;
 import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.weather.Fog;
+import me.oskarmendel.mass.hud.Font;
+import me.oskarmendel.mass.hud.Hud;
 import me.oskarmendel.mass.input.MouseHandler;
 import me.oskarmendel.mass.phys.Collidable;
 import me.oskarmendel.mass.phys.PhysicsSpace;
@@ -109,6 +111,8 @@ public class Game implements Runnable {
     Player player;
     
     Scene scene;
+    Font font;
+    Hud hud;
 
     /**
      * Default constructor for the game.
@@ -156,7 +160,7 @@ public class Game implements Runnable {
         screen.init();
 
         timer.init();
-        
+
         mouseHandler.init(screen);
 
         // Initialize renderer.
@@ -193,6 +197,13 @@ public class Game implements Runnable {
             scene.setSkyBox(skyBox);
             
             entities = new Entity[]{massterBall, room, player};
+            
+            // Initialize the font for the Hud.
+            font = new Font("src/main/resources/font/OpenSans-Bold.ttf");
+            
+            // Initialize the Hud.
+            hud = new Hud(screenOptions, font, SCREEN_WIDTH, SCREEN_HEIGHT);
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -367,5 +378,7 @@ public class Game implements Runnable {
      */
     public void render() {
         renderer.render(this.screen, this.camera, this.scene, sceneChanged);
+        
+        hud.render(this.screen);
     }
 }

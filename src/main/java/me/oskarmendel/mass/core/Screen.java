@@ -299,6 +299,19 @@ public class Screen {
     }
     
     /**
+     * Restores the state of the Screen.
+     */
+    public void restore() {
+    	glEnable(GL_DEPTH_TEST);
+        glEnable(GL_STENCIL_TEST);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        if (this.screenOptions.getCullFace()) {
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+        }
+    }
+    
+    /**
      * Destroys the window and releases the callbacks.
      */
     public void destroy() {

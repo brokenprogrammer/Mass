@@ -22,36 +22,40 @@
  * SOFTWARE.
  */
 
-package me.oskarmendel.mass.gfx;
+package me.oskarmendel.mass.hud;
+
+import me.oskarmendel.mass.util.IOUtil;
+
+import java.nio.ByteBuffer;
 
 /**
- * This calss represents a single font glyph.
+ * This class represents a Font that the renderer can handle.
  *
  * @author Oskar Mendel
  * @version 0.00.00
- * @name Glyph.java
+ * @name Font.java
  */
-public class Glyph {
+public class Font {
 	
-	public final int width;
-    public final int height;
-    public final int x;
-    public final int y;
-    public final float advance;
+	/**
+	 * 
+	 */
+	private ByteBuffer fontBuffer;
+	
+	/**
+	 * 
+	 * @param path
+	 * @throws Exception
+	 */
+    public Font (String path) throws Exception{
+    	this.fontBuffer = IOUtil.ioResourceToByteBuffer(path, 150*1024);
+    }
     
     /**
      * 
-     * @param width
-     * @param height
-     * @param x
-     * @param y
-     * @param advance
+     * @return
      */
-    public Glyph(int width, int height, int x, int y, float advance) {
-        this.width = width;
-        this.height = height;
-        this.x = x;
-        this.y = y;
-        this.advance = advance;
+    public ByteBuffer getFontBuffer() {
+    	return this.fontBuffer;
     }
 }
