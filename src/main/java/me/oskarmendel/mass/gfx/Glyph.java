@@ -24,30 +24,34 @@
 
 package me.oskarmendel.mass.gfx;
 
-import java.util.Map;
-import java.util.HashMap;
-
 /**
- * This class represents a Font that the renderer can handle.
+ * This calss represents a single font glyph.
  *
  * @author Oskar Mendel
  * @version 0.00.00
- * @name Font.java
+ * @name Glyph.java
  */
-public class Font {
+public class Glyph {
 	
-	private final Map<Character, Glyph> glyphs;
-	
-	private final Texture texture;
-	
-	private int fontHeight;
-	
-    public Font (Font font, boolean antiAlias) {
-    	glyphs = new HashMap<>();
-    	texture = new Texture();
-    }
-
-    public void draw(String text, float x, float y) {
-    	
+	public final int width;
+    public final int height;
+    public final int x;
+    public final int y;
+    public final float advance;
+    
+    /**
+     * 
+     * @param width
+     * @param height
+     * @param x
+     * @param y
+     * @param advance
+     */
+    public Glyph(int width, int height, int x, int y, float advance) {
+        this.width = width;
+        this.height = height;
+        this.x = x;
+        this.y = y;
+        this.advance = advance;
     }
 }
