@@ -34,6 +34,7 @@ import me.oskarmendel.mass.gfx.light.DirectionalLight;
 import me.oskarmendel.mass.gfx.weather.Fog;
 import me.oskarmendel.mass.hud.Font;
 import me.oskarmendel.mass.hud.Hud;
+import me.oskarmendel.mass.hud.HudTextComponent;
 import me.oskarmendel.mass.input.MouseHandler;
 import me.oskarmendel.mass.phys.Collidable;
 import me.oskarmendel.mass.phys.PhysicsSpace;
@@ -113,6 +114,7 @@ public class Game implements Runnable {
     Scene scene;
     Font font;
     Hud hud;
+    HudTextComponent text;
 
     /**
      * Default constructor for the game.
@@ -203,6 +205,8 @@ public class Game implements Runnable {
             
             // Initialize the Hud.
             hud = new Hud(screenOptions, font, SCREEN_WIDTH, SCREEN_HEIGHT);
+            text = new HudTextComponent("HP: 100", 0, SCREEN_HEIGHT-40);
+            hud.addHudComponent(text);
             
         } catch (Exception e) {
             e.printStackTrace();
