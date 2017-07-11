@@ -35,7 +35,7 @@ package me.oskarmendel.mass.hud;
 public interface HudComponent {
 	
 	/**
-	 * 
+	 * Draws the HudComponent.
 	 */
 	public void draw();
 	

@@ -39,7 +39,7 @@ import me.oskarmendel.mass.gfx.Color;
 public class Crosshair {
 	
 	/**
-	 * NanoVG handle used to specify which NanoVG instnace to draw to.
+	 * NanoVG handle used to specify which NanoVG instance to draw to.
 	 */
 	private long vg;
 	

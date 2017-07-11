@@ -38,13 +38,15 @@ import java.nio.ByteBuffer;
 public class Font {
 	
 	/**
-	 * 
+	 * The ByteBuffer containing the loaded font.
 	 */
 	private ByteBuffer fontBuffer;
 	
 	/**
+	 * Creates a new Font object by loading the font at the specified path.
 	 * 
-	 * @param path
+	 * @param path - Path to the font to load.
+	 * 
 	 * @throws Exception
 	 */
     public Font (String path) throws Exception{
@@ -52,8 +54,9 @@ public class Font {
     }
     
     /**
+     * Getter for the ByteBuffer containing the loaded font.
      * 
-     * @return
+     * @return - fontBuffer containing the loaded font.
      */
     public ByteBuffer getFontBuffer() {
     	return this.fontBuffer;

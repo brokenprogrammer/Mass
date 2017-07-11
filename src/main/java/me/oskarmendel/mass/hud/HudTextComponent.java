@@ -49,12 +49,12 @@ public class HudTextComponent implements HudComponent{
 	private static final String FONT_NAME = "";
 	
 	/**
-	 * 
+	 * NanoVG handle used to specify which NanoVG instance to draw to.
 	 */
 	private long vg;
 	
 	/**
-	 * 
+	 * NanoVG color instance.
 	 */
 	private NVGColor color;
 	
@@ -89,11 +89,10 @@ public class HudTextComponent implements HudComponent{
 	}
 	
 	/**
-	 * 
+	 * Renders this HudTextComponent.
 	 */
 	@Override
 	public void draw() {
-		// Render text
         nvgFontSize(vg, 40.0f);
         nvgFontFace(vg, FONT_NAME);
         nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
@@ -102,15 +101,16 @@ public class HudTextComponent implements HudComponent{
 	}
 
 	/**
+	 * Converts an rgba value into the NanoVG color format and places it
+	 * into the specified NVGColor instance.
 	 * 
+	 * @param r - Red value.
+	 * @param g - Green value.
+	 * @param b - Blue value.
+	 * @param a - Alpha value.
+	 * @param color - NVGColor instance.
 	 * 
-	 * @param r
-	 * @param g
-	 * @param b
-	 * @param a
-	 * @param color
-	 * 
-	 * @return
+	 * @return - The NVGColor instance now with a new color value.
 	 */
 	private NVGColor rgba(int r, int g, int b, int a, NVGColor color) {
 		color.r(r / 255.0f);
@@ -122,79 +122,100 @@ public class HudTextComponent implements HudComponent{
     }
 	
 	/**
-	 * @return the vg
+	 * Getter for the NanoVG handle this HudTextComponent is using.
+	 * 
+	 * @return - The vg value of this HudTextComponent.
 	 */
 	public long getVg() {
 		return vg;
 	}
 
 	/**
-	 * @param vg the vg to set
+	 * Setter for the NanoVG handle of this HudTextComponent.
+	 * 
+	 * @param vg - The vg to set for this HudTextComponent.
 	 */
 	public void setVg(long vg) {
 		this.vg = vg;
 	}
 
 	/**
-	 * @return the color
+	 * Getter for the NanoVG color instance this HudTextComponent is using.
+	 * 
+	 * @return - The NanoVG hudColor of this HudTextComponent.
 	 */
 	public NVGColor getColor() {
 		return color;
 	}
 
 	/**
-	 * @param color the color to set
+	 * Setter for the NanoVG hudColor instance of this HudTextComponent.
+	 * 
+	 * @param hudColor - The hudColor instance to set for this HudTextComponent.
 	 */
 	public void setColor(NVGColor color) {
 		this.color = color;
 	}
 
 	/**
-	 * @return the text
+	 * Getter for the text value of this HudTextComponent.
+	 * 
+	 * @return - The text value of this HudTextComponent.
 	 */
 	public String getText() {
 		return text;
 	}
 
 	/**
-	 * @param text the text to set
+	 * Setter for the text value of this HudTextComponent.
+	 * 
+	 * @param text - The text value to set for this HudTextComponent.
 	 */
 	public void setText(String text) {
 		this.text = text;
 	}
 
 	/**
-	 * @return the x
+	 * Getter for the x coordinate value of this HudTextComponent.
+	 * 
+	 * @return - The x coordinate value of this HudTextComponent.
 	 */
 	public int getX() {
 		return x;
 	}
 
 	/**
-	 * @param x the x to set
+	 * Setter for the x coordinate value of this HudTextComponent.
+	 * 
+	 * @param x - The x coordinate value to set for this HudTextComponent.
 	 */
 	public void setX(int x) {
 		this.x = x;
 	}
 
 	/**
-	 * @return the y
+	 * Getter for the y coordinate value of this HudTextComponent.
+	 * 
+	 * @return - The y coordinate value of this HudTextComponent.
 	 */
 	public int getY() {
 		return y;
 	}
 
 	/**
-	 * @param y the y to set
+	 * Setter for the y coordinate value of this HudTextComponent.
+	 * 
+	 * @param y - The y coordinate value to set for this HudTextComponent.
 	 */
 	public void setY(int y) {
 		this.y = y;
 	}
 	
 	/**
+	 * Setter for the x and y coordinate value of this HudTextComponent.
 	 * 
-	 * @param x
-	 * @param y
+	 * @param x - X Coordinate to set for this HudTextComponent.
+	 * @param y - Y Coordinate to set for this HudTextComponent.
 	 */
 	public void setPosition(int x, int y) {
 		this.x = x;
