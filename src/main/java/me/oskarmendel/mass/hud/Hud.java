@@ -27,13 +27,13 @@ package me.oskarmendel.mass.hud;
 import me.oskarmendel.mass.core.Screen;
 import me.oskarmendel.mass.core.ScreenOptions;
 
-import java.nio.DoubleBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.lwjgl.nanovg.NVGColor;
 import static org.lwjgl.nanovg.NanoVG.*;
 import static org.lwjgl.nanovg.NanoVGGL3.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
-import org.lwjgl.system.MemoryUtil;
 
 /**
  * This class handles the ingame Hud.
@@ -47,7 +47,7 @@ public class Hud {
 	/**
 	 * 
 	 */
-	private static final String FONT_NAME = "BOLD";
+	private static final String FONT_NAME = "";
 	
 	/**
 	 * 
@@ -58,6 +58,11 @@ public class Hud {
 	 * 
 	 */
 	private Font font;
+	
+	/**
+	 * 
+	 */
+	List<HudComponent> hudComponents;
 	
 	/**
 	 * 
@@ -76,12 +81,6 @@ public class Hud {
 	
 	/**
 	 * 
-	 */
-	private DoubleBuffer posx;
-	private DoubleBuffer posy;
-	
-	/**
-	 * 
 	 * @param options
 	 * @param font
 	 * @param width
@@ -89,6 +88,7 @@ public class Hud {
 	 * @throws Exception
 	 */
 	public Hud(ScreenOptions options, Font font, int width, int height) throws Exception {
+		this.hudComponents = new ArrayList<>();
 		this.font = font;
 		this.width = width;
 		this.height = height;
@@ -104,9 +104,6 @@ public class Hud {
 		}
 		
 		this.color = NVGColor.create();
-		
-		posx = MemoryUtil.memAllocDouble(1);
-		posy = MemoryUtil.memAllocDouble(1);
 	}
 	
 	/**
@@ -116,18 +113,10 @@ public class Hud {
 	public void render(Screen screen) {
 		nvgBeginFrame(vg, this.width, this.height, 1);
 		
-		// Upper ribbon
-        nvgBeginPath(vg);
-        nvgRect(vg, 0, this.height - 100, this.width, 50);
-        nvgFillColor(vg, rgba(0x23, 0xa1, 0xf1, 200, color));
-        nvgFill(vg);
-		
-        // Render text
-        nvgFontSize(vg, 40.0f);
-        nvgFontFace(vg, FONT_NAME);
-        nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
-        nvgFillColor(vg, rgba(0xe6, 0xea, 0xed, 255, color));
-        nvgText(vg, this.width - 180, this.height - 95, "Test 1231241");
+		// Render each individual Hud component.
+		for (HudComponent component : this.hudComponents) {
+			component.draw();
+		}
         
 		nvgEndFrame(vg);
 		
@@ -136,27 +125,35 @@ public class Hud {
 	}
 	
 	/**
-	 * TODO: Move to color class.
-	 * @param r
-	 * @param g
-	 * @param b
-	 * @param a
-	 * @param color
-	 * @return
+	 * 
+	 * @param component
 	 */
-	private NVGColor rgba(int r, int g, int b, int a, NVGColor color) {
-		color.r(r / 255.0f);
-		color.g(g / 255.0f);
-		color.b(b / 255.0f);
-		color.a(a / 255.0f);
-
-        return color;
-    }
+	public void addHudComponent(HudComponent component) {
+		if (component instanceof HudTextComponent) {
+			((HudTextComponent) component).setVg(this.vg);
+			((HudTextComponent) component).setColor(this.color);
+			this.hudComponents.add(component);
+		}
+	}
 	
+	/**
+	 * @return the font
+	 */
+	public Font getFont() {
+		return font;
+	}
+
+	/**
+	 * @param font the font to set
+	 */
+	public void setFont(Font font) {
+		this.font = font;
+	}
+
 	/**
 	 * 
 	 */
 	public void delete() {
-		
+		nvgDelete(this.vg);
 	}
 }
